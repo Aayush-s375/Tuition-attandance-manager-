@@ -624,7 +624,11 @@ let googleUser = null;
 function handleGoogleLogin(response) {
 
     googleUser = response.credential;
+  const payload = JSON.parse(
+        atob(response.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+    );
 localStorage.setItem("googleLoggedIn", "true");
+  localStorage.setItem("googleEmail", payload.email);
     document.body.classList.add("googleLoggedIn");
 
     document.getElementById("googleLogin").style.display = "none";
