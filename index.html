@@ -216,21 +216,48 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
 }
 
 .googleLoginBox{
+    width:90%;
+    max-width:380px;
     background:white;
-    padding:30px 25px;
-    border-radius:18px;
-    box-shadow:0 4px 20px rgba(0,0,0,.15);
+    padding:38px 25px;
+    border-radius:24px;
+    box-shadow:0 12px 35px rgba(0,0,0,.15);
     text-align:center;
+    border:1px solid rgba(255,255,255,.8);
+}
+
+.googleLoginBox::before{
+    content:"✓";
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:70px;
+    height:70px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#0d6efd,#6f42c1);
+    color:white;
+    font-size:38px;
+    font-weight:bold;
+    box-shadow:0 8px 20px rgba(13,110,253,.3);
 }
 
 .googleLoginBox h2{
-    margin-bottom:10px;
+    margin:0 0 10px;
+    font-size:27px;
+    font-weight:bold;
 }
 
 .googleLoginBox p{
-    margin-bottom:20px;
-    color:#666;
-    }  
+    margin:0 0 25px;
+    color:#777;
+    font-size:16px;
+}
+
+#googleButton{
+    display:flex;
+    justify-content:center;
+  }
     
 </style>  
 </head>  
