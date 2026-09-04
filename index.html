@@ -1631,6 +1631,82 @@ alert("PIN Changed Successfully");
         alert("Google Drive backup failed.");
     }
   }
+  async function restoreFromGoogleDrive() {
+
+    if (!driveAccessToken) {
+        alert("Google Drive is not connected.");
+        return;
+    }
+
+    try {
+
+        const searchResponse = await fetch(
+            "https://www.googleapis.com/drive/v3/files?q=name%3D%27Tuition_Attendance_Manager_Backup.json%27+and+trashed%3Dfalse&spaces=drive&fields=files(id,name,modifiedTime)",
+            {
+                headers: {
+                    Authorization: "Bearer " + driveAccessToken
+                }
+            }
+        );
+
+        if (!searchResponse.ok) {
+            throw new Error("Could not search Google Drive.");
+        }
+
+        const searchData = await searchResponse.json();
+
+        if (!searchData.files || searchData.files.length === 0) {
+            alert("No Google Drive backup found.");
+            return;
+        }
+
+        const fileId = searchData.files[0].id;
+
+        const fileResponse = await fetch(
+            "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media",
+            {
+                headers: {
+                    Authorization: "Bearer " + driveAccessToken
+                }
+            }
+        );
+
+        if (!fileResponse.ok) {
+            throw new Error("Could not download backup.");
+        }
+
+        const backup = await fileResponse.json();
+
+        if (!backup.students) {
+            alert("Invalid backup file.");
+            return;
+        }
+
+        const confirmRestore = confirm(
+            "Google Drive backup mil gaya.\n\n" +
+            "Kya aap is backup ko restore karna chahte hain?"
+        );
+
+        if (!confirmRestore) return;
+
+        students = backup.students;
+
+        localStorage.setItem(
+            "tuitionData_v2",
+            JSON.stringify(students)
+        );
+
+        alert("Google Drive backup restored successfully.");
+
+        location.reload();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Google Drive restore failed.");
+    }
+  }
 function backupData(){
 
 document.getElementById("menuPopup").style.display="none";
