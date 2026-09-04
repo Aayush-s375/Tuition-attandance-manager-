@@ -613,7 +613,12 @@ Save Fee
 let googleUser = null;
 
 function handleGoogleLogin(response) {
+
     googleUser = response.credential;
+
+    document.body.classList.add("googleLoggedIn");
+
+    document.getElementById("googleLogin").style.display = "none";
 
     alert("Google Login Successful");
 }
