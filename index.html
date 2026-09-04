@@ -540,6 +540,34 @@ Save Fee
 </div>
 
 <script>  
+  const GOOGLE_CLIENT_ID = "858615378828-7b1vhd70qn7h0f8c4l7vdjf4clp1qm4e.apps.googleusercontent.com";
+
+let googleUser = null;
+
+function handleGoogleLogin(response) {
+    googleUser = response.credential;
+
+    alert("Google Login Successful");
+}
+
+function initGoogleLogin() {
+    if (!window.google) return;
+
+    google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleLogin
+    });
+
+    google.accounts.id.renderButton(
+        document.getElementById("googleLogin"),
+        {
+            theme: "outline",
+            size: "large",
+            text: "signin_with",
+            shape: "rectangular"
+        }
+    );
+}
 let students = [];  
 let currentStudent = null;  
 function checkSundayButton(){
