@@ -449,7 +449,15 @@ box-shadow:0 2px 8px rgba(0,0,0,.2);
 min-width:170px;
 z-index:999;
 ">
-
+<div
+onclick="backupToGoogleDrive()"
+style="
+padding:12px;
+cursor:pointer;
+">
+Backup to Google Drive
+</div>
+  
 <div
 onclick="backupData()"
 style="
@@ -675,6 +683,7 @@ function initGoogleLogin() {
     );
 }
   let driveTokenClient = null;
+  let driveAccessToken = null;
 
 function initDriveAuthorization() {
 
@@ -693,7 +702,7 @@ function initDriveAuthorization() {
     }
 
     if (response.access_token) {
-
+driveAccessToken = response.access_token;
         localStorage.setItem("driveAuthorized", "true");
 
         alert("Google Drive Connected Successfully");
@@ -1558,6 +1567,69 @@ alert("PIN Changed Successfully");
     document.getElementById("googleLogin").style.display = "flex";
 
     initGoogleLogin();
+  }
+  async function backupToGoogleDrive() {
+
+    if (!driveAccessToken) {
+        alert("Google Drive is not connected.");
+        return;
+    }
+
+    const backup = {
+        students: students,
+        backupDate: new Date().toISOString()
+    };
+
+    const fileContent = JSON.stringify(backup, null, 2);
+
+    const metadata = {
+        name: "Tuition_Attendance_Manager_Backup.json",
+        mimeType: "application/json"
+    };
+
+    const form = new FormData();
+
+    form.append(
+        "metadata",
+        new Blob(
+            [JSON.stringify(metadata)],
+            { type: "application/json" }
+        )
+    );
+
+    form.append(
+        "file",
+        new Blob(
+            [fileContent],
+            { type: "application/json" }
+        )
+    );
+
+    try {
+
+        const response = await fetch(
+            "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
+            {
+                method: "POST",
+                headers: {
+                    Authorization: "Bearer " + driveAccessToken
+                },
+                body: form
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Drive upload failed");
+        }
+
+        alert("Backup saved to Google Drive successfully.");
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Google Drive backup failed.");
+    }
   }
 function backupData(){
 
