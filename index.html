@@ -570,7 +570,7 @@ document.getElementById(
 function toggleLock(){
 
 let savedPin =
-localStorage.getItem("appPin");
+localStorage.getItem("appPin_v2");
 
 if(savedPin){
 
@@ -886,7 +886,7 @@ function renderReports(){
     </div>`;
   });
 
-  localStorage.setItem("tuitionData", JSON.stringify(students));
+  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
 }
 
 function openFee(index){
@@ -931,7 +931,7 @@ function deleteFeeStatus(){
     return !(parts[0] === selectedYear && parts[1] === selectedMonth);
   });
 
-  localStorage.setItem("tuitionData", JSON.stringify(students));
+  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
   closeFeeStatus();
   renderReports();
 }
@@ -966,7 +966,7 @@ function deleteAttendanceStatus(){
     student.attendance = student.attendance.filter(
       a => a.date !== selectedAttendanceDate
     );
-    localStorage.setItem("tuitionData", JSON.stringify(students));
+    localStorage.setItem("tuitionData_v2", JSON.stringify(students));
   }
 
   closeAttendanceStatus();
@@ -1077,7 +1077,7 @@ function saveStudentDetails(){
   let st = students[selectedStudentDetails];
   st.mobile = document.getElementById("studentMobile").value.trim();
   st.address = document.getElementById("studentAddress").value.trim();
-  localStorage.setItem("tuitionData", JSON.stringify(students));
+  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
   document.getElementById("studentDetailsView").style.display = "block";
   renderStudentDetails();
 }
@@ -1088,7 +1088,7 @@ function toggleStudentActiveFromDetails(){
   let message = action === "deactivate" ? `Mark ${st.name} as Inactive?\n\nThis student will stop appearing in Daily Attendance. Previous attendance and fee data will remain safe.` : `Mark ${st.name} as Active?\n\nThis student will appear again in Daily Attendance.`;
   if(!confirm(message)) return;
   st.active = action === "activate";
-  localStorage.setItem("tuitionData", JSON.stringify(students));
+  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
   updateStudentActiveButton();
   render();
 }
@@ -1225,7 +1225,7 @@ function downloadPDF(index){
 function checkLock(){
 
 let savedPin =
-localStorage.getItem("appPin");
+localStorage.getItem("appPin_v2");
 
 if(savedPin){
 
@@ -1242,7 +1242,7 @@ let pin =
 document.getElementById("unlockPin").value;
 
 let savedPin =
-localStorage.getItem("appPin");
+localStorage.getItem("appPin_v2");
 
 if(pin === savedPin){
 
@@ -1328,7 +1328,7 @@ function changePin(){
 
 document.getElementById("menuPopup").style.display="none";
 
-let savedPin = localStorage.getItem("appPin");
+let savedPin = localStorage.getItem("appPin_v2");
 
 if(!savedPin){
   alert("App Lock is not enabled. Please enable App Lock first.");
@@ -1362,7 +1362,7 @@ if(confirmPin !== newPin){
   return;
 }
 
-localStorage.setItem("appPin", newPin);
+localStorage.setItem("appPin_v2", newPin);
 
 alert("PIN Changed Successfully");
 
@@ -1375,7 +1375,7 @@ let backup = {
 
 students: students,
 
-appPin: localStorage.getItem("appPin")
+appPin: localStorage.getItem("appPin_v2")
 
 };
 
@@ -1468,7 +1468,7 @@ localStorage.removeItem(
 
 render();
 
-if(localStorage.getItem("appPin")){
+if(localStorage.getItem("appPin_v2")){
 
 document.getElementById("lockSwitch").checked=true;
 
@@ -1532,7 +1532,7 @@ document.getElementById("attDate")
 document.getElementById("reportMonth").value =
     String(today.getMonth() + 1).padStart(2, "0");
   let saved =  
-    localStorage.getItem("tuitionData");  
+    localStorage.getItem("tuitionData_v2");  
   if(saved){
 students = JSON.parse(saved);
 students.forEach(s => {
@@ -1542,7 +1542,7 @@ if(typeof s.active === "undefined") s.active = true;
 });
 
 render();
-if(localStorage.getItem("appPin")){
+if(localStorage.getItem("appPin_v2")){
 
 document.getElementById(
 "lockSwitch"
