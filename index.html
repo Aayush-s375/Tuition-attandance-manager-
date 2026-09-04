@@ -644,6 +644,7 @@ localStorage.setItem("googleLoggedIn", "true");
     document.getElementById("googleLogin").style.display = "none";
 
     alert("Google Login Successful");
+  initDriveAuthorization();
 }
 function updateGoogleEmailDisplay() {
 
@@ -672,6 +673,30 @@ function initGoogleLogin() {
             shape: "rectangular"
         }
     );
+}
+  let driveTokenClient = null;
+
+function initDriveAuthorization() {
+
+    if (!window.google) return;
+
+    driveTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: "https://www.googleapis.com/auth/drive.file",
+        callback: function(response) {
+
+            if (response.error) {
+                alert("Google Drive permission was not granted.");
+                return;
+            }
+
+            localStorage.setItem("driveAuthorized", "true");
+
+            alert("Google Drive Connected Successfully");
+        }
+    });
+
+    driveTokenClient.requestAccessToken();
 }
 let students = [];  
 let currentStudent = null;  
