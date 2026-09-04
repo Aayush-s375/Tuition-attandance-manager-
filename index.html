@@ -685,14 +685,23 @@ function initDriveAuthorization() {
         scope: "https://www.googleapis.com/auth/drive.file",
         callback: function(response) {
 
-            if (response.error) {
-                alert("Google Drive permission was not granted.");
-                return;
-            }
+    console.log("Drive OAuth Response:", response);
 
-            localStorage.setItem("driveAuthorized", "true");
+    if (response.error) {
+        alert("Google Drive permission failed: " + response.error);
+        return;
+    }
 
-            alert("Google Drive Connected Successfully");
+    if (response.access_token) {
+
+        localStorage.setItem("driveAuthorized", "true");
+
+        alert("Google Drive Connected Successfully");
+
+    } else {
+
+        alert("Google Drive authorization response received, but no access token was found.");
+    }
         }
     });
 
