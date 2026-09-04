@@ -479,6 +479,15 @@ cursor:pointer;
 Change PIN
 </div>
 
+  <div style="
+padding:12px;
+border-bottom:1px solid #ddd;
+font-size:14px;
+">
+    <b>Google Account</b><br>
+    <span id="googleEmailDisplay" style="color:#666;"></span>
+  </div>
+  
 <div
 onclick="changeGoogleAccount()"
 style="
@@ -629,13 +638,23 @@ function handleGoogleLogin(response) {
     );
 localStorage.setItem("googleLoggedIn", "true");
   localStorage.setItem("googleEmail", payload.email);
+  updateGoogleEmailDisplay();
     document.body.classList.add("googleLoggedIn");
 
     document.getElementById("googleLogin").style.display = "none";
 
     alert("Google Login Successful");
 }
+function updateGoogleEmailDisplay() {
 
+    const email = localStorage.getItem("googleEmail");
+
+    const display = document.getElementById("googleEmailDisplay");
+
+    if (display && email) {
+        display.textContent = email;
+    }
+}
 function initGoogleLogin() {
     if (!window.google) return;
 
