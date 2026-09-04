@@ -479,6 +479,15 @@ cursor:pointer;
 Change PIN
 </div>
 
+<div
+onclick="changeGoogleAccount()"
+style="
+padding:12px;
+cursor:pointer;
+">
+Change Google Account
+</div>
+  
 </div>
 </div>
 </div>
@@ -1471,6 +1480,28 @@ localStorage.setItem("appPin_v2", newPin);
 alert("PIN Changed Successfully");
 
 }
+
+  function changeGoogleAccount(){
+
+    document.getElementById("menuPopup").style.display = "none";
+
+    let confirmChange = confirm(
+        "Change Google Account?\n\n" +
+        "You will be taken to Google Sign in."
+    );
+
+    if(!confirmChange) return;
+
+    localStorage.removeItem("googleLoggedIn");
+
+    googleUser = null;
+
+    document.body.classList.remove("googleLoggedIn");
+
+    document.getElementById("googleLogin").style.display = "flex";
+
+    initGoogleLogin();
+  }
 function backupData(){
 
 document.getElementById("menuPopup").style.display="none";
