@@ -615,7 +615,7 @@ let googleUser = null;
 function handleGoogleLogin(response) {
 
     googleUser = response.credential;
-
+localStorage.setItem("googleLoggedIn", "true");
     document.body.classList.add("googleLoggedIn");
 
     document.getElementById("googleLogin").style.display = "none";
