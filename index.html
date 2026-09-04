@@ -580,7 +580,7 @@ let pin = prompt(
 
 if(pin === savedPin){
 
-localStorage.removeItem("appPin");
+localStorage.removeItem("appPin_v2");
 
 document.getElementById(
 "lockSwitch"
@@ -615,7 +615,7 @@ return;
 }
 
 localStorage.setItem(
-"appPin",
+"appPin_v2",
 pin
 );
 
@@ -1303,7 +1303,7 @@ btn.style.opacity=".5";
 
 function confirmReset(){
 
-localStorage.clear();
+localStorage.removeItem("tuitionData_v2"); localStorage.removeItem("appPin_v2");
 
 location.reload();
 
@@ -1447,21 +1447,21 @@ students.forEach(s => {
 });
 
 localStorage.setItem(
-"tuitionData",
+"tuitionData_v2",
 JSON.stringify(students)
 );
 
 if(backup.appPin){
 
 localStorage.setItem(
-"appPin",
+"appPin_v2",
 backup.appPin
 );
 
 }else{
 
 localStorage.removeItem(
-"appPin"
+"appPin_v2"
 );
 
 }
