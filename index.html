@@ -196,7 +196,41 @@ background:#28a745;
 .switch input:checked + .slider:before{
 transform:translateX(22px);
 }
-  
+
+body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
+    display:none !important;
+}
+
+#googleLogin{
+    position:fixed !important;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    margin:0 !important;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#f3f5f7;
+    z-index:999999;
+}
+
+.googleLoginBox{
+    background:white;
+    padding:30px 25px;
+    border-radius:18px;
+    box-shadow:0 4px 20px rgba(0,0,0,.15);
+    text-align:center;
+}
+
+.googleLoginBox h2{
+    margin-bottom:10px;
+}
+
+.googleLoginBox p{
+    margin-bottom:20px;
+    color:#666;
+    }  
 </style>  
 </head>  
   <body>
