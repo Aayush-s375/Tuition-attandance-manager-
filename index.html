@@ -493,8 +493,8 @@ border-bottom:1px solid #ddd;
 font-size:14px;
 ">
     <b>Google Account</b><br>
-    <span id="googleEmailDisplay" style="color:#666;"></span>
-  </div>
+    <span id="googleEmailDisplay" style="color:#666;"></span><br>
+    <span id="driveSyncStatus" style="color:#666;font-size:13px;">Drive sync: checking…</span><br>  </div>
   
 <div
 onclick="changeGoogleAccount()"
@@ -633,298 +633,545 @@ Save Fee
   </div>
 </div>
 
-<script>  
-  const GOOGLE_CLIENT_ID = "858615378828-7b1vhd70qn7h0f8c4l7vdjf4clp1qm4e.apps.googleusercontent.com";
+<script>
+const GOOGLE_CLIENT_ID = "858615378828-7b1vhd70qn7h0f8c4l7vdjf4clp1qm4e.apps.googleusercontent.com";
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
+const DRIVE_FILE_NAME = "Tuition_Attendance_Manager_Data.json";
+const DATA_KEY_PREFIX = "tuitionData_v2_";
+const PIN_KEY_PREFIX = "appPin_v2_";
+const SYNC_KEY_PREFIX = "tuitionSync_v1_";
 
 let googleUser = null;
+let driveTokenClient = null;
+let driveAccessToken = null;
+let driveAuthPromise = null;
+let syncTimer = null;
+let syncInProgress = false;
+let currentAccountKey = null;
+let currentAccountSub = null;
 
-function handleGoogleLogin(response) {
+let students = [];
+let currentStudent = null;
+let selectedAttendanceStudent = null;
+let selectedAttendanceDate = null;
+let selectedStudentDetails = null;
 
-    googleUser = response.credential;
-  const payload = JSON.parse(
-        atob(response.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
-    );
-localStorage.setItem("googleLoggedIn", "true");
-  localStorage.setItem("googleEmail", payload.email);
-  updateGoogleEmailDisplay();
-    document.body.classList.add("googleLoggedIn");
-
-    document.getElementById("googleLogin").style.display = "none";
-
-    alert("Google Login Successful");
-  initDriveAuthorization();
-}
-function updateGoogleEmailDisplay() {
-
-    const email = localStorage.getItem("googleEmail");
-
-    const display = document.getElementById("googleEmailDisplay");
-
-    if (display && email) {
-        display.textContent = email;
-    }
-}
-function initGoogleLogin() {
-    if (!window.google) return;
-
-    google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleLogin
-    });
-
-    google.accounts.id.renderButton(
-        document.getElementById("googleButton"),
-        {
-            theme: "outline",
-            size: "large",
-            text: "signin_with",
-            shape: "rectangular"
-        }
-    );
-}
-  let driveTokenClient = null;
-  let driveAccessToken = null;
-
-function initDriveAuthorization() {
-
-    if (!window.google) return;
-
-    driveTokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: "https://www.googleapis.com/auth/drive.file",
-        callback: function(response) {
-
-    console.log("Drive OAuth Response:", response);
-
-    if (response.error) {
-        alert("Google Drive permission failed: " + response.error);
-        return;
-    }
-
-    if (response.access_token) {
-driveAccessToken = response.access_token;
-        localStorage.setItem("driveAuthorized", "true");
-
-        alert("Google Drive Connected Successfully");
-
-    } else {
-
-        alert("Google Drive authorization response received, but no access token was found.");
-    }
-        }
-    });
-
-    driveTokenClient.requestAccessToken();
-}
-let students = [];  
-let currentStudent = null;  
-function checkSundayButton(){
-
-let date =
-document.getElementById("attDate").value;
-
-if(!date) return;
-
-let day =
-new Date(date).getDay();
-
-document.getElementById("sundayBtn")
-.style.display =
-(day === 0) ? "block" : "none";
-
-}
-function markAllSunday(){
-
-students.forEach((s,index)=>{
-
-if(s.active === false) return;
-
-document.getElementById(
-"status"+index
-).value = "Sunday";
-
-});
-
-}
-function toggleLock(){
-
-let savedPin =
-localStorage.getItem("appPin_v2");
-
-if(savedPin){
-
-let pin = prompt(
-"Enter PIN to Disable Lock"
-);
-
-if(pin === savedPin){
-
-localStorage.removeItem("appPin_v2");
-
-document.getElementById(
-"lockSwitch"
-).checked = false;
-
-alert("App Lock Disabled");
-
-}else{
-
-alert("Wrong PIN");
-
-document.getElementById("lockSwitch").checked = true;
-
+function accountKeyFromSub(sub) {
+  return encodeURIComponent(String(sub || "unknown"));
 }
 
-}else{
-
-let pin =
-prompt("Create 4 Digit PIN");
-
-if(!pin){
-  document.getElementById("lockSwitch").checked = false;
-  return;
+function getDataKey() {
+  return currentAccountKey ? DATA_KEY_PREFIX + currentAccountKey : "tuitionData_v2";
 }
 
-if(pin.length!=4 || isNaN(pin)){
-
-alert("PIN must be 4 digits");
-document.getElementById("lockSwitch").checked = false;
-return;
-
+function getPinKey() {
+  return currentAccountKey ? PIN_KEY_PREFIX + currentAccountKey : "appPin_v2";
 }
 
-localStorage.setItem(
-"appPin_v2",
-pin
-);
-
-document.getElementById(
-"lockSwitch"
-).checked = true;
-
-alert("App Lock Enabled");
-}
-}
-function addStudent(){  
-  
-let name = prompt("Student Name");  
-  
-if(!name) return;  
-  
-students.push({
-name:name,
-fees: [],
-attendance:[],
-active:true
-});
-  
-render();  
-  
-}  
-  
-function render(){  
-  let attendanceArea = document.getElementById("attendanceArea");  
-  attendanceArea.innerHTML="";  
-
-  students.forEach((s,index)=>{  
-    if(s.active === false) return;
-
-    attendanceArea.innerHTML += `  
-    <div class="student">  
-      <b>${s.name}</b>  
-      <select id="status${index}" onchange="customStatus(${index})">
-        <option>Present</option>  
-        <option>Absent ❌</option>  
-        <option>Leave</option>  
-        <option>Sunday</option>  
-        <option>Sunday Manage ✅</option>  
-        <option>Custom</option>
-      </select>  
-    </div>  
-    `;  
-  });  
-
-  renderReports();  
-}  
-    function customStatus(index){
-
-let select = document.getElementById("status"+index);
-
-if(select.value=="Custom"){
-
-let text = prompt("Enter Extra Holiday");
-
-if(text){
-
-select.dataset.customStatus = text;
-
-}else{
-
-select.value="Present";
-delete select.dataset.customStatus;
-
+function getSyncKey() {
+  return currentAccountKey ? SYNC_KEY_PREFIX + currentAccountKey : "tuitionSync_v1";
 }
 
-}
-
+function getSyncMeta() {
+  try {
+    return JSON.parse(localStorage.getItem(getSyncKey()) || '{"updatedAt":0,"pending":false}');
+  } catch {
+    return {updatedAt:0, pending:false};
   }
-  
-function saveAttendance(){  
-  
-let date =  
-document.getElementById("attDate").value;  
-  
-if(!date){  
-alert("Select Date");  
-return;  
-}  
-  
-students.forEach((s,index)=>{  
-  if(s.active === false) return;
-  
- let select =
-document.getElementById("status"+index);
-
-let status = select.value;
-
-if(status=="Custom"){
-
-let customText = select.dataset.customStatus;
-
-if(customText){
-
-status = "EH|" + customText;
-
-}else{
-
-status = "Custom";
-
 }
 
-} 
-  
-  
-let existing = s.attendance.find(
-  a => a.date === date
-);
+function setSyncMeta(meta) {
+  localStorage.setItem(getSyncKey(), JSON.stringify(meta));
+}
 
-if(existing){
-  existing.status = status;
-}else{
-  s.attendance.push({
-    date: date,
-    status: status
+function setDriveSyncStatus(text, type) {
+  const el = document.getElementById("driveSyncStatus");
+  if (!el) return;
+  el.textContent = text;
+  el.style.color =
+    type === "error" ? "#dc3545" :
+    type === "ok" ? "#198754" :
+    "#666";
+}
+
+function saveLocalData(markPending = true) {
+  localStorage.setItem(getDataKey(), JSON.stringify(students));
+
+  if (markPending && currentAccountKey) {
+    const meta = getSyncMeta();
+    meta.updatedAt = Date.now();
+    meta.pending = true;
+    setSyncMeta(meta);
+    scheduleDriveSync();
+  }
+}
+
+function loadAccountData() {
+  let saved = localStorage.getItem(getDataKey());
+
+  // One-time migration for the old version: attach existing local data
+  // to the Google account that signs in first, instead of exposing it
+  // to every account.
+  if (!saved && currentAccountKey && !localStorage.getItem("tuitionAccountMigration_v1")) {
+    const legacy = localStorage.getItem("tuitionData_v2");
+    if (legacy) {
+      saved = legacy;
+      localStorage.setItem(getDataKey(), legacy);
+      localStorage.setItem("tuitionAccountMigration_v1", "done");
+    }
+  }
+
+  students = [];
+  if (saved) {
+    try {
+      students = JSON.parse(saved);
+    } catch {
+      students = [];
+    }
+  }
+
+  students.forEach(s => {
+    if (!s.fees) s.fees = [];
+    if (!s.attendance) s.attendance = [];
+    if (typeof s.active !== "boolean") s.active = true;
   });
 }
-  
-});  
-  
-renderReports();  
-  
-alert("Attendance Saved");  
-  
-}  
-  
+
+function handleGoogleLogin(response) {
+  try {
+    const payload = JSON.parse(
+      atob(response.credential.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+    );
+
+    if (!payload.sub || !payload.email) throw new Error("Invalid Google identity.");
+
+    googleUser = response.credential;
+    currentAccountSub = payload.sub;
+    currentAccountKey = accountKeyFromSub(payload.sub);
+
+    localStorage.setItem("googleLoggedIn", "true");
+    localStorage.setItem("googleEmail", payload.email);
+    localStorage.setItem("googleSub", payload.sub);
+
+    // Keep the existing app lock, but make it account-specific.
+    const legacyPin = localStorage.getItem("appPin_v2");
+    const accountPinKey = getPinKey();
+    if (!localStorage.getItem(accountPinKey) && legacyPin) {
+      localStorage.setItem(accountPinKey, legacyPin);
+    }
+
+    loadAccountData();
+    updateGoogleEmailDisplay();
+    document.body.classList.add("googleLoggedIn");
+    document.getElementById("googleLogin").style.display = "none";
+    render();
+
+    // Drive permission is requested once, then future syncs are automatic.
+    initDriveAuthorization(true);
+  } catch (error) {
+    console.error("Google login error:", error);
+    alert("Google Login failed. Please try again.");
+  }
+}
+
+function updateGoogleEmailDisplay() {
+  const email = localStorage.getItem("googleEmail");
+  const display = document.getElementById("googleEmailDisplay");
+  if (display && email) display.textContent = email;
+}
+
+function initGoogleLogin() {
+  if (!window.google || !google.accounts || !google.accounts.id) return;
+
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleLogin,
+    auto_select: false
+  });
+
+  const button = document.getElementById("googleButton");
+  if (button) {
+    button.innerHTML = "";
+    google.accounts.id.renderButton(button, {
+      theme: "outline",
+      size: "large",
+      text: "signin_with",
+      shape: "rectangular"
+    });
+  }
+}
+
+function initDriveAuthorization(forceConsent = false) {
+  if (!window.google || !google.accounts || !google.accounts.oauth2 || !currentAccountKey) {
+    return Promise.reject(new Error("Google services are not ready."));
+  }
+
+  if (driveAccessToken) return Promise.resolve(driveAccessToken);
+  if (driveAuthPromise) return driveAuthPromise;
+
+  driveAuthPromise = new Promise((resolve, reject) => {
+    driveTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: response => {
+        driveAuthPromise = null;
+
+        if (response && response.access_token) {
+          driveAccessToken = response.access_token;
+          localStorage.setItem("driveAuthorized", "true");
+          setDriveSyncStatus("Drive sync active", "ok");
+          resolve(driveAccessToken);
+        } else {
+          const err = new Error(response?.error || "Google Drive authorization failed.");
+          setDriveSyncStatus("Drive permission needed", "error");
+          reject(err);
+        }
+      }
+    });
+
+    try {
+      driveTokenClient.requestAccessToken(forceConsent ? {prompt:"consent"} : {prompt:""});
+    } catch (error) {
+      driveAuthPromise = null;
+      reject(error);
+    }
+  });
+
+  return driveAuthPromise;
+}
+
+function getDriveToken(force = false) {
+  if (force) driveAccessToken = null;
+  if (driveAccessToken) return Promise.resolve(driveAccessToken);
+
+  return initDriveAuthorization(false).catch(error => {
+    // If the account has not granted Drive access yet, show Google's
+    // normal consent dialog. This is only needed once per account.
+    return initDriveAuthorization(true);
+  });
+}
+
+async function driveFetch(url, options = {}, retry = true) {
+  const token = await getDriveToken(false);
+  const headers = new Headers(options.headers || {});
+  headers.set("Authorization", "Bearer " + token);
+
+  const response = await fetch(url, {...options, headers});
+
+  if (response.status === 401 && retry) {
+    driveAccessToken = null;
+    const newToken = await getDriveToken(true);
+    headers.set("Authorization", "Bearer " + newToken);
+    return fetch(url, {...options, headers});
+  }
+
+  return response;
+}
+
+async function findDriveDataFile() {
+  const q = encodeURIComponent(
+    `'appDataFolder' in parents and name = '${DRIVE_FILE_NAME}' and trashed = false`
+  );
+
+  const response = await driveFetch(
+    "https://www.googleapis.com/drive/v3/files?q=" + q +
+    "&spaces=appDataFolder&fields=files(id,name,modifiedTime,size)&pageSize=10"
+  );
+
+  if (!response.ok) throw new Error("Could not search Google Drive.");
+  const data = await response.json();
+  return data.files && data.files.length ? data.files[0] : null;
+}
+
+async function readDriveData(fileId) {
+  const response = await driveFetch(
+    "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId) + "?alt=media"
+  );
+  if (!response.ok) throw new Error("Could not download Google Drive data.");
+  return response.json();
+}
+
+async function uploadDriveData(backup, fileId = null) {
+  const fileContent = JSON.stringify(backup);
+
+  if (fileId) {
+    const response = await driveFetch(
+      "https://www.googleapis.com/upload/drive/v3/files/" +
+      encodeURIComponent(fileId) + "?uploadType=media",
+      {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: fileContent
+      }
+    );
+
+    if (!response.ok) throw new Error("Google Drive update failed.");
+    return response.json();
+  }
+
+  const metadata = {
+    name: DRIVE_FILE_NAME,
+    mimeType: "application/json",
+    parents: ["appDataFolder"]
+  };
+
+  const form = new FormData();
+  form.append("metadata", new Blob([JSON.stringify(metadata)], {
+    type: "application/json"
+  }));
+  form.append("file", new Blob([fileContent], {
+    type: "application/json"
+  }));
+
+  const response = await driveFetch(
+    "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,modifiedTime",
+    {method: "POST", body: form}
+  );
+
+  if (!response.ok) throw new Error("Google Drive upload failed.");
+  return response.json();
+}
+
+async function syncWithGoogleDrive() {
+  if (!currentAccountKey || !navigator.onLine || syncInProgress) return;
+
+  syncInProgress = true;
+  setDriveSyncStatus("Syncing…", "working");
+
+  try {
+    await getDriveToken(false);
+
+    const localMeta = getSyncMeta();
+    const localUpdatedAt = Number(localMeta.updatedAt || 0);
+    const driveFile = await findDriveDataFile();
+
+    if (!driveFile) {
+      const backup = {
+        schemaVersion: 1,
+        accountSub: currentAccountSub,
+        email: localStorage.getItem("googleEmail") || "",
+        updatedAt: localUpdatedAt || Date.now(),
+        appPin: localStorage.getItem(getPinKey()) || null,
+        students: students
+      };
+
+      const created = await uploadDriveData(backup);
+      const syncedAt = Number(backup.updatedAt);
+      setSyncMeta({updatedAt: syncedAt, pending: false, driveFileId: created.id});
+      setDriveSyncStatus("Synced with Google Drive", "ok");
+      return;
+    }
+
+    const driveBackup = await readDriveData(driveFile.id);
+    const driveUpdatedAt = Number(driveBackup?.updatedAt || 0);
+
+    // If local changes are newer, upload them. If Drive is newer, download them.
+    if (localUpdatedAt > driveUpdatedAt) {
+      const backup = {
+        schemaVersion: 1,
+        accountSub: currentAccountSub,
+        email: localStorage.getItem("googleEmail") || "",
+        updatedAt: localUpdatedAt,
+        appPin: localStorage.getItem(getPinKey()) || null,
+        students: students
+      };
+
+      await uploadDriveData(backup, driveFile.id);
+      setSyncMeta({updatedAt: localUpdatedAt, pending: false, driveFileId: driveFile.id});
+      setDriveSyncStatus("Synced with Google Drive", "ok");
+    } else if (driveUpdatedAt > localUpdatedAt) {
+      if (Array.isArray(driveBackup.students)) {
+        students = driveBackup.students;
+        students.forEach(s => {
+          if (!s.fees) s.fees = [];
+          if (!s.attendance) s.attendance = [];
+          if (typeof s.active !== "boolean") s.active = true;
+        });
+        localStorage.setItem(getDataKey(), JSON.stringify(students));
+        if (Object.prototype.hasOwnProperty.call(driveBackup, "appPin")) {
+          if (driveBackup.appPin) localStorage.setItem(getPinKey(), driveBackup.appPin);
+          else localStorage.removeItem(getPinKey());
+        }
+        setSyncMeta({updatedAt: driveUpdatedAt, pending: false, driveFileId: driveFile.id});
+        render();
+      }
+      setDriveSyncStatus("Synced with Google Drive", "ok");
+    } else {
+      setSyncMeta({updatedAt: localUpdatedAt, pending: false, driveFileId: driveFile.id});
+      setDriveSyncStatus("Synced with Google Drive", "ok");
+    }
+  } catch (error) {
+    console.error("Drive sync failed:", error);
+    setDriveSyncStatus("Offline / sync pending", "error");
+    // Keep local data and the pending flag. The next online event/retry will sync it.
+    const meta = getSyncMeta();
+    meta.pending = true;
+    setSyncMeta(meta);
+  } finally {
+    syncInProgress = false;
+  }
+}
+
+function scheduleDriveSync() {
+  clearTimeout(syncTimer);
+  if (!currentAccountKey || !navigator.onLine) return;
+
+  syncTimer = setTimeout(() => {
+    syncWithGoogleDrive();
+  }, 700);
+}
+
+function startAutomaticSync() {
+  window.addEventListener("online", () => {
+    setDriveSyncStatus("Internet restored — syncing…", "working");
+    scheduleDriveSync();
+  });
+
+  window.addEventListener("offline", () => {
+    setDriveSyncStatus("Offline — changes saved locally", "error");
+  });
+
+  // Retry periodically only while there are pending changes.
+  setInterval(() => {
+    const meta = getSyncMeta();
+    if (navigator.onLine && meta.pending) scheduleDriveSync();
+  }, 15000);
+}
+
+function checkSundayButton(){
+  const date = document.getElementById("attDate").value;
+  if(!date) return;
+  const day = new Date(date).getDay();
+  document.getElementById("sundayBtn").style.display =
+    (day === 0) ? "block" : "none";
+}
+
+function markAllSunday(){
+  students.forEach((s,index)=>{
+    if(s.active === false) return;
+    const select = document.getElementById("status"+index);
+    if (select) select.value = "Sunday";
+  });
+}
+
+function toggleLock(){
+  const savedPin = localStorage.getItem(getPinKey());
+
+  if(savedPin){
+    const pin = prompt("Enter PIN to Disable Lock");
+    if(pin === savedPin){
+      localStorage.removeItem(getPinKey());
+      document.getElementById("lockSwitch").checked = false;
+      saveLocalData(true);
+      alert("App Lock Disabled");
+    }else{
+      alert("Wrong PIN");
+      document.getElementById("lockSwitch").checked = true;
+    }
+  }else{
+    const pin = prompt("Create 4 Digit PIN");
+    if(!pin){
+      document.getElementById("lockSwitch").checked = false;
+      return;
+    }
+    if(pin.length!=4 || isNaN(pin)){
+      alert("PIN must be 4 digits");
+      document.getElementById("lockSwitch").checked = false;
+      return;
+    }
+    localStorage.setItem(getPinKey(), pin);
+    saveLocalData(true);
+    document.getElementById("lockSwitch").checked = true;
+    alert("App Lock Enabled");
+  }
+}
+
+function addStudent(){
+  const name = prompt("Student Name");
+  if(!name) return;
+  students.push({
+    name:name,
+    fees: [],
+    attendance:[],
+    active:true
+  });
+  saveLocalData(true);
+  render();
+}
+
+function render(){
+  const attendanceArea = document.getElementById("attendanceArea");
+  attendanceArea.innerHTML="";
+
+  students.forEach((s,index)=>{
+    if(s.active === false) return;
+
+    attendanceArea.innerHTML += `
+      <div class="student">
+        <b>${s.name}</b>
+        <select id="status${index}" onchange="customStatus(${index})">
+          <option>Present</option>
+          <option>Absent ❌</option>
+          <option>Leave</option>
+          <option>Sunday</option>
+          <option>Sunday Manage ✅</option>
+          <option>Custom</option>
+        </select>
+      </div>
+    `;
+  });
+
+  renderReports();
+}
+
+function customStatus(index){
+  const select = document.getElementById("status"+index);
+  if(!select) return;
+
+  if(select.value=="Custom"){
+    const text = prompt("Enter Extra Holiday");
+    if(text){
+      select.dataset.customStatus = text;
+    }else{
+      select.value="Present";
+      delete select.dataset.customStatus;
+    }
+  }
+}
+
+function saveAttendance(){
+  const date = document.getElementById("attDate").value;
+  if(!date){
+    alert("Select Date");
+    return;
+  }
+
+  students.forEach((s,index)=>{
+    if(s.active === false) return;
+
+    const select = document.getElementById("status"+index);
+    if(!select) return;
+
+    let status = select.value;
+
+    if(status=="Custom"){
+      const customText = select.dataset.customStatus;
+      status = customText ? "EH|" + customText : "Custom";
+    }
+
+    const existing = s.attendance.find(a => a.date === date);
+    if(existing){
+      existing.status = status;
+    }else{
+      s.attendance.push({date: date, status: status});
+    }
+  });
+
+  saveLocalData(true);
+  renderReports();
+  alert("Attendance Saved");
+}
+
 function populateReportYears(){
   const yearSelect = document.getElementById("reportYear");
   if(!yearSelect) return;
@@ -932,7 +1179,6 @@ function populateReportYears(){
   const currentYear = new Date().getFullYear();
   const oldYear = yearSelect.value;
 
-  // Fixed year range: 2025 to 2035
   yearSelect.innerHTML = "";
   for(let year = 2025; year <= 2035; year++){
     const option = document.createElement("option");
@@ -950,16 +1196,16 @@ function populateReportYears(){
   }
 }
 
-function renderReports(){  
-  let reportArea = document.getElementById("reportArea");  
+function renderReports(){
+  const reportArea = document.getElementById("reportArea");
   reportArea.innerHTML="";
 
   populateReportYears();
 
-  let selectedMonth = document.getElementById("reportMonth").value;
-  let selectedYear = document.getElementById("reportYear").value;
+  const selectedMonth = document.getElementById("reportMonth").value;
+  const selectedYear = document.getElementById("reportYear").value;
 
-  students.forEach((s,index)=>{  
+  students.forEach((s,index)=>{
     if(!s.attendance) s.attendance=[];
     if(!s.fees) s.fees=[];
 
@@ -967,7 +1213,7 @@ function renderReports(){
     let sundayManage = 0, sunday = 0, extraHoliday = 0;
 
     s.attendance.forEach(a=>{
-      let parts = a.date.split("-");
+      const parts = a.date.split("-");
       if(parts[0] === selectedYear && parts[1] === selectedMonth){
         if(a.status=="Present") present++;
         else if(a.status=="Sunday") sunday++;
@@ -986,12 +1232,12 @@ function renderReports(){
     let feeInfo = "";
 
     s.fees.forEach(f=>{
-      let parts = f.date.split("-");
+      const parts = f.date.split("-");
       if(parts[0] === selectedYear && parts[1] === selectedMonth){
         const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        let feeMonth = parseInt(parts[1]);
-        let previousMonthName = monthNames[(feeMonth + 10) % 12];
-        let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        const feeMonth = parseInt(parts[1]);
+        const previousMonthName = monthNames[(feeMonth + 10) % 12];
+        const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
         feeInfo =
         `<span style="color:green;font-weight:bold;">
@@ -1005,13 +1251,13 @@ function renderReports(){
       feeInfo = `<span style="color:#721c24;font-weight:bold;">Fee Status : Pending</span>`;
     }
 
-    let sortedAttendance = [...s.attendance];
+    const sortedAttendance = [...s.attendance];
     sortedAttendance.sort((a,b)=>new Date(a.date)-new Date(b.date));
 
     sortedAttendance.forEach(a=>{
-      let parts = a.date.split("-");
+      const parts = a.date.split("-");
       if(parts[0] === selectedYear && parts[1] === selectedMonth){
-        let day = parts[2];
+        const day = parts[2];
         let color = "#000";
         if(a.status=="Present") color="green";
         else if(a.status=="Absent ❌") color="red";
@@ -1020,10 +1266,11 @@ function renderReports(){
         else if(a.status=="Sunday Manage ✅") color="green";
         else color="#ff8800";
 
-        let displayStatus = a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
+        const displayStatus = a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
+        const safeDate = a.date.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 
         attendanceHtml +=
-        `<p onclick="openAttendanceStatus(${index},'${a.date.replace(/'/g,"\\'")}')" style="
+        `<p onclick="openAttendanceStatus(${index},'${safeDate}')" style="
         width:220px;
         margin:auto;
         text-align:left;
@@ -1064,28 +1311,16 @@ function renderReports(){
       </div>
     </div>`;
   });
-
-  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
 }
 
 function openFee(index){
-
-currentStudent=index;
-
-document.getElementById(
-"feePopup"
-).style.display="flex";
-
+  currentStudent=index;
+  document.getElementById("feePopup").style.display="flex";
 }
 
 function closeFeePopup(){
-
-document.getElementById(
-"feePopup"
-).style.display = "none";
-
+  document.getElementById("feePopup").style.display = "none";
 }
-
 
 function openFeeStatus(index){
   currentStudent = index;
@@ -1099,32 +1334,29 @@ function closeFeeStatus(){
 function deleteFeeStatus(){
   if(!confirm("Are you sure you want to delete this fee status?")) return;
 
-  let selectedMonth = document.getElementById("reportMonth").value;
-  let selectedYear = document.getElementById("reportYear").value;
-  let student = students[currentStudent];
+  const selectedMonth = document.getElementById("reportMonth").value;
+  const selectedYear = document.getElementById("reportYear").value;
+  const student = students[currentStudent];
 
   if(!student || !student.fees) return;
 
   student.fees = student.fees.filter(f=>{
-    let parts = f.date.split("-");
+    const parts = f.date.split("-");
     return !(parts[0] === selectedYear && parts[1] === selectedMonth);
   });
 
-  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
+  saveLocalData(true);
   closeFeeStatus();
   renderReports();
 }
-
-let selectedAttendanceStudent = null;
-let selectedAttendanceDate = null;
 
 function openAttendanceStatus(index,date){
   selectedAttendanceStudent = index;
   selectedAttendanceDate = date;
 
-  let student = students[index];
-  let record = student && (student.attendance || []).find(a=>a.date===date);
-  let statusText = record ? (record.status.startsWith("EH|") ? record.status.split("|")[1] : record.status) : "";
+  const student = students[index];
+  const record = student && (student.attendance || []).find(a=>a.date===date);
+  const statusText = record ? (record.status.startsWith("EH|") ? record.status.split("|")[1] : record.status) : "";
 
   document.getElementById("attendanceStatusText").textContent =
     `${date.split("-")[2]} - ${statusText}`;
@@ -1140,12 +1372,12 @@ function closeAttendanceStatus(){
 function deleteAttendanceStatus(){
   if(!confirm("Are you sure you want to delete this attendance?")) return;
 
-  let student = students[selectedAttendanceStudent];
+  const student = students[selectedAttendanceStudent];
   if(student && student.attendance){
     student.attendance = student.attendance.filter(
       a => a.date !== selectedAttendanceDate
     );
-    localStorage.setItem("tuitionData_v2", JSON.stringify(students));
+    saveLocalData(true);
   }
 
   closeAttendanceStatus();
@@ -1153,61 +1385,38 @@ function deleteAttendanceStatus(){
 }
 
 function saveFee(){
+  const mode = document.getElementById("feeMode").value;
+  const amount = document.getElementById("feeAmount").value;
+  const date = document.getElementById("feeDate").value;
 
- let mode =  
-document.getElementById(  
-"feeMode"  
-).value;  
-  
-let amount =  
-document.getElementById(  
-"feeAmount"  
-).value;  
-  
-let date =  
-document.getElementById(  
-"feeDate"  
-).value;  
-  
-if(!mode || !amount || !date){  
-  
-alert("Fill all details");  
-  
-return;  
-  
-}  
-  
-let existingFee = students[currentStudent].fees.find(
-f => f.date === date
-);
-
-if(existingFee){
-
-existingFee.amount = amount;
-existingFee.mode = mode;
-
-}else{
-
-students[currentStudent].fees.push({
-amount: amount,
-mode: mode,
-date: date
-});
-
+  if(!mode || !amount || !date){
+    alert("Fill all details");
+    return;
   }
-  
-document.getElementById(  
-"feePopup"  
-).style.display="none";  
-  
-renderReports();  
-  
-}  
-  let selectedStudentDetails = null;
+
+  if(!students[currentStudent].fees) students[currentStudent].fees=[];
+
+  const existingFee = students[currentStudent].fees.find(f => f.date === date);
+
+  if(existingFee){
+    existingFee.amount = amount;
+    existingFee.mode = mode;
+  }else{
+    students[currentStudent].fees.push({
+      amount: amount,
+      mode: mode,
+      date: date
+    });
+  }
+
+  document.getElementById("feePopup").style.display="none";
+  saveLocalData(true);
+  renderReports();
+}
 
 function openStudentDetails(index){
   selectedStudentDetails = index;
-  let st = students[index];
+  const st = students[index];
   if(typeof st.mobile === "undefined") st.mobile = "";
   if(typeof st.address === "undefined") st.address = "";
   document.getElementById("studentDetailsName").textContent = st.name;
@@ -1218,18 +1427,19 @@ function openStudentDetails(index){
 }
 
 function updateStudentActiveButton(){
-  let st = students[selectedStudentDetails];
-  let btn = document.getElementById("studentActiveBtn");
+  const st = students[selectedStudentDetails];
+  const btn = document.getElementById("studentActiveBtn");
   btn.textContent = st.active === false ? "Activate" : "Inactive";
   btn.style.background = st.active === false ? "#28a745" : "#6c757d";
 }
 
 function renderStudentDetails(){
-  let st = students[selectedStudentDetails];
-  let hasDetails = !!(st.mobile || st.address);
-  let view = document.getElementById("studentDetailsView");
-  let form = document.getElementById("studentDetailsForm");
-  let editBtn = document.getElementById("studentDetailsEditBtn");
+  const st = students[selectedStudentDetails];
+  const hasDetails = !!(st.mobile || st.address);
+  const view = document.getElementById("studentDetailsView");
+  const form = document.getElementById("studentDetailsForm");
+  const editBtn = document.getElementById("studentDetailsEditBtn");
+
   if(hasDetails){
     view.innerHTML = `<div style="margin-bottom:12px;"><strong>Mobile Number:</strong><br>${st.mobile || "Not added"}</div><div><strong>Address:</strong><br>${st.address || "Not added"}</div>`;
     form.style.display = "none";
@@ -1244,7 +1454,7 @@ function renderStudentDetails(){
 }
 
 function editStudentDetails(){
-  let st = students[selectedStudentDetails];
+  const st = students[selectedStudentDetails];
   document.getElementById("studentMobile").value = st.mobile || "";
   document.getElementById("studentAddress").value = st.address || "";
   document.getElementById("studentDetailsView").style.display = "none";
@@ -1253,21 +1463,25 @@ function editStudentDetails(){
 }
 
 function saveStudentDetails(){
-  let st = students[selectedStudentDetails];
+  const st = students[selectedStudentDetails];
   st.mobile = document.getElementById("studentMobile").value.trim();
   st.address = document.getElementById("studentAddress").value.trim();
-  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
+  saveLocalData(true);
   document.getElementById("studentDetailsView").style.display = "block";
   renderStudentDetails();
 }
 
 function toggleStudentActiveFromDetails(){
-  let st = students[selectedStudentDetails];
-  let action = st.active === false ? "activate" : "deactivate";
-  let message = action === "deactivate" ? `Mark ${st.name} as Inactive?\n\nThis student will stop appearing in Daily Attendance. Previous attendance and fee data will remain safe.` : `Mark ${st.name} as Active?\n\nThis student will appear again in Daily Attendance.`;
+  const st = students[selectedStudentDetails];
+  const action = st.active === false ? "activate" : "deactivate";
+  const message = action === "deactivate"
+    ? `Mark ${st.name} as Inactive?\n\nThis student will stop appearing in Daily Attendance. Previous attendance and fee data will remain safe.`
+    : `Mark ${st.name} as Active?\n\nThis student will appear again in Daily Attendance.`;
+
   if(!confirm(message)) return;
+
   st.active = action === "activate";
-  localStorage.setItem("tuitionData_v2", JSON.stringify(students));
+  saveLocalData(true);
   updateStudentActiveButton();
   render();
 }
@@ -1278,27 +1492,20 @@ function closeStudentDetails(){
 }
 
 function editStudent(index){
-
-let newName = prompt(
-"Edit Student Name",
-students[index].name
-);
-
-if(newName){
-
-students[index].name = newName;
-
-render();
-
+  const newName = prompt("Edit Student Name", students[index].name);
+  if(newName){
+    students[index].name = newName;
+    saveLocalData(true);
+    render();
+  }
 }
 
-}
 function downloadPDF(index){
-  let s = students[index];
-  let selectedMonth = document.getElementById("reportMonth").value;
-  let selectedYear = document.getElementById("reportYear").value;
+  const s = students[index];
+  const selectedMonth = document.getElementById("reportMonth").value;
+  const selectedYear = document.getElementById("reportYear").value;
 
-  let monthNames = [
+  const monthNames = [
     "January","February","March","April","May","June",
     "July","August","September","October","November","December"
   ];
@@ -1312,11 +1519,11 @@ function downloadPDF(index){
   let feeFound = false;
 
   (s.fees || []).forEach(f=>{
-    let parts = f.date.split("-");
+    const parts = f.date.split("-");
     if(parts[0] === selectedYear && parts[1] === selectedMonth){
       feeFound = true;
-      let formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      let previousMonthName = monthNames[(parseInt(selectedMonth)+10)%12];
+      const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      const previousMonthName = monthNames[(parseInt(selectedMonth)+10)%12];
 
       reportHtml += `
       <h3>Fee Details</h3>
@@ -1336,11 +1543,11 @@ function downloadPDF(index){
   let foundAttendance=false;
 
   (s.attendance || []).forEach(a=>{
-    let parts = a.date.split("-");
+    const parts = a.date.split("-");
     if(parts[0] === selectedYear && parts[1] === selectedMonth){
       foundAttendance=true;
-      let day=parts[2];
-      let displayStatus=a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
+      const day=parts[2];
+      const displayStatus=a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
 
       reportHtml += `<p>${day} - ${displayStatus}</p>`;
 
@@ -1368,7 +1575,7 @@ function downloadPDF(index){
 
   if(!foundAttendance) reportHtml += `<p>No attendance found</p>`;
 
-  let reportWindow=window.open("","_blank");
+  const reportWindow=window.open("","_blank");
   reportWindow.document.write(`
   <html><head>
   <title>${s.name}_${monthNames[parseInt(selectedMonth)-1]}_${selectedYear}_Report</title>
@@ -1380,466 +1587,305 @@ function downloadPDF(index){
       </button>
     </div>
     ${reportHtml}
-  
-<div class="card" style="text-align:center;">
-  <div style="font-weight:700;font-size:18px;">Tuition Attendance Manager</div>
-  <div style="margin-top:6px;font-size:13px;color:#666;">Developed by Aayush Kumar</div>
-  <div style="margin-top:10px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;">
-    <a href="whatsapp://send?phone=919279060820"
-       onclick="contactDeveloper(event)"
-       style="text-decoration:none;color:#25D366;font-weight:600;font-size:13px;">
-      📞 Contact Developer
-    </a>
-    <a href="mailto:aayushaniket1722@gmail.com"
-       style="text-decoration:none;color:#0d6efd;font-weight:600;font-size:13px;">
-      ✉️ Email
-    </a>
-  </div>
-</div>
 
-</body></html>`);
+    <div class="card" style="text-align:center;">
+      <div style="font-weight:700;font-size:18px;">Tuition Attendance Manager</div>
+      <div style="margin-top:6px;font-size:13px;color:#666;">Developed by Aayush Kumar</div>
+      <div style="margin-top:10px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap;">
+        <a href="whatsapp://send?phone=919279060820"
+           onclick="contactDeveloper(event)"
+           style="text-decoration:none;color:#25D366;font-weight:600;font-size:13px;">
+          📞 Contact Developer
+        </a>
+        <a href="mailto:aayushaniket1722@gmail.com"
+           style="text-decoration:none;color:#0d6efd;font-weight:600;font-size:13px;">
+          ✉️ Email
+        </a>
+      </div>
+    </div>
+  </body></html>`);
   reportWindow.document.close();
 }
 
 function checkLock(){
-
-let savedPin =
-localStorage.getItem("appPin_v2");
-
-if(savedPin){
-
-document.getElementById("lockScreen")
-.style.display = "flex";
-
-}
-
+  const savedPin = localStorage.getItem(getPinKey());
+  if(savedPin){
+    document.getElementById("lockScreen").style.display = "flex";
+  }
 }
 
 function unlockApp(){
+  const pin = document.getElementById("unlockPin").value;
+  const savedPin = localStorage.getItem(getPinKey());
 
-let pin =
-document.getElementById("unlockPin").value;
-
-let savedPin =
-localStorage.getItem("appPin_v2");
-
-if(pin === savedPin){
-
-document.getElementById("lockScreen")
-.style.display = "none";
-
-document.getElementById("unlockPin").value="";
-
-}else{
-
-alert("Wrong PIN");
-
-document.getElementById("unlockPin").value="";
-
-}
-
+  if(pin === savedPin){
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("unlockPin").value="";
+  }else{
+    alert("Wrong PIN");
+    document.getElementById("unlockPin").value="";
+  }
 }
 
 function forgotPin(){
-
-document.getElementById("resetPopup").style.display="flex";
-
+  document.getElementById("resetPopup").style.display="flex";
 }
 
 function closeResetPopup(){
-
-document.getElementById("resetPopup").style.display="none";
-
-document.getElementById("resetText").value="";
-
-document.getElementById("resetBtn").disabled=true;
-
-document.getElementById("resetBtn").style.opacity=".5";
-
+  document.getElementById("resetPopup").style.display="none";
+  document.getElementById("resetText").value="";
+  document.getElementById("resetBtn").disabled=true;
+  document.getElementById("resetBtn").style.opacity=".5";
 }
 
 function checkResetText(){
+  const text=document.getElementById("resetText").value;
+  const btn=document.getElementById("resetBtn");
 
-let text=document.getElementById("resetText").value;
-
-let btn=document.getElementById("resetBtn");
-
-if(text==="RESET"){
-
-btn.disabled=false;
-
-btn.style.opacity="1";
-
-}else{
-
-btn.disabled=true;
-
-btn.style.opacity=".5";
-
-}
-
+  if(text==="RESET"){
+    btn.disabled=false;
+    btn.style.opacity="1";
+  }else{
+    btn.disabled=true;
+    btn.style.opacity=".5";
+  }
 }
 
 function confirmReset(){
-
-localStorage.removeItem("tuitionData_v2"); localStorage.removeItem("appPin_v2");
-
-location.reload();
-
+  localStorage.removeItem(getDataKey());
+  localStorage.removeItem(getPinKey());
+  localStorage.removeItem(getSyncKey());
+  location.reload();
 }
+
 function toggleMenu(){
-
-let menu=document.getElementById("menuPopup");
-
-if(menu.style.display=="block"){
-
-menu.style.display="none";
-
-}else{
-
-menu.style.display="block";
-
-}
-
+  const menu=document.getElementById("menuPopup");
+  menu.style.display = menu.style.display=="block" ? "none" : "block";
 }
 
 function changePin(){
+  document.getElementById("menuPopup").style.display="none";
 
-document.getElementById("menuPopup").style.display="none";
+  const savedPin = localStorage.getItem(getPinKey());
+  if(!savedPin){
+    alert("App Lock is not enabled. Please enable App Lock first.");
+    return;
+  }
 
-let savedPin = localStorage.getItem("appPin_v2");
+  const oldPin = prompt("Enter Current PIN");
+  if(oldPin === null) return;
 
-if(!savedPin){
-  alert("App Lock is not enabled. Please enable App Lock first.");
-  return;
+  if(oldPin !== savedPin){
+    alert("Wrong Current PIN");
+    return;
+  }
+
+  const newPin = prompt("Create New 4 Digit PIN");
+  if(newPin === null) return;
+
+  if(newPin.length !== 4 || isNaN(newPin)){
+    alert("PIN must be 4 digits");
+    return;
+  }
+
+  const confirmPin = prompt("Re-enter New PIN");
+  if(confirmPin === null) return;
+
+  if(confirmPin !== newPin){
+    alert("New PINs do not match");
+    return;
+  }
+
+  localStorage.setItem(getPinKey(), newPin);
+  saveLocalData(true);
+  alert("PIN Changed Successfully");
 }
 
-let oldPin = prompt("Enter Current PIN");
+function changeGoogleAccount(){
+  document.getElementById("menuPopup").style.display = "none";
 
-if(oldPin === null) return;
+  const confirmChange = confirm(
+    "Change Google Account?\n\n" +
+    "Your current account's data will remain saved separately. " +
+    "You will be taken to Google Sign in."
+  );
 
-if(oldPin !== savedPin){
-  alert("Wrong Current PIN");
-  return;
+  if(!confirmChange) return;
+
+  // Keep the current account's local/Drive data. Only clear the active
+  // login identity so the next account cannot see this account's data.
+  clearTimeout(syncTimer);
+  driveAccessToken = null;
+  driveTokenClient = null;
+  googleUser = null;
+  currentAccountKey = null;
+  currentAccountSub = null;
+
+  localStorage.removeItem("googleLoggedIn");
+  localStorage.removeItem("googleEmail");
+  localStorage.removeItem("googleSub");
+  localStorage.removeItem("driveAuthorized");
+
+  if(window.google?.accounts?.id){
+    google.accounts.id.disableAutoSelect();
+  }
+
+  location.reload();
 }
 
-let newPin = prompt("Create New 4 Digit PIN");
+async function backupToGoogleDrive(){
+  document.getElementById("menuPopup").style.display="none";
 
-if(newPin === null) return;
-
-if(newPin.length !== 4 || isNaN(newPin)){
-  alert("PIN must be 4 digits");
-  return;
+  try {
+    await syncWithGoogleDrive();
+    alert("Google Drive sync completed.");
+  } catch(error) {
+    console.error(error);
+    alert("Google Drive sync failed. Your local data is safe.");
+  }
 }
 
-let confirmPin = prompt("Re-enter New PIN");
+async function restoreFromGoogleDrive(){
+  document.getElementById("menuPopup").style.display="none";
 
-if(confirmPin === null) return;
+  try {
+    await getDriveToken(false);
+    const driveFile = await findDriveDataFile();
 
-if(confirmPin !== newPin){
-  alert("New PINs do not match");
-  return;
-}
+    if(!driveFile){
+      alert("No Google Drive data found for this Google account.");
+      return;
+    }
 
-localStorage.setItem("appPin_v2", newPin);
+    const backup = await readDriveData(driveFile.id);
 
-alert("PIN Changed Successfully");
+    if(!Array.isArray(backup.students)){
+      alert("Invalid Google Drive data.");
+      return;
+    }
 
-}
-
-  function changeGoogleAccount(){
-
-    document.getElementById("menuPopup").style.display = "none";
-
-    let confirmChange = confirm(
-        "Change Google Account?\n\n" +
-        "You will be taken to Google Sign in."
+    const confirmRestore = confirm(
+      "Google Drive data mil gaya.\n\n" +
+      "Kya aap is data ko restore karna chahte hain?\n\n" +
+      "Current local data will be replaced."
     );
 
-    if(!confirmChange) return;
+    if(!confirmRestore) return;
 
-    localStorage.removeItem("googleLoggedIn");
+    students = backup.students;
+    students.forEach(s => {
+      if(!s.fees) s.fees=[];
+      if(!s.attendance) s.attendance=[];
+      if(typeof s.active !== "boolean") s.active=true;
+    });
 
-    googleUser = null;
+    const updatedAt = Number(backup.updatedAt || Date.now());
+    localStorage.setItem(getDataKey(), JSON.stringify(students));
+    if (Object.prototype.hasOwnProperty.call(backup, "appPin")) {
+      if (backup.appPin) localStorage.setItem(getPinKey(), backup.appPin);
+      else localStorage.removeItem(getPinKey());
+    }
+    setSyncMeta({updatedAt: updatedAt, pending:false, driveFileId:driveFile.id});
+    render();
+    document.getElementById("lockSwitch").checked = !!localStorage.getItem(getPinKey());
 
-    document.body.classList.remove("googleLoggedIn");
-
-    document.getElementById("googleLogin").style.display = "flex";
-
-    initGoogleLogin();
+    alert("Google Drive data restored successfully.");
+  } catch(error) {
+    console.error(error);
+    alert("Google Drive restore failed. Your local data is safe.");
   }
-  async function backupToGoogleDrive() {
+}
 
-    if (!driveAccessToken) {
-        alert("Google Drive is not connected.");
-        return;
-    }
-
-    const backup = {
-        students: students,
-        backupDate: new Date().toISOString()
-    };
-
-    const fileContent = JSON.stringify(backup, null, 2);
-
-    const metadata = {
-        name: "Tuition_Attendance_Manager_Backup.json",
-        mimeType: "application/json"
-    };
-
-    const form = new FormData();
-
-    form.append(
-        "metadata",
-        new Blob(
-            [JSON.stringify(metadata)],
-            { type: "application/json" }
-        )
-    );
-
-    form.append(
-        "file",
-        new Blob(
-            [fileContent],
-            { type: "application/json" }
-        )
-    );
-
-    try {
-
-        const response = await fetch(
-            "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",
-            {
-                method: "POST",
-                headers: {
-                    Authorization: "Bearer " + driveAccessToken
-                },
-                body: form
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error("Drive upload failed");
-        }
-
-        alert("Backup saved to Google Drive successfully.");
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Google Drive backup failed.");
-    }
-  }
-  async function restoreFromGoogleDrive() {
-
-    if (!driveAccessToken) {
-        alert("Google Drive is not connected.");
-        return;
-    }
-
-    try {
-
-        const searchResponse = await fetch(
-            "https://www.googleapis.com/drive/v3/files?q=name%3D%27Tuition_Attendance_Manager_Backup.json%27+and+trashed%3Dfalse&spaces=drive&fields=files(id,name,modifiedTime)",
-            {
-                headers: {
-                    Authorization: "Bearer " + driveAccessToken
-                }
-            }
-        );
-
-        if (!searchResponse.ok) {
-            throw new Error("Could not search Google Drive.");
-        }
-
-        const searchData = await searchResponse.json();
-
-        if (!searchData.files || searchData.files.length === 0) {
-            alert("No Google Drive backup found.");
-            return;
-        }
-
-        const fileId = searchData.files[0].id;
-
-        const fileResponse = await fetch(
-            "https://www.googleapis.com/drive/v3/files/" + fileId + "?alt=media",
-            {
-                headers: {
-                    Authorization: "Bearer " + driveAccessToken
-                }
-            }
-        );
-
-        if (!fileResponse.ok) {
-            throw new Error("Could not download backup.");
-        }
-
-        const backup = await fileResponse.json();
-
-        if (!backup.students) {
-            alert("Invalid backup file.");
-            return;
-        }
-
-        const confirmRestore = confirm(
-            "Google Drive backup mil gaya.\n\n" +
-            "Kya aap is backup ko restore karna chahte hain?"
-        );
-
-        if (!confirmRestore) return;
-
-        students = backup.students;
-
-        localStorage.setItem(
-            "tuitionData_v2",
-            JSON.stringify(students)
-        );
-
-        alert("Google Drive backup restored successfully.");
-
-        location.reload();
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert("Google Drive restore failed.");
-    }
-  }
 function backupData(){
+  document.getElementById("menuPopup").style.display="none";
 
-document.getElementById("menuPopup").style.display="none";
+  const backup = {
+    students: students,
+    appPin: localStorage.getItem(getPinKey())
+  };
 
-let backup = {
+  const data = JSON.stringify(backup,null,2);
+  const blob = new Blob([data],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
 
-students: students,
+  const today = new Date();
+  const fileName =
+    "Tuition_Backup_" +
+    today.getFullYear() + "-" +
+    String(today.getMonth()+1).padStart(2,"0") + "-" +
+    String(today.getDate()).padStart(2,"0") +
+    ".json";
 
-appPin: localStorage.getItem("appPin_v2")
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  URL.revokeObjectURL(url);
 
-};
-
-let data = JSON.stringify(backup,null,2);
-
-let blob = new Blob([data],{
-type:"application/json"
-});
-
-let url = URL.createObjectURL(blob);
-
-let a = document.createElement("a");
-
-let today = new Date();
-
-let fileName =
-"Tuition_Backup_" +
-today.getFullYear() + "-" +
-String(today.getMonth()+1).padStart(2,"0") + "-" +
-String(today.getDate()).padStart(2,"0") +
-".json";
-
-a.href = url;
-
-a.download = fileName;
-
-a.click();
-
-URL.revokeObjectURL(url);
-
-alert("Backup Created Successfully");
-
+  alert("Backup Created Successfully");
 }
 
 function restoreData(){
-
-document.getElementById("menuPopup").style.display="none";
-
-document.getElementById("restoreFile").click();
-
+  document.getElementById("menuPopup").style.display="none";
+  document.getElementById("restoreFile").click();
 }
+
 function restoreBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
 
-let file = event.target.files[0];
+  const reader = new FileReader();
 
-if(!file) return;
+  reader.onload = function(e){
+    try{
+      const backup = JSON.parse(e.target.result);
 
-let reader = new FileReader();
+      if(!backup.students){
+        alert("Invalid Backup File");
+        return;
+      }
 
-reader.onload = function(e){
+      students = backup.students;
+      students.forEach(s => {
+        if(!s.fees) s.fees=[];
+        if(!s.attendance) s.attendance=[];
+        if(typeof s.active !== "boolean") s.active=true;
+      });
 
-try{
+      if(backup.appPin){
+        localStorage.setItem(getPinKey(), backup.appPin);
+      }else{
+        localStorage.removeItem(getPinKey());
+      }
 
-let backup = JSON.parse(e.target.result);
+      saveLocalData(true);
+      render();
 
-if(!backup.students){
+      if(localStorage.getItem(getPinKey())){
+        document.getElementById("lockSwitch").checked=true;
+      }else{
+        document.getElementById("lockSwitch").checked=false;
+      }
 
-alert("Invalid Backup File");
+      alert("Backup Restored Successfully");
+    }catch{
+      alert("Invalid Backup File");
+    }
 
-return;
+    document.getElementById("restoreFile").value="";
+  };
 
+  reader.readAsText(file);
 }
 
-students = backup.students;
-students.forEach(s => {
-  if(!s.fees) s.fees=[];
-  if(!s.attendance) s.attendance=[];
-  if(typeof s.active !== "boolean") s.active=true;
-});
-
-localStorage.setItem(
-"tuitionData_v2",
-JSON.stringify(students)
-);
-
-if(backup.appPin){
-
-localStorage.setItem(
-"appPin_v2",
-backup.appPin
-);
-
-}else{
-
-localStorage.removeItem(
-"appPin_v2"
-);
-
+function deleteStudent(index){
+  if(confirm("Delete Student?")){
+    students.splice(index,1);
+    saveLocalData(true);
+    render();
+  }
 }
 
-render();
-
-if(localStorage.getItem("appPin_v2")){
-
-document.getElementById("lockSwitch").checked=true;
-
-}else{
-
-document.getElementById("lockSwitch").checked=false;
-
-}
-
-alert("Backup Restored Successfully");
-
-}catch{
-
-alert("Invalid Backup File");
-
-}
-
-document.getElementById("restoreFile").value="";
-
-};
-
-reader.readAsText(file);
-
-}
-function deleteStudent(index){  
-  if(confirm("Delete Student?")){  
-  students.splice(index,1);  
-  render();   
-}  
-}  
- 
 function contactDeveloper(event){
   event.preventDefault();
 
@@ -1847,65 +1893,69 @@ function contactDeveloper(event){
   const whatsappUrl = "whatsapp://send?phone=91" + phone;
   const callUrl = "tel:" + phone;
 
-  // Try WhatsApp first. If WhatsApp is not installed, fall back to calling.
-  let fallback = setTimeout(function(){
+  const fallback = setTimeout(function(){
     window.location.href = callUrl;
   }, 900);
 
   window.location.href = whatsappUrl;
 
-  // If navigation succeeds, this page normally leaves the app;
-  // the timeout is cleared when the page becomes hidden.
   document.addEventListener("visibilitychange", function(){
     if(document.hidden) clearTimeout(fallback);
   }, {once:true});
 }
 
-</script>    <script>  
-  window.onload = function () {
-updateGoogleEmailDisplay();
-  if (localStorage.getItem("googleLoggedIn") === "true") {
+async function initializeApp(){
+  updateGoogleEmailDisplay();
+
+  const loggedIn = localStorage.getItem("googleLoggedIn") === "true";
+  const savedSub = localStorage.getItem("googleSub");
+
+  if (loggedIn && savedSub) {
+    currentAccountSub = savedSub;
+    currentAccountKey = accountKeyFromSub(savedSub);
 
     document.body.classList.add("googleLoggedIn");
-
     document.getElementById("googleLogin").style.display = "none";
 
+    loadAccountData();
   } else {
-
+    document.body.classList.remove("googleLoggedIn");
+    document.getElementById("googleLogin").style.display = "flex";
     initGoogleLogin();
-
   }
 
-  let today = new Date();
-document.getElementById("attDate").valueAsDate = today;  
-checkSundayButton();
+  const today = new Date();
+  document.getElementById("attDate").valueAsDate = today;
+  checkSundayButton();
 
-document.getElementById("attDate")
-.addEventListener("change", checkSundayButton);
-document.getElementById("reportMonth").value =
+  document.getElementById("attDate").addEventListener("change", checkSundayButton);
+  document.getElementById("reportMonth").value =
     String(today.getMonth() + 1).padStart(2, "0");
-  let saved =  
-    localStorage.getItem("tuitionData_v2");  
-  if(saved){
-students = JSON.parse(saved);
-students.forEach(s => {
-if(!s.fees) s.fees = [];
-if(!s.attendance) s.attendance = [];
-if(typeof s.active === "undefined") s.active = true;
+
+  if (loggedIn && savedSub) {
+    render();
+    checkLock();
+
+    // Re-obtain a short-lived Drive token after every page load.
+    // No manual backup action is required.
+    if (navigator.onLine) {
+      initDriveAuthorization(false)
+        .then(() => syncWithGoogleDrive())
+        .catch(error => {
+          console.warn("Drive authorization pending:", error);
+          setDriveSyncStatus("Drive permission needed", "error");
+        });
+    } else {
+      setDriveSyncStatus("Offline — changes saved locally", "error");
+    }
+  }
+}
+
+window.addEventListener("load", function(){
+  startAutomaticSync();
+  initializeApp();
 });
-
-render();
-if(localStorage.getItem("appPin_v2")){
-
-document.getElementById(
-"lockSwitch"
-).checked = true;
-
-}
-}
-  checkLock();
-};  
-  </script>  
+</script>  
 <input
 type="file"
 id="restoreFile"
