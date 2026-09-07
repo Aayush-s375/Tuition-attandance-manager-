@@ -1829,6 +1829,40 @@ function confirmReset(){
   location.reload();
 }
 
+function closeAllOverlays(){
+  const ids = ["menuPopup","feePopup","feeStatusPopup","attendanceStatusPopup","studentDetailsPopup","resetPopup"];
+  let closed = false;
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el && el.style.display !== "none" && getComputedStyle(el).display !== "none"){
+      el.style.display = "none";
+      closed = true;
+    }
+  });
+  selectedAttendanceStudent = null;
+  selectedAttendanceDate = null;
+  selectedStudentDetails = null;
+  return closed;
+}
+
+function handleOutsideTap(event){
+  const menu = document.getElementById("menuPopup");
+  const menuButton = event.target.closest && event.target.closest('button[onclick="toggleMenu()"]');
+  if(menu && menu.style.display === "block" && !menu.contains(event.target) && !menuButton){
+    menu.style.display = "none";
+  }
+}
+
+document.addEventListener("click", handleOutsideTap);
+
+window.addEventListener("popstate", function(){
+  if(!closeAllOverlays()) history.back();
+});
+
+window.addEventListener("load", function(){
+  history.pushState({appLayer:true}, "", location.href);
+});
+
 function toggleMenu(){
   const menu=document.getElementById("menuPopup");
   menu.style.display = menu.style.display=="block" ? "none" : "block";
