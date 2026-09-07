@@ -298,7 +298,35 @@ box-shadow:0 2px 8px rgba(0,0,0,.2);
 text-align:center;
 ">
 
-<h2 style="margin-bottom:8px;">App Locked</h2>
+<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;">
+<h2 style="margin:0;">App Locked</h2>
+<button
+  type="button"
+  onclick="unlockWithFingerprint(false)"
+  title="Unlock with fingerprint"
+  aria-label="Unlock with fingerprint"
+  style="
+    width:38px;
+    height:38px;
+    padding:7px;
+    border:1px solid #ddd;
+    border-radius:50%;
+    background:#f7f7f7;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  ">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 3a7 7 0 0 0-7 7"/>
+    <path d="M12 6a4 4 0 0 0-4 4c0 3.2-.6 5.9-1.8 8.1"/>
+    <path d="M12 9a1 1 0 0 0-1 1c0 5.2-.9 8.4-2.6 10.2"/>
+    <path d="M15.9 20.2C17.3 17.8 18 14.5 18 10a6 6 0 0 0-12 0"/>
+    <path d="M19 18.5c.7-2.1 1-4.9 1-8.5a8 8 0 0 0-16 0"/>
+    <path d="M14.5 21c1.7-2.8 2.5-6.5 2.5-11a5 5 0 0 0-10 0c0 4.4-.7 7.3-1.8 9.3"/>
+  </svg>
+</button>
+</div>
 
 <p style="margin:0 0 15px;color:#666;font-size:15px;">
 Enter PIN or use fingerprint
