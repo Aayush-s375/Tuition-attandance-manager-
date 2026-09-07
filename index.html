@@ -494,15 +494,6 @@ min-width:170px;
 z-index:999;
 ">
 <div
-onclick="backupToGoogleDrive()"
-style="
-padding:12px;
-cursor:pointer;
-">
-Backup to Google Drive
-</div>
-  
-<div
 onclick="backupData()"
 style="
 padding:12px;
@@ -1829,26 +1820,98 @@ function confirmReset(){
   location.reload();
 }
 
-function closeAllOverlays(){
-  const ids = ["menuPopup","feePopup","feeStatusPopup","attendanceStatusPopup","studentDetailsPopup","resetPopup"];
-  let closed = false;
-  ids.forEach(id=>{
-    const el = document.getElementById(id);
-    if(el && el.style.display !== "none" && getComputedStyle(el).display !== "none"){
-      el.style.display = "none";
-      closed = true;
-    }
-  });
+const appOverlayIds = [
+  "menuPopup",
+  "feePopup",
+  "feeStatusPopup",
+  "attendanceStatusPopup",
+  "studentDetailsPopup",
+  "resetPopup"
+];
+
+let overlayHistoryStack = [];
+let handlingBackOverlayClose = false;
+let overlayObserverReady = false;
+
+function isOverlayVisible(id){
+  const el = document.getElementById(id);
+  return !!(el && getComputedStyle(el).display !== "none");
+}
+
+function hideOverlay(id){
+  const el = document.getElementById(id);
+  if(el) el.style.display = "none";
+}
+
+function clearOverlaySelection(){
   selectedAttendanceStudent = null;
   selectedAttendanceDate = null;
   selectedStudentDetails = null;
-  return closed;
+}
+
+function setupOverlayBackHandling(){
+  const observer = new MutationObserver(function(mutations){
+    mutations.forEach(function(mutation){
+      if(mutation.type !== "attributes" || mutation.attributeName !== "style") return;
+      const id = mutation.target.id;
+      if(!appOverlayIds.includes(id)) return;
+
+      const visible = isOverlayVisible(id);
+      const wasTracked = overlayHistoryStack.includes(id);
+
+      if(visible && !wasTracked){
+        history.pushState({tuitionOverlay:id}, "", location.href);
+        overlayHistoryStack.push(id);
+      }else if(!visible && wasTracked){
+        overlayHistoryStack = overlayHistoryStack.filter(x => x !== id);
+        if(!handlingBackOverlayClose){
+          // The user closed the popup normally. Remove its history layer too,
+          // so the next Back press behaves normally.
+          history.back();
+        }
+      }
+    });
+  });
+
+  appOverlayIds.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) observer.observe(el,{attributes:true,attributeFilter:["style"]});
+  });
+
+  overlayObserverReady = true;
+}
+
+function closeTopOverlayFromBack(){
+  for(let i=overlayHistoryStack.length-1;i>=0;i--){
+    const id=overlayHistoryStack[i];
+    if(isOverlayVisible(id)){
+      overlayHistoryStack.splice(i,1);
+      handlingBackOverlayClose = true;
+      hideOverlay(id);
+      clearOverlaySelection();
+      setTimeout(()=>{ handlingBackOverlayClose=false; },0);
+      return true;
+    }
+    overlayHistoryStack.splice(i,1);
+  }
+
+  // Safety fallback in case an overlay was opened before the observer tracked it.
+  for(let i=appOverlayIds.length-1;i>=0;i--){
+    if(isOverlayVisible(appOverlayIds[i])){
+      handlingBackOverlayClose = true;
+      hideOverlay(appOverlayIds[i]);
+      clearOverlaySelection();
+      setTimeout(()=>{ handlingBackOverlayClose=false; },0);
+      return true;
+    }
+  }
+  return false;
 }
 
 function handleOutsideTap(event){
   const menu = document.getElementById("menuPopup");
   const menuButton = event.target.closest && event.target.closest('button[onclick="toggleMenu()"]');
-  if(menu && menu.style.display === "block" && !menu.contains(event.target) && !menuButton){
+  if(menu && isOverlayVisible("menuPopup") && !menu.contains(event.target) && !menuButton){
     menu.style.display = "none";
   }
 }
@@ -1856,11 +1919,16 @@ function handleOutsideTap(event){
 document.addEventListener("click", handleOutsideTap);
 
 window.addEventListener("popstate", function(){
-  if(!closeAllOverlays()) history.back();
+  if(closeTopOverlayFromBack()) return;
+
+  // No popup is open: let the Back button leave the app/page.
+  history.back();
 });
 
 window.addEventListener("load", function(){
-  history.pushState({appLayer:true}, "", location.href);
+  setupOverlayBackHandling();
+  // One guard entry lets the first Back press be intercepted while the app is open.
+  history.pushState({tuitionAppGuard:true}, "", location.href);
 });
 
 function toggleMenu(){
