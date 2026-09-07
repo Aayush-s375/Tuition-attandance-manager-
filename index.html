@@ -298,7 +298,11 @@ box-shadow:0 2px 8px rgba(0,0,0,.2);
 text-align:center;
 ">
 
-<h2 style="margin-bottom:15px;">App Locked</h2>
+<h2 style="margin-bottom:8px;">App Locked</h2>
+
+<p style="margin:0 0 15px;color:#666;font-size:15px;">
+Enter PIN or use fingerprint
+</p>
 
 <input
 type="password"
@@ -310,14 +314,6 @@ placeholder="Enter PIN">
 class="saveBtn"
 onclick="unlockApp()">
 Unlock with PIN
-</button>
-
-<button
-class="saveBtn"
-style="margin-top:10px;background:#6f42c1;"
-onclick="unlockWithFingerprint()"
-id="fingerprintUnlockBtn">
-🔐 Unlock with Fingerprint
 </button>
 
 <div style="margin-top:15px;">
@@ -1643,13 +1639,23 @@ function downloadPDF(index){
 function checkLock(){
   const savedPin = localStorage.getItem(getPinKey());
   const lockSwitch = document.getElementById("lockSwitch");
+  const lockScreen = document.getElementById("lockScreen");
 
   if(savedPin){
     lockSwitch.checked = true;
-    document.getElementById("lockScreen").style.display = "flex";
+    lockScreen.style.display = "flex";
+
+    // If fingerprint unlock has already been enabled, immediately ask
+    // the phone for biometric verification when the lock screen opens.
+    const credentialId = localStorage.getItem(fingerprintStorageKey());
+    if(credentialId && fingerprintSupported()){
+      setTimeout(() => {
+        unlockWithFingerprint(true);
+      }, 150);
+    }
   }else{
     lockSwitch.checked = false;
-    document.getElementById("lockScreen").style.display = "none";
+    lockScreen.style.display = "none";
   }
 }
 
@@ -1710,23 +1716,15 @@ async function registerFingerprint(){
   }
 }
 
-async function unlockWithFingerprint(){
+async function unlockWithFingerprint(autoStart=false){
   const credentialId=localStorage.getItem(fingerprintStorageKey());
   if(!credentialId){
-    const setup=confirm("Fingerprint is not set up yet. Set it up now?");
-    if(setup){
-      const ok=await registerFingerprint();
-      if(ok){
-        alert("Fingerprint enabled. Tap the fingerprint button again to unlock.");
-      }else{
-        alert("Fingerprint setup was cancelled or is not available. You can use your PIN.");
-      }
-    }
+    // No fingerprint credential exists yet. Keep the PIN screen available.
     return;
   }
 
   if(!fingerprintSupported()){
-    alert("Fingerprint/biometric unlock is not available in this browser. Use your PIN.");
+    if(!autoStart) alert("Fingerprint/biometric unlock is not available in this browser. Use your PIN.");
     return;
   }
 
@@ -1740,12 +1738,14 @@ async function unlockWithFingerprint(){
       }
     });
     if(assertion){
+      document.getElementById("lockSwitch").checked=true;
       document.getElementById("lockScreen").style.display="none";
       document.getElementById("unlockPin").value="";
     }
   }catch(error){
-    console.warn("Fingerprint unlock failed:",error);
-    alert("Fingerprint verification failed or was cancelled. Use your PIN.");
+    // If the user cancels/fingerprint fails, simply leave the PIN screen open.
+    // PIN remains available as the normal fallback.
+    console.warn("Fingerprint unlock failed or cancelled:",error);
   }
 }
 
