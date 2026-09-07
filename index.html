@@ -791,7 +791,7 @@ function initGoogleLogin() {
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: handleGoogleLogin,
-    auto_select: false
+    auto_select: true
   });
 
   const button = document.getElementById("googleButton");
@@ -835,7 +835,14 @@ function initDriveAuthorization(forceConsent = false) {
     });
 
     try {
-      driveTokenClient.requestAccessToken(forceConsent ? {prompt:"consent"} : {prompt:""});
+      // Reuse the Google account already selected for this app.
+      // This prevents the Drive authorization step from asking the user
+      // to choose an email again on every app reopen.
+      const savedEmail = localStorage.getItem("googleEmail");
+      const tokenRequest = forceConsent
+        ? {prompt:"consent", login_hint: savedEmail || undefined}
+        : {prompt:"", login_hint: savedEmail || undefined};
+      driveTokenClient.requestAccessToken(tokenRequest);
     } catch (error) {
       driveAuthPromise = null;
       reject(error);
