@@ -841,7 +841,7 @@ function initDriveAuthorization(forceConsent = false) {
       const savedEmail = localStorage.getItem("googleEmail");
       const tokenRequest = forceConsent
         ? {prompt:"consent", login_hint: savedEmail || undefined}
-        : {prompt:"", login_hint: savedEmail || undefined};
+        : {prompt:"none", login_hint: savedEmail || undefined};
       driveTokenClient.requestAccessToken(tokenRequest);
     } catch (error) {
       driveAuthPromise = null;
@@ -856,11 +856,10 @@ function getDriveToken(force = false) {
   if (force) driveAccessToken = null;
   if (driveAccessToken) return Promise.resolve(driveAccessToken);
 
-  return initDriveAuthorization(false).catch(error => {
-    // If the account has not granted Drive access yet, show Google's
-    // normal consent dialog. This is only needed once per account.
-    return initDriveAuthorization(true);
-  });
+  // On app reopen, request the token silently. Never open Google's
+  // account chooser/consent dialog automatically. The consent dialog
+  // is shown only during the first successful Google login.
+  return initDriveAuthorization(false);
 }
 
 async function driveFetch(url, options = {}, retry = true) {
