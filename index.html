@@ -264,6 +264,71 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
     justify-content:center;
   }
     
+
+/* ===== Modern Dashboard Redesign ===== */
+body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
+.appShell{max-width:720px;margin:0 auto;padding:14px 14px 24px;}
+.appHeader{background:linear-gradient(135deg,#263b8f,#5b4bd8);color:#fff;border-radius:20px;padding:18px 18px 20px;box-shadow:0 8px 24px rgba(39,55,145,.22);position:relative;overflow:visible;}
+.appHeaderTop{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.appTitle{font-size:23px;font-weight:800;line-height:1.1;}
+.appSubtitle{font-size:13px;opacity:.82;margin-top:5px;}
+.headerActions{display:flex;align-items:center;gap:5px;}
+.headerIconBtn{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.headerAdd{font-size:27px;font-weight:400;}
+#menuPopup{right:0!important;top:48px!important;min-width:215px!important;border-radius:14px!important;overflow:hidden;}
+#menuPopup>div{padding:13px 15px!important;}
+.section{display:none;animation:sectionIn .18s ease;}
+.section.active{display:block;}
+@keyframes sectionIn{from{opacity:.6;transform:translateY(4px)}to{opacity:1;transform:none}}
+.dashboardWelcome{padding:22px 3px 13px;}
+.dashboardWelcome h2{font-size:20px;margin:0 0 4px;}
+.dashboardWelcome p{margin:0;color:#6b7280;font-size:14px;}
+.featureGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.featureCard{border:0;border-radius:18px;padding:18px 16px;min-height:128px;text-align:left;color:#fff;box-shadow:0 7px 18px rgba(20,30,60,.12);cursor:pointer;position:relative;overflow:hidden;}
+.featureCard:active{transform:scale(.98);}
+.featureIcon{font-size:30px;margin-bottom:12px;display:block;}
+.featureCard h3{margin:0;font-size:17px;}
+.featureCard p{margin:5px 0 0;font-size:13px;opacity:.88;}
+.cardStudents{background:linear-gradient(135deg,#17a65b,#28c76f)}
+.cardAttendance{background:linear-gradient(135deg,#1769d2,#3c8bea)}
+.cardFees{background:linear-gradient(135deg,#ed9216,#f5b52e)}
+.cardReports{background:linear-gradient(135deg,#7542cf,#9865e8)}
+.quickBox{margin-top:18px;background:#fff;border-radius:18px;padding:15px;box-shadow:0 3px 14px rgba(20,30,60,.07);}
+.quickTitle{font-size:14px;font-weight:800;margin-bottom:11px;}
+.quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.quickBtn{border:1px solid #e7eaf0;background:#f8f9fc;border-radius:12px;padding:12px 10px;font-weight:700;color:#303746;cursor:pointer;}
+.pageHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 2px 13px;}
+.pageHead h2{margin:0;font-size:21px;}
+.pageHead p{margin:4px 0 0;color:#6b7280;font-size:13px;}
+.backHomeBtn{border:0;background:#fff;border-radius:11px;padding:9px 12px;font-weight:700;color:#3947a7;box-shadow:0 2px 8px rgba(0,0,0,.07);}
+.modernPanel{background:#fff;border-radius:18px;padding:15px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin-bottom:13px;}
+.modernStudent{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid #eef0f4;}
+.modernStudent:last-child{border-bottom:0;}
+.avatar{width:43px;height:43px;border-radius:14px;background:#eef2ff;color:#4b4fc4;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex:none;}
+.studentMain{min-width:0;flex:1;}
+.studentMain b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.studentMeta{font-size:12px;color:#7b8190;margin-top:3px;}
+.studentActions{display:flex;gap:5px;}
+.miniBtn{border:0;border-radius:9px;padding:8px 9px;background:#eef2ff;color:#3947a7;font-weight:700;font-size:12px;}
+.miniBtn.red{background:#fff0f0;color:#d33;}
+.emptyState{text-align:center;padding:28px 10px;color:#777;}
+.attendanceDateBox{background:#fff;border-radius:18px;padding:15px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin-bottom:13px;}
+.attendanceDateBox label{display:block;font-size:13px;font-weight:700;color:#606775;margin-bottom:6px;}
+.attendanceDateBox input{margin:0!important;}
+#attendanceArea .student{border:0;border-bottom:1px solid #edf0f4;border-left:0;padding:12px 0;border-radius:0;margin:0;}
+#attendanceArea .student b{display:block;margin-bottom:7px;font-size:15px;}
+#attendanceArea select{margin:0!important;background:#f8f9fc;}
+.saveAttendanceBtn{margin-top:4px!important;}
+#sundayBtn{border-radius:11px!important;}
+#reportArea .student{background:#fff;border:0;border-radius:16px;padding:14px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin:0 0 12px;}
+#reportArea .summary{border-radius:10px;}
+.bottomNav{position:fixed;left:0;right:0;bottom:0;height:66px;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid #e7e9ee;display:flex;justify-content:center;z-index:5000;box-shadow:0 -4px 18px rgba(20,30,60,.08);}
+.bottomNavInner{width:100%;max-width:720px;display:grid;grid-template-columns:repeat(5,1fr);}
+.navItem{border:0;background:none;color:#858b98;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;}
+.navItem span:first-child{font-size:21px;line-height:1;}
+.navItem.active{color:#3947a7;}
+@media(max-width:390px){.featureGrid{gap:9px}.featureCard{padding:15px 13px;min-height:118px}.featureCard h3{font-size:15px}.featureIcon{font-size:27px}.studentActions .miniBtn{padding:7px 6px}.appTitle{font-size:21px}}
+
 </style>  
 </head>  
   <body>
@@ -443,140 +508,113 @@ Reset PIN
 </div>
 
 </div>
-<div class="card header">
+<div class="appShell">
+  <header class="appHeader">
+    <div class="appHeaderTop">
+      <div>
+        <div class="appTitle">Tuition Manager</div>
+        <div class="appSubtitle">Simple • Organized • Made for Teachers</div>
+      </div>
+      <div class="headerActions">
+        <button class="headerIconBtn headerAdd" onclick="addStudent()" title="Add Student">+</button>
+        <label class="switch" style="margin:0;">
+          <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
+          <span class="slider"></span>
+        </label>
+        <div style="position:relative;">
+          <button class="headerIconBtn" onclick="toggleMenu()" title="More">⋮</button>
+          <div id="menuPopup" style="display:none;position:absolute;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:999;">
+            <div onclick="backupData()">Backup Data</div>
+            <div onclick="restoreData()">Restore Data</div>
+            <div onclick="changePin()">Change PIN</div>
+            <div style="border-bottom:1px solid #ddd;font-size:14px;">
+              <b>Google Account</b><br>
+              <span id="googleEmailDisplay" style="color:#666;"></span><br>
+              <span id="driveSyncStatus" style="color:#666;font-size:13px;">Drive sync: checking…</span>
+            </div>
+            <div onclick="changeGoogleAccount()">Change Google Account</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-<h1>Tuition Attendance</h1>
+  <main>
+    <section id="homeSection" class="section active">
+      <div class="dashboardWelcome">
+        <h2>Welcome back 👋</h2>
+        <p>Choose what you want to manage today.</p>
+      </div>
+      <div class="featureGrid">
+        <button class="featureCard cardStudents" onclick="showSection('studentsSection','studentsNav')">
+          <span class="featureIcon">👨‍🎓</span><h3>Students</h3><p id="studentCountText">Manage your students</p>
+        </button>
+        <button class="featureCard cardAttendance" onclick="showSection('attendanceSection','attendanceNav')">
+          <span class="featureIcon">📅</span><h3>Attendance</h3><p>Mark today's attendance</p>
+        </button>
+        <button class="featureCard cardFees" onclick="showSection('feesSection','feesNav')">
+          <span class="featureIcon">₹</span><h3>Fees</h3><p>Record & manage fees</p>
+        </button>
+        <button class="featureCard cardReports" onclick="showSection('reportsSection','reportsNav')">
+          <span class="featureIcon">📊</span><h3>Reports</h3><p>View monthly reports</p>
+        </button>
+      </div>
+      <div class="quickBox">
+        <div class="quickTitle">Quick Actions</div>
+        <div class="quickGrid">
+          <button class="quickBtn" onclick="addStudent()">＋ Add Student</button>
+          <button class="quickBtn" onclick="showSection('attendanceSection','attendanceNav')">✓ Mark Attendance</button>
+        </div>
+      </div>
+    </section>
 
-<div style="
-display:flex;
-align-items:center;
-gap:10px;
-">
+    <section id="studentsSection" class="section">
+      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div class="modernPanel"><button class="saveBtn" onclick="addStudent()">＋ Add New Student</button></div>
+      <div id="studentsArea" class="modernPanel"></div>
+    </section>
 
-<button class="addBtn"
-onclick="addStudent()">
-+
-</button>
+    <section id="attendanceSection" class="section">
+      <div class="pageHead"><div><h2>Daily Attendance</h2><p>Mark attendance for all active students</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div class="attendanceDateBox">
+        <label for="attDate">Attendance Date</label>
+        <input type="date" id="attDate">
+        <button id="sundayBtn" class="saveBtn" style="display:none;background:#6f42c1;margin-bottom:0;" onclick="markAllSunday()">Mark All Sunday</button>
+      </div>
+      <div class="modernPanel"><div id="attendanceArea"></div><button class="saveBtn saveAttendanceBtn" onclick="saveAttendance()">Save Attendance</button></div>
+    </section>
 
-<label class="switch">
-<input
-type="checkbox"
-id="lockSwitch"
-onchange="toggleLock()">
-<span class="slider"></span>
-</label>
-<div style="position:relative;">
+    <section id="feesSection" class="section">
+      <div class="pageHead"><div><h2>Fees</h2><p>Record and manage student payments</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div id="feesArea" class="modernPanel"></div>
+    </section>
 
-<button
-onclick="toggleMenu()"
-style="
-background:none;
-border:none;
-font-size:24px;
-padding:5px 8px;
-cursor:pointer;
-">
-⋮
-</button>
-
-<div
-id="menuPopup"
-style="
-display:none;
-position:absolute;
-right:0;
-top:35px;
-background:white;
-border:1px solid #ddd;
-border-radius:8px;
-box-shadow:0 2px 8px rgba(0,0,0,.2);
-min-width:170px;
-z-index:999;
-">
-<div
-onclick="backupData()"
-style="
-padding:12px;
-cursor:pointer;
-border-bottom:1px solid #eee;
-">
-Backup Data
+    <section id="reportsSection" class="section">
+      <div class="pageHead"><div><h2>Reports</h2><p>Monthly attendance & fee records</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div class="modernPanel" style="padding:12px;">
+        <div style="display:flex;gap:8px;">
+          <select id="reportMonth" style="flex:1;min-width:0;" onchange="renderReports()">
+            <option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option>
+          </select>
+          <select id="reportYear" onchange="renderReports()" style="flex:1;min-width:0;"></select>
+        </div>
+      </div>
+      <div id="reportArea"></div>
+    </section>
+  </main>
 </div>
 
-<div
-onclick="restoreData()"
-style="
-padding:12px;
-cursor:pointer;
-border-bottom:1px solid #eee;
-">
-Restore Data
-</div>
+<nav class="bottomNav">
+  <div class="bottomNavInner">
+    <button id="homeNav" class="navItem active" onclick="showSection('homeSection','homeNav')"><span>⌂</span><span>Home</span></button>
+    <button id="studentsNav" class="navItem" onclick="showSection('studentsSection','studentsNav')"><span>👥</span><span>Students</span></button>
+    <button id="attendanceNav" class="navItem" onclick="showSection('attendanceSection','attendanceNav')"><span>☑</span><span>Attendance</span></button>
+    <button id="feesNav" class="navItem" onclick="showSection('feesSection','feesNav')"><span>₹</span><span>Fees</span></button>
+    <button id="reportsNav" class="navItem" onclick="showSection('reportsSection','reportsNav')"><span>▦</span><span>Reports</span></button>
+  </div>
+</nav>
 
-<div
-onclick="changePin()"
-style="
-padding:12px;
-cursor:pointer;
-">
-Change PIN
-</div>
-
-  <div style="
-padding:12px;
-border-bottom:1px solid #ddd;
-font-size:14px;
-">
-    <b>Google Account</b><br>
-    <span id="googleEmailDisplay" style="color:#666;"></span><br>
-    <span id="driveSyncStatus" style="color:#666;font-size:13px;">Drive sync: checking…</span><br>  </div>
-  
-<div
-onclick="changeGoogleAccount()"
-style="
-padding:12px;
-cursor:pointer;
-">
-Change Google Account
-</div>
-  
-</div>
-</div>
-</div>
-</div>
-
- <div class="card">  
-<h2>Daily Attendance</h2>  <input type="date" id="attDate">  
-<button
-id="sundayBtn"
-class="saveBtn"
-style="display:none;background:#6f42c1;margin-bottom:10px;"
-onclick="markAllSunday()">
-Mark All Sunday
-</button>
-<div id="attendanceArea"></div>  <button class="saveBtn" onclick="saveAttendance()">  
-Save Attendance  
-</button>  
-</div>  <div class="card">  
-<h2>Monthly Report & Fee Tracker</h2>  
-<div style="display:flex;gap:8px;">
-<select id="reportMonth" style="flex:1;min-width:0;" onchange="renderReports()">  
-  <option value="01">January</option>  
-  <option value="02">February</option>  
-  <option value="03">March</option>  
-  <option value="04">April</option>  
-  <option value="05">May</option>  
-  <option value="06">June</option>  
-  <option value="07">July</option>  
-  <option value="08">August</option>  
-  <option value="09">September</option>  
-  <option value="10">October</option>  
-  <option value="11">November</option>  
-  <option value="12">December</option>  
-</select>
-<select id="reportYear" onchange="renderReports()" style="flex:1;min-width:0;"></select>
-</div>
-<div id="reportArea"></div>  </div>   <div class="popup" id="feePopup">  <div class="popupContent">
+<div class="popup" id="feePopup">  <div class="popupContent">
 
 <div style="text-align:right;">
 <button onclick="closeFeePopup()"
@@ -1154,6 +1192,67 @@ function addStudent(){
   render();
 }
 
+function showSection(sectionId, navId){
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  const section=document.getElementById(sectionId);
+  if(section) section.classList.add('active');
+  document.querySelectorAll('.navItem').forEach(el=>el.classList.remove('active'));
+  const nav=document.getElementById(navId);
+  if(nav) nav.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(sectionId==='studentsSection') renderStudentsPage();
+  if(sectionId==='feesSection') renderFeesPage();
+  if(sectionId==='reportsSection') renderReports();
+}
+
+function renderStudentsPage(){
+  const area=document.getElementById('studentsArea');
+  if(!area) return;
+  const active=students.filter(s=>s.active!==false);
+  const inactive=students.filter(s=>s.active===false);
+  let html='';
+  if(!students.length){
+    html='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap Add New Student to get started.</div></div>';
+  }else{
+    const list=[...active,...inactive];
+    list.forEach((s)=>{
+      const index=students.indexOf(s);
+      const initial=(s.name||'?').trim().charAt(0).toUpperCase();
+      html+=`<div class="modernStudent">
+        <div class="avatar">${initial}</div>
+        <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
+        <div class="studentActions">
+          <button class="miniBtn" onclick="openStudentDetails(${index})">View</button>
+          <button class="miniBtn" onclick="editStudent(${index})">Edit</button>
+        </div>
+      </div>`;
+    });
+  }
+  area.innerHTML=html;
+  const count=document.getElementById('studentCountText');
+  if(count) count.textContent=`${active.length} active${students.length!==active.length?' · '+(students.length-active.length)+' inactive':''}`;
+}
+
+function renderFeesPage(){
+  const area=document.getElementById('feesArea');
+  if(!area) return;
+  if(!students.length){
+    area.innerHTML='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">₹</div><b>No students yet</b><div style="margin-top:5px;">Add a student first.</div></div>';
+    return;
+  }
+  let html='';
+  students.forEach((s,index)=>{
+    if(!s.fees) s.fees=[];
+    const last=s.fees.length?s.fees[s.fees.length-1]:null;
+    html+=`<div class="modernStudent">
+      <div class="avatar" style="background:#fff4df;color:#e58b00;">₹</div>
+      <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${last?`Last payment ₹${last.amount} · ${last.date}`:'No payment recorded'}</div></div>
+      <button class="miniBtn" onclick="openFee(${index})">Add Fee</button>
+    </div>`;
+  });
+  area.innerHTML=html;
+}
+
 function render(){
   const attendanceArea = document.getElementById("attendanceArea");
   attendanceArea.innerHTML="";
@@ -1177,6 +1276,8 @@ function render(){
   });
 
   renderReports();
+  renderStudentsPage();
+  renderFeesPage();
 }
 
 function customStatus(index){
