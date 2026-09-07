@@ -309,7 +309,15 @@ placeholder="Enter PIN">
 <button
 class="saveBtn"
 onclick="unlockApp()">
-Unlock
+Unlock with PIN
+</button>
+
+<button
+class="saveBtn"
+style="margin-top:10px;background:#6f42c1;"
+onclick="unlockWithFingerprint()"
+id="fingerprintUnlockBtn">
+🔐 Unlock with Fingerprint
 </button>
 
 <div style="margin-top:15px;">
@@ -1070,6 +1078,11 @@ function toggleLock(){
 
   if(savedPin){
     const pin = prompt("Enter PIN to Disable Lock");
+    if(pin === null){
+      // User pressed Cancel. Keep App Lock enabled without showing an error.
+      document.getElementById("lockSwitch").checked = true;
+      return;
+    }
     if(pin === savedPin){
       localStorage.removeItem(getPinKey());
       document.getElementById("lockSwitch").checked = false;
@@ -1094,6 +1107,15 @@ function toggleLock(){
     saveLocalData(true);
     document.getElementById("lockSwitch").checked = true;
     alert("App Lock Enabled");
+    if(fingerprintSupported() && !localStorage.getItem(fingerprintStorageKey())){
+      setTimeout(async ()=>{
+        const setup=confirm("Would you like to unlock App Lock with your phone's fingerprint too?");
+        if(setup){
+          const ok=await registerFingerprint();
+          if(ok) alert("Fingerprint unlock enabled.");
+        }
+      },100);
+    }
   }
 }
 
@@ -1628,6 +1650,102 @@ function checkLock(){
   }else{
     lockSwitch.checked = false;
     document.getElementById("lockScreen").style.display = "none";
+  }
+}
+
+function base64UrlFromBytes(bytes){
+  let binary="";
+  bytes.forEach(b=>binary+=String.fromCharCode(b));
+  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
+}
+
+function bytesFromBase64Url(str){
+  const base64=str.replace(/-/g,"+").replace(/_/g,"/")+"===".slice((str.length+3)%4);
+  const binary=atob(base64);
+  return Uint8Array.from(binary,c=>c.charCodeAt(0));
+}
+
+function randomBytes(length){
+  const a=new Uint8Array(length);
+  crypto.getRandomValues(a);
+  return a;
+}
+
+function fingerprintStorageKey(){
+  return "appFingerprintCredential_v1_" + (currentAccountKey || "default");
+}
+
+function fingerprintSupported(){
+  return window.isSecureContext && !!window.PublicKeyCredential && !!navigator.credentials;
+}
+
+async function registerFingerprint(){
+  if(!fingerprintSupported()) return false;
+  try{
+    const credential=await navigator.credentials.create({
+      publicKey:{
+        challenge:randomBytes(32),
+        rp:{name:"Tuition Attendance Manager"},
+        user:{
+          id:randomBytes(16),
+          name:(localStorage.getItem("googleEmail") || "tuition-user"),
+          displayName:"Tuition Attendance Manager"
+        },
+        pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+        authenticatorSelection:{
+          authenticatorAttachment:"platform",
+          userVerification:"required",
+          residentKey:"preferred"
+        },
+        timeout:60000,
+        attestation:"none"
+      }
+    });
+    if(!credential) return false;
+    localStorage.setItem(fingerprintStorageKey(),base64UrlFromBytes(new Uint8Array(credential.rawId)));
+    return true;
+  }catch(error){
+    console.warn("Fingerprint setup cancelled/unavailable:",error);
+    return false;
+  }
+}
+
+async function unlockWithFingerprint(){
+  const credentialId=localStorage.getItem(fingerprintStorageKey());
+  if(!credentialId){
+    const setup=confirm("Fingerprint is not set up yet. Set it up now?");
+    if(setup){
+      const ok=await registerFingerprint();
+      if(ok){
+        alert("Fingerprint enabled. Tap the fingerprint button again to unlock.");
+      }else{
+        alert("Fingerprint setup was cancelled or is not available. You can use your PIN.");
+      }
+    }
+    return;
+  }
+
+  if(!fingerprintSupported()){
+    alert("Fingerprint/biometric unlock is not available in this browser. Use your PIN.");
+    return;
+  }
+
+  try{
+    const assertion=await navigator.credentials.get({
+      publicKey:{
+        challenge:randomBytes(32),
+        allowCredentials:[{type:"public-key",id:bytesFromBase64Url(credentialId)}],
+        userVerification:"required",
+        timeout:60000
+      }
+    });
+    if(assertion){
+      document.getElementById("lockScreen").style.display="none";
+      document.getElementById("unlockPin").value="";
+    }
+  }catch(error){
+    console.warn("Fingerprint unlock failed:",error);
+    alert("Fingerprint verification failed or was cancelled. Use your PIN.");
   }
 }
 
