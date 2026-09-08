@@ -266,6 +266,39 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
     
 
 /* ===== Modern Dashboard Redesign ===== */
+/* Menu rows: icon + text, with the entire row clickable */
+.modernMenuPopup{
+  min-width:260px!important;
+  right:0!important;
+  top:48px!important;
+  border-radius:14px!important;
+  overflow:hidden;
+  color:#202638!important;
+}
+.modernMenuPopup .modernMenuItem{
+  min-height:52px;
+  box-sizing:border-box;
+  padding:11px 14px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:12px;
+  border-bottom:1px solid #eee;
+  cursor:pointer!important;
+  color:#202638!important;
+  background:#fff;
+  font-size:15px!important;
+  font-weight:700;
+  text-align:left;
+}
+.modernMenuPopup .modernMenuItem:active{background:#f2f4ff;}
+.modernMenuIcon{width:30px;min-width:30px;text-align:center;font-size:22px;line-height:1;}
+.modernMenuLabel{flex:1;color:#202638!important;display:block!important;}
+.modernMenuPopup .menuLockItem{padding-right:10px!important;}
+.modernMenuPopup .menuLockSwitch{margin:0 0 0 auto!important;flex:0 0 46px;}
+.modernMenuAccount{padding:10px 14px!important;background:#fafbfe;color:#657080;font-size:11px;line-height:1.5;display:flex;flex-direction:column;gap:2px;}
+.modernMenuAccount #googleEmailDisplay{color:#4b5563;font-weight:600;word-break:break-all;}
+.modernMenuAccount #driveSyncStatus{color:#16a36a;font-weight:600;}
+
 body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .appShell{max-width:720px;margin:0 auto;padding:14px 14px 24px;}
 .appHeader{background:linear-gradient(135deg,#263b8f,#5b4bd8);color:#fff;border-radius:20px;padding:18px 18px 20px;box-shadow:0 8px 24px rgba(39,55,145,.22);position:relative;overflow:visible;}
@@ -521,23 +554,35 @@ Reset PIN
         <button class="headerIconBtn headerAdd" onclick="addStudent()" title="Add Student">+</button>
         <div style="position:relative;">
           <button class="headerIconBtn" onclick="toggleMenu()" title="Menu">☰</button>
-          <div id="menuPopup" style="display:none;position:absolute;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:999;">
-            <div class="menuLockRow" onclick="toggleLock()" style="cursor:pointer;">
-              <span>🔒 App Lock</span>
-              <label class="switch menuLockSwitch" style="margin:0;cursor:pointer;" onclick="event.stopPropagation();">
+          <div id="menuPopup" class="modernMenuPopup" style="display:none;position:absolute;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:999;">
+            <div class="modernMenuItem menuLockItem" onclick="toggleLock()">
+              <span class="modernMenuIcon">🔒</span>
+              <span class="modernMenuLabel">App Lock</span>
+              <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
                 <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
                 <span class="slider"></span>
               </label>
             </div>
-            <div onclick="backupData()" style="cursor:pointer;">💾 Backup</div>
-            <div onclick="restoreData()" style="cursor:pointer;">♻️ Restore</div>
-            <div onclick="changePin()" style="cursor:pointer;">🔑 Change PIN</div>
-            <div style="border-bottom:1px solid #ddd;font-size:14px;cursor:default;">
-              <b>Google Account</b><br>
-              <span id="googleEmailDisplay" style="color:#666;"></span><br>
-              <span id="driveSyncStatus" style="color:#666;font-size:13px;">Drive sync: checking…</span>
+            <div class="modernMenuItem" onclick="backupData()">
+              <span class="modernMenuIcon">💾</span>
+              <span class="modernMenuLabel">Backup</span>
             </div>
-            <div onclick="changeGoogleAccount()" style="cursor:pointer;">🔄 Change Account</div>
+            <div class="modernMenuItem" onclick="restoreData()">
+              <span class="modernMenuIcon">♻️</span>
+              <span class="modernMenuLabel">Restore</span>
+            </div>
+            <div class="modernMenuItem" onclick="changePin()">
+              <span class="modernMenuIcon">🔑</span>
+              <span class="modernMenuLabel">Change PIN</span>
+            </div>
+            <div class="modernMenuItem" onclick="changeGoogleAccount()">
+              <span class="modernMenuIcon">🔄</span>
+              <span class="modernMenuLabel">Change Account</span>
+            </div>
+            <div class="modernMenuAccount">
+              <span id="googleEmailDisplay"></span>
+              <span id="driveSyncStatus">Drive sync: checking…</span>
+            </div>
           </div>
         </div>
       </div>
