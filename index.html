@@ -522,22 +522,22 @@ Reset PIN
         <div style="position:relative;">
           <button class="headerIconBtn" onclick="toggleMenu()" title="Menu">☰</button>
           <div id="menuPopup" style="display:none;position:absolute;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:999;">
-            <div class="menuLockRow">
+            <div class="menuLockRow" onclick="toggleLock()" style="cursor:pointer;">
               <span>🔒 App Lock</span>
-              <label class="switch menuLockSwitch" style="margin:0;">
+              <label class="switch menuLockSwitch" style="margin:0;cursor:pointer;" onclick="event.stopPropagation();">
                 <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
                 <span class="slider"></span>
               </label>
             </div>
-            <div onclick="backupData()">💾 Backup Data</div>
-            <div onclick="restoreData()">♻️ Restore Data</div>
-            <div onclick="changePin()">🔑 Change PIN</div>
-            <div style="border-bottom:1px solid #ddd;font-size:14px;">
+            <div onclick="backupData()" style="cursor:pointer;">💾 Backup</div>
+            <div onclick="restoreData()" style="cursor:pointer;">♻️ Restore</div>
+            <div onclick="changePin()" style="cursor:pointer;">🔑 Change PIN</div>
+            <div style="border-bottom:1px solid #ddd;font-size:14px;cursor:default;">
               <b>Google Account</b><br>
               <span id="googleEmailDisplay" style="color:#666;"></span><br>
               <span id="driveSyncStatus" style="color:#666;font-size:13px;">Drive sync: checking…</span>
             </div>
-            <div onclick="changeGoogleAccount()">🔄 Change Google Account</div>
+            <div onclick="changeGoogleAccount()" style="cursor:pointer;">🔄 Change Account</div>
           </div>
         </div>
       </div>
