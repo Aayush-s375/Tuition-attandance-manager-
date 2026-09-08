@@ -267,6 +267,20 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
 
 /* ===== Modern Dashboard Redesign ===== */
 /* Menu rows: icon + text, with the entire row clickable */
+/* Student search */
+.studentSearchPanel{padding:12px!important;}
+.searchWrap{display:flex;align-items:center;gap:9px;border:1px solid #e1e5ee;border-radius:12px;background:#fff;padding:0 12px;min-height:44px;box-sizing:border-box;}
+.searchIcon{font-size:17px;line-height:1;}
+.searchWrap input{border:0;outline:0;background:transparent;width:100%;font-size:15px;color:#202638;padding:10px 0;}
+.searchWrap input::placeholder{color:#9aa3b2;}
+
+/* Developer popup */
+.developerPopupContent{text-align:center;position:relative;padding:25px 20px 22px!important;}
+.developerPopupIcon{font-size:42px;margin:2px 0 8px;}
+.developerPopupContent h3{margin:0 0 7px;font-size:19px;color:#202638;}
+.developerPopupByline{margin:0 0 20px;color:#667085;font-size:14px;}
+.developerEmailBtn{display:block;margin-top:10px;padding:11px 14px;border:1px solid #dfe3eb;border-radius:10px;text-decoration:none;color:#202638;background:#fff;font-weight:700;font-size:14px;}
+
 .modernMenuPopup{
   min-width:260px!important;
   right:0!important;
@@ -575,13 +589,13 @@ Reset PIN
               <span class="modernMenuIcon">🔑</span>
               <span class="modernMenuLabel">Change PIN</span>
             </div>
+            <div class="modernMenuItem" onclick="openDeveloperPopup()">
+              <span class="modernMenuIcon">📞</span>
+              <span class="modernMenuLabel">Contact Developer</span>
+            </div>
             <div class="modernMenuItem" onclick="changeGoogleAccount()">
               <span class="modernMenuIcon">🔄</span>
               <span class="modernMenuLabel">Change Account</span>
-            </div>
-            <div class="modernMenuItem" onclick="contactDeveloper(event)">
-              <span class="modernMenuIcon">📞</span>
-              <span class="modernMenuLabel">Contact Developer</span>
             </div>
             <div class="modernMenuAccount">
               <span id="googleEmailDisplay"></span>
@@ -618,7 +632,12 @@ Reset PIN
 
     <section id="studentsSection" class="section">
       <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
-      <div class="modernPanel"><button class="saveBtn" onclick="addStudent()">＋ Add New Student</button></div>
+      <div class="modernPanel studentSearchPanel">
+        <div class="searchWrap">
+          <span class="searchIcon">🔍</span>
+          <input id="studentSearchInput" type="search" placeholder="Search student..." oninput="renderStudentsPage()" autocomplete="off">
+        </div>
+      </div>
       <div id="studentsArea" class="modernPanel"></div>
     </section>
 
@@ -661,6 +680,17 @@ Reset PIN
     <button id="reportsNav" class="navItem" onclick="showSection('reportsSection','reportsNav')"><span>▦</span><span>Reports</span></button>
   </div>
 </nav>
+
+<div class="popup" id="developerPopup">
+  <div class="popupContent developerPopupContent">
+    <button class="popupClose" onclick="closeDeveloperPopup()">✕</button>
+    <div class="developerPopupIcon">👨‍💻</div>
+    <h3>Tuition Attendance Manager</h3>
+    <p class="developerPopupByline">Developed by <b>Aayush Kumar</b></p>
+    <button class="popupSave" onclick="contactDeveloper(event)">📞 Contact Developer</button>
+    <a class="developerEmailBtn" href="mailto:aayushaniket1722@gmail.com">✉️ Email</a>
+  </div>
+</div>
 
 <div class="popup" id="feePopup">  <div class="popupContent">
 
@@ -1258,15 +1288,19 @@ function renderStudentsPage(){
   if(!area) return;
   const active=students.filter(s=>s.active!==false);
   const inactive=students.filter(s=>s.active===false);
+  const query=(document.getElementById('studentSearchInput')?.value || '').trim().toLowerCase();
+  const allList=[...active,...inactive];
+  const list=query ? allList.filter(s=>(s.name||'').toLowerCase().includes(query)) : allList;
   let html='';
   if(!students.length){
-    html='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap Add New Student to get started.</div></div>';
+    html='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap + at the top to add your first student.</div></div>';
+  }else if(!list.length){
+    html='<div class="emptyState"><div style="font-size:34px;margin-bottom:8px;">🔎</div><b>No student found</b><div style="margin-top:5px;">No student matches “'+escapeHtml(query)+'”.</div></div>';
   }else{
-    const list=[...active,...inactive];
-    list.forEach((s)=>{
+    const listHtml=list.map((s)=>{
       const index=students.indexOf(s);
       const initial=(s.name||'?').trim().charAt(0).toUpperCase();
-      html+=`<div class="modernStudent">
+      return `<div class="modernStudent">
         <div class="avatar">${initial}</div>
         <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
         <div class="studentActions">
@@ -1274,7 +1308,8 @@ function renderStudentsPage(){
           <button class="miniBtn" onclick="editStudent(${index})">Edit</button>
         </div>
       </div>`;
-    });
+    }).join('');
+    html=listHtml;
   }
   area.innerHTML=html;
   const count=document.getElementById('studentCountText');
@@ -1971,6 +2006,7 @@ function confirmReset(){
 
 const appOverlayIds = [
   "menuPopup",
+  "developerPopup",
   "feePopup",
   "feeStatusPopup",
   "attendanceStatusPopup",
@@ -1980,6 +2016,7 @@ const appOverlayIds = [
 
 let overlayHistoryStack = [];
 let handlingBackOverlayClose = false;
+let pendingDeveloperPopup = false;
 let overlayObserverReady = false;
 
 function isOverlayVisible(id){
@@ -2068,6 +2105,12 @@ function handleOutsideTap(event){
 document.addEventListener("click", handleOutsideTap);
 
 window.addEventListener("popstate", function(){
+  if(pendingDeveloperPopup){
+    pendingDeveloperPopup = false;
+    const popup=document.getElementById("developerPopup");
+    if(popup) popup.style.display="flex";
+    return;
+  }
   if(closeTopOverlayFromBack()) return;
 
   // No popup is open: let the Back button leave the app/page.
@@ -2306,6 +2349,24 @@ function deleteStudent(index){
     saveLocalData(true);
     render();
   }
+}
+
+function openDeveloperPopup(){
+  const menu=document.getElementById("menuPopup");
+  if(menu && isOverlayVisible("menuPopup")){
+    pendingDeveloperPopup = true;
+    menu.style.display="none";
+    // The overlay observer removes the menu's history layer; the popstate
+    // handler then opens the developer popup without an extra Back action.
+    return;
+  }
+  const popup=document.getElementById("developerPopup");
+  if(popup) popup.style.display="flex";
+}
+
+function closeDeveloperPopup(){
+  const popup=document.getElementById("developerPopup");
+  if(popup) popup.style.display="none";
 }
 
 function contactDeveloper(event){
