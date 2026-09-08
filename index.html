@@ -277,6 +277,8 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .headerAdd{font-size:27px;font-weight:400;}
 #menuPopup{right:0!important;top:48px!important;min-width:215px!important;border-radius:14px!important;overflow:hidden;}
 #menuPopup>div{padding:13px 15px!important;}
+.menuLockRow{display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;}
+.menuLockSwitch{flex:0 0 46px;}
 .section{display:none;animation:sectionIn .18s ease;}
 .section.active{display:block;}
 @keyframes sectionIn{from{opacity:.6;transform:translateY(4px)}to{opacity:1;transform:none}}
@@ -517,22 +519,25 @@ Reset PIN
       </div>
       <div class="headerActions">
         <button class="headerIconBtn headerAdd" onclick="addStudent()" title="Add Student">+</button>
-        <label class="switch" style="margin:0;">
-          <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
-          <span class="slider"></span>
-        </label>
         <div style="position:relative;">
-          <button class="headerIconBtn" onclick="toggleMenu()" title="More">⋮</button>
+          <button class="headerIconBtn" onclick="toggleMenu()" title="Menu">☰</button>
           <div id="menuPopup" style="display:none;position:absolute;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:999;">
-            <div onclick="backupData()">Backup Data</div>
-            <div onclick="restoreData()">Restore Data</div>
-            <div onclick="changePin()">Change PIN</div>
+            <div class="menuLockRow">
+              <span>🔒 App Lock</span>
+              <label class="switch menuLockSwitch" style="margin:0;">
+                <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div onclick="backupData()">💾 Backup Data</div>
+            <div onclick="restoreData()">♻️ Restore Data</div>
+            <div onclick="changePin()">🔑 Change PIN</div>
             <div style="border-bottom:1px solid #ddd;font-size:14px;">
               <b>Google Account</b><br>
               <span id="googleEmailDisplay" style="color:#666;"></span><br>
               <span id="driveSyncStatus" style="color:#666;font-size:13px;">Drive sync: checking…</span>
             </div>
-            <div onclick="changeGoogleAccount()">Change Google Account</div>
+            <div onclick="changeGoogleAccount()">🔄 Change Google Account</div>
           </div>
         </div>
       </div>
