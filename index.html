@@ -631,7 +631,7 @@ Reset PIN
     </section>
 
     <section id="studentsSection" class="section">
-      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div class="modernPanel studentSearchPanel">
         <div class="searchWrap">
           <span class="searchIcon">🔍</span>
@@ -642,7 +642,7 @@ Reset PIN
     </section>
 
     <section id="attendanceSection" class="section">
-      <div class="pageHead"><div><h2>Daily Attendance</h2><p>Mark attendance for all active students</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div class="pageHead"><div><h2>Daily Attendance</h2><p>Mark attendance for all active students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div class="attendanceDateBox">
         <label for="attDate">Attendance Date</label>
         <input type="date" id="attDate">
@@ -652,12 +652,12 @@ Reset PIN
     </section>
 
     <section id="feesSection" class="section">
-      <div class="pageHead"><div><h2>Fees</h2><p>Record and manage student payments</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div class="pageHead"><div><h2>Fees</h2><p>Record and manage student payments</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div id="feesArea" class="modernPanel"></div>
     </section>
 
     <section id="reportsSection" class="section">
-      <div class="pageHead"><div><h2>Reports</h2><p>Monthly attendance & fee records</p></div><button class="backHomeBtn" onclick="showSection('homeSection','homeNav')">Home</button></div>
+      <div class="pageHead"><div><h2>Reports</h2><p>Monthly attendance & fee records</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div class="modernPanel" style="padding:12px;">
         <div style="display:flex;gap:8px;">
           <select id="reportMonth" style="flex:1;min-width:0;" onchange="renderReports()">
@@ -673,7 +673,7 @@ Reset PIN
 
 <nav class="bottomNav">
   <div class="bottomNavInner">
-    <button id="homeNav" class="navItem active" onclick="showSection('homeSection','homeNav')"><span>⌂</span><span>Home</span></button>
+    <button id="homeNav" class="navItem active" onclick="goHome()"><span>⌂</span><span>Home</span></button>
     <button id="studentsNav" class="navItem" onclick="showSection('studentsSection','studentsNav')"><span>👥</span><span>Students</span></button>
     <button id="attendanceNav" class="navItem" onclick="showSection('attendanceSection','attendanceNav')"><span>☑</span><span>Attendance</span></button>
     <button id="feesNav" class="navItem" onclick="showSection('feesSection','feesNav')"><span>₹</span><span>Fees</span></button>
@@ -1270,17 +1270,55 @@ function addStudent(){
   render();
 }
 
-function showSection(sectionId, navId){
-  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+let currentSectionId = 'homeSection';
+let sectionHistoryStack = [];
+let pendingHomeNavigation = false;
+let handlingSectionPop = false;
+
+function sectionNavId(sectionId){
+  const map={
+    homeSection:'homeNav',
+    studentsSection:'studentsNav',
+    attendanceSection:'attendanceNav',
+    feesSection:'feesNav',
+    reportsSection:'reportsNav'
+  };
+  return map[sectionId] || 'homeNav';
+}
+
+function showSection(sectionId, navId, fromHistory){
   const section=document.getElementById(sectionId);
-  if(section) section.classList.add('active');
+  if(!section) return;
+
+  // A normal tap creates one browser-history step. Android Back can then
+  // return to the previous section instead of immediately leaving the app.
+  if(!fromHistory && !handlingSectionPop && sectionId!==currentSectionId){
+    history.pushState({tuitionSection:sectionId}, '', location.href);
+    sectionHistoryStack.push(sectionId);
+  }
+
+  currentSectionId=sectionId;
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  section.classList.add('active');
   document.querySelectorAll('.navItem').forEach(el=>el.classList.remove('active'));
-  const nav=document.getElementById(navId);
+  const nav=document.getElementById(navId || sectionNavId(sectionId));
   if(nav) nav.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(sectionId==='studentsSection') renderStudentsPage();
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='reportsSection') renderReports();
+}
+
+function goHome(){
+  // Home is the root of the app. If we are several screens deep, jump back
+  // to the guard entry in one operation so Back on Home can behave normally.
+  if(currentSectionId==='homeSection') return;
+  if(sectionHistoryStack.length){
+    pendingHomeNavigation=true;
+    history.go(-sectionHistoryStack.length);
+    return;
+  }
+  showSection('homeSection','homeNav',true);
 }
 
 function renderStudentsPage(){
@@ -2104,7 +2142,7 @@ function handleOutsideTap(event){
 
 document.addEventListener("click", handleOutsideTap);
 
-window.addEventListener("popstate", function(){
+window.addEventListener("popstate", function(event){
   if(pendingDeveloperPopup){
     pendingDeveloperPopup = false;
     const popup=document.getElementById("developerPopup");
@@ -2113,12 +2151,43 @@ window.addEventListener("popstate", function(){
   }
   if(closeTopOverlayFromBack()) return;
 
-  // No popup is open: let the Back button leave the app/page.
-  history.back();
+  // Main app navigation: restore the previous section first.
+  if(pendingHomeNavigation){
+    pendingHomeNavigation=false;
+    sectionHistoryStack=[];
+    handlingSectionPop=true;
+    showSection('homeSection','homeNav',true);
+    handlingSectionPop=false;
+    return;
+  }
+
+  if(event.state && event.state.tuitionSection){
+    // The browser moved to the previous section entry. Remove the current
+    // section from our logical stack and display the section in the state.
+    if(sectionHistoryStack.length) sectionHistoryStack.pop();
+    const target=event.state.tuitionSection;
+    handlingSectionPop=true;
+    showSection(target, sectionNavId(target), true);
+    handlingSectionPop=false;
+    return;
+  }
+
+  // Reached the app's root/guard entry. If we are not on Home yet, the
+  // Back press becomes the step that takes us Home. On Home, do nothing
+  // here so the browser/WebView can handle the next Back normally.
+  if(currentSectionId!=='homeSection'){
+    sectionHistoryStack=[];
+    handlingSectionPop=true;
+    showSection('homeSection','homeNav',true);
+    handlingSectionPop=false;
+  }
+  return;
 });
 
 window.addEventListener("load", function(){
   setupOverlayBackHandling();
+  currentSectionId='homeSection';
+  sectionHistoryStack=[];
   // One guard entry lets the first Back press be intercepted while the app is open.
   history.pushState({tuitionAppGuard:true}, "", location.href);
 });
