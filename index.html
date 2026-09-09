@@ -371,7 +371,10 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .photoViewer img{max-width:92vw;max-height:72vh;object-fit:contain;border-radius:14px;}
 .photoViewerTop{position:absolute;top:18px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;}
 .photoViewerBtn{border:0;border-radius:9px;padding:9px 13px;background:#fff;color:#333;font-weight:700;}
-.photoViewerChange{margin-top:18px;border:0;border-radius:9px;padding:10px 16px;background:#3947a7;color:#fff;font-weight:700;}
+.photoViewerActions{display:flex;gap:10px;margin-top:18px;justify-content:center;flex-wrap:wrap;}
+.photoViewerChange,.photoViewerRemove{border:0;border-radius:9px;padding:10px 16px;color:#fff;font-weight:700;}
+.photoViewerChange{background:#3947a7;}
+.photoViewerRemove{background:#d33;}
 .emptyState{text-align:center;padding:28px 10px;color:#777;}
 .attendanceDateBox{background:#fff;border-radius:18px;padding:15px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin-bottom:13px;}
 .attendanceDateBox label{display:block;font-size:13px;font-weight:700;color:#606775;margin-bottom:6px;}
@@ -1918,6 +1921,20 @@ function changeStudentPhoto(){
   if(input) input.click();
 }
 
+function removeStudentPhoto(){
+  if(selectedPhotoStudent===null) return;
+  const index=selectedPhotoStudent;
+  const st=students[index];
+  if(!st || !st.photo) return;
+
+  if(!confirm("Remove this student's photo?")) return;
+
+  st.photo="";
+  saveLocalData(true);
+  closeStudentPhoto();
+  renderStudentsPage();
+}
+
 function uploadStudentPhoto(event,index){
   const file = event.target.files && event.target.files[0];
   if(!file) return;
@@ -1957,6 +1974,15 @@ function uploadStudentPhoto(event,index){
       students[index].photo = canvas.toDataURL("image/jpeg",0.8);
       saveLocalData(true);
       renderStudentsPage();
+
+      if(selectedPhotoStudent === index){
+        const large=document.getElementById("studentPhotoLarge");
+        const title=document.getElementById("studentPhotoTitle");
+        const viewer=document.getElementById("studentPhotoViewer");
+        if(large) large.src=students[index].photo;
+        if(title) title.textContent=students[index].name || "Student";
+        if(viewer) viewer.style.display="flex";
+      }
     };
     img.onerror = function(){
       alert("Unable to load this image.");
@@ -2070,15 +2096,7 @@ function downloadPDF(index){
         </a>
       </div>
     </div>
-  
-<div id="studentPhotoViewer" class="photoViewer">
-  <div class="photoViewerTop">
-    <button class="photoViewerBtn" onclick="closeStudentPhoto()">← Back</button>
-    <b id="studentPhotoTitle" style="color:white;font-size:17px;"></b>
-  </div>
-  <img id="studentPhotoLarge" src="" alt="Student photo">
-  <button class="photoViewerChange" onclick="changeStudentPhoto()">Change Photo</button>
-</div>
+
 </body></html>`);
   reportWindow.document.close();
 }
@@ -2249,7 +2267,8 @@ const appOverlayIds = [
   "feeStatusPopup",
   "attendanceStatusPopup",
   "studentDetailsPopup",
-  "resetPopup"
+  "resetPopup",
+  "studentPhotoViewer"
 ];
 
 let overlayHistoryStack = [];
@@ -2731,6 +2750,18 @@ id="restoreFile"
 accept=".json"
 style="display:none"
 onchange="restoreBackup(event)">
+<div id="studentPhotoViewer" class="photoViewer">
+  <div class="photoViewerTop">
+    <button class="photoViewerBtn" onclick="closeStudentPhoto()">← Back</button>
+    <b id="studentPhotoTitle" style="color:white;font-size:17px;"></b>
+  </div>
+  <img id="studentPhotoLarge" src="" alt="Student photo">
+  <div class="photoViewerActions">
+    <button class="photoViewerChange" onclick="changeStudentPhoto()">Change Photo</button>
+    <button class="photoViewerRemove" onclick="removeStudentPhoto()">Remove Photo</button>
+  </div>
+</div>
+
   <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
