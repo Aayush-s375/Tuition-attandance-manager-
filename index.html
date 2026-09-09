@@ -305,6 +305,11 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
   text-align:left;
 }
 .modernMenuPopup .modernMenuItem:active{background:#f2f4ff;}
+.modernMenuProfile{min-height:58px;box-sizing:border-box;padding:10px 12px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;background:#fff;}
+.modernMenuProfileName{min-width:0;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:#202638;}
+.modernMenuProfileName #ownerNameDisplay{min-width:0;max-width:185px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ownerEditBtn{width:34px;height:34px;flex:0 0 34px;border:0;border-radius:9px;background:#eef2ff;color:#3947a7;font-size:21px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.ownerEditBtn:active{background:#dde3ff;}
 .modernMenuIcon{width:30px;min-width:30px;text-align:center;font-size:22px;line-height:1;}
 .modernMenuLabel{flex:1;color:#202638!important;display:block!important;}
 .modernMenuPopup .menuLockItem{padding-right:10px!important;}
@@ -569,6 +574,13 @@ Reset PIN
         <div style="position:relative;">
           <button class="headerIconBtn" onclick="toggleMenu()" title="Menu">☰</button>
           <div id="menuPopup" class="modernMenuPopup" style="display:none;position:absolute;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:999;">
+            <div class="modernMenuProfile">
+              <div class="modernMenuProfileName">
+                <span class="modernMenuIcon">👤</span>
+                <span id="ownerNameDisplay">Set Your Name</span>
+              </div>
+              <button class="ownerEditBtn" type="button" onclick="event.stopPropagation(); editOwnerName()" title="Edit Name" aria-label="Edit Name">✎</button>
+            </div>
             <div class="modernMenuItem menuLockItem" onclick="toggleLock()">
               <span class="modernMenuIcon">🔒</span>
               <span class="modernMenuLabel">App Lock</span>
@@ -610,7 +622,7 @@ Reset PIN
   <main>
     <section id="homeSection" class="section active">
       <div class="dashboardWelcome">
-        <h2>Welcome back 👋</h2>
+        <h2>Welcome back, <span id="welcomeName">Welcome</span> 👋</h2>
         <p>Choose what you want to manage today.</p>
       </div>
       <div class="featureGrid">
@@ -791,6 +803,7 @@ const DRIVE_FILE_NAME = "Tuition_Attendance_Manager_Data.json";
 const DATA_KEY_PREFIX = "tuitionData_v2_";
 const PIN_KEY_PREFIX = "appPin_v2_";
 const SYNC_KEY_PREFIX = "tuitionSync_v1_";
+const OWNER_NAME_KEY_PREFIX = "tuitionOwnerName_v1_";
 
 let googleUser = null;
 let driveTokenClient = null;
@@ -821,6 +834,79 @@ function getPinKey() {
 
 function getSyncKey() {
   return currentAccountKey ? SYNC_KEY_PREFIX + currentAccountKey : "tuitionSync_v1";
+}
+
+function getOwnerNameKey() {
+  return currentAccountKey ? OWNER_NAME_KEY_PREFIX + currentAccountKey : "tuitionOwnerName_v1";
+}
+
+function getOwnerName() {
+  return (localStorage.getItem(getOwnerNameKey()) || "").trim();
+}
+
+function setOwnerName(name) {
+  const cleanName = String(name || "").trim().replace(/\s+/g, " ");
+  if (!cleanName) return false;
+  localStorage.setItem(getOwnerNameKey(), cleanName);
+  updateOwnerNameDisplay();
+
+  if (currentAccountKey) {
+    const meta = getSyncMeta();
+    meta.updatedAt = Date.now();
+    meta.pending = true;
+    setSyncMeta(meta);
+    scheduleDriveSync();
+  }
+
+  return true;
+}
+
+function updateOwnerNameDisplay() {
+  const name = getOwnerName();
+  const nameDisplay = document.getElementById("ownerNameDisplay");
+  const welcomeName = document.getElementById("welcomeName");
+
+  if (nameDisplay) nameDisplay.textContent = name || "Set Your Name";
+  if (welcomeName) welcomeName.textContent = name || "Welcome";
+}
+
+function editOwnerName() {
+  const currentName = getOwnerName();
+  const newName = prompt("Enter your name", currentName || "");
+  if (newName === null) return;
+
+  const cleanName = newName.trim().replace(/\s+/g, " ");
+  if (!cleanName) {
+    alert("Name cannot be empty");
+    return;
+  }
+
+  setOwnerName(cleanName);
+}
+
+function ensureOwnerName(defaultName = "") {
+  const existingName = getOwnerName();
+  if (existingName) {
+    updateOwnerNameDisplay();
+    return;
+  }
+
+  const suggestedName = String(defaultName || "").trim();
+  const enteredName = prompt(
+    "Enter your name",
+    suggestedName
+  );
+
+  if (enteredName !== null) {
+    const cleanName = enteredName.trim().replace(/\s+/g, " ");
+    if (cleanName) localStorage.setItem(getOwnerNameKey(), cleanName);
+  }
+
+  updateOwnerNameDisplay();
+}
+
+function getDriveBackupOwnerName() {
+  return getOwnerName();
 }
 
 function getSyncMeta() {
@@ -900,6 +986,10 @@ function handleGoogleLogin(response) {
     currentAccountSub = payload.sub;
     currentAccountKey = accountKeyFromSub(payload.sub);
 
+    if (!getOwnerName() && payload.name) {
+      localStorage.setItem(getOwnerNameKey(), String(payload.name).trim());
+    }
+
     localStorage.setItem("googleLoggedIn", "true");
     localStorage.setItem("googleEmail", payload.email);
     localStorage.setItem("googleSub", payload.sub);
@@ -913,6 +1003,7 @@ function handleGoogleLogin(response) {
 
     loadAccountData();
     updateGoogleEmailDisplay();
+    updateOwnerNameDisplay();
     document.body.classList.add("googleLoggedIn");
     document.getElementById("googleLogin").style.display = "none";
     render();
@@ -1108,6 +1199,7 @@ async function syncWithGoogleDrive() {
         accountSub: currentAccountSub,
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt || Date.now(),
+        ownerName: getDriveBackupOwnerName(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students
       };
@@ -1129,6 +1221,7 @@ async function syncWithGoogleDrive() {
         accountSub: currentAccountSub,
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt,
+        ownerName: getDriveBackupOwnerName(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students
       };
@@ -1145,6 +1238,9 @@ async function syncWithGoogleDrive() {
           if (typeof s.active !== "boolean") s.active = true;
         });
         localStorage.setItem(getDataKey(), JSON.stringify(students));
+        if (Object.prototype.hasOwnProperty.call(driveBackup, "ownerName") && String(driveBackup.ownerName || "").trim()) {
+          localStorage.setItem(getOwnerNameKey(), String(driveBackup.ownerName).trim());
+        }
         if (Object.prototype.hasOwnProperty.call(driveBackup, "appPin")) {
           if (driveBackup.appPin) localStorage.setItem(getPinKey(), driveBackup.appPin);
           else localStorage.removeItem(getPinKey());
@@ -2039,6 +2135,7 @@ function confirmReset(){
   localStorage.removeItem(getDataKey());
   localStorage.removeItem(getPinKey());
   localStorage.removeItem(getSyncKey());
+  localStorage.removeItem(getOwnerNameKey());
   location.reload();
 }
 
@@ -2315,11 +2412,15 @@ async function restoreFromGoogleDrive(){
 
     const updatedAt = Number(backup.updatedAt || Date.now());
     localStorage.setItem(getDataKey(), JSON.stringify(students));
+    if (Object.prototype.hasOwnProperty.call(backup, "ownerName") && String(backup.ownerName || "").trim()) {
+      localStorage.setItem(getOwnerNameKey(), String(backup.ownerName).trim());
+    }
     if (Object.prototype.hasOwnProperty.call(backup, "appPin")) {
       if (backup.appPin) localStorage.setItem(getPinKey(), backup.appPin);
       else localStorage.removeItem(getPinKey());
     }
     setSyncMeta({updatedAt: updatedAt, pending:false, driveFileId:driveFile.id});
+    updateOwnerNameDisplay();
     render();
     document.getElementById("lockSwitch").checked = !!localStorage.getItem(getPinKey());
 
@@ -2335,6 +2436,7 @@ function backupData(){
 
   const backup = {
     students: students,
+    ownerName: getOwnerName(),
     appPin: localStorage.getItem(getPinKey())
   };
 
@@ -2386,12 +2488,16 @@ function restoreBackup(event){
         if(typeof s.active !== "boolean") s.active=true;
       });
 
+      if(backup.ownerName && String(backup.ownerName).trim()){
+        localStorage.setItem(getOwnerNameKey(), String(backup.ownerName).trim());
+      }
       if(backup.appPin){
         localStorage.setItem(getPinKey(), backup.appPin);
       }else{
         localStorage.removeItem(getPinKey());
       }
 
+      updateOwnerNameDisplay();
       saveLocalData(true);
       render();
 
@@ -2470,6 +2576,7 @@ async function initializeApp(){
     document.getElementById("googleLogin").style.display = "none";
 
     loadAccountData();
+    updateOwnerNameDisplay();
   } else {
     document.body.classList.remove("googleLoggedIn");
     document.getElementById("googleLogin").style.display = "flex";
@@ -2485,6 +2592,13 @@ async function initializeApp(){
     String(today.getMonth() + 1).padStart(2, "0");
 
   if (loggedIn && savedSub) {
+    if (!getOwnerName()) {
+      const email = localStorage.getItem("googleEmail") || "";
+      const suggestedName = email ? email.split("@")[0].replace(/[._-]+/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "";
+      ensureOwnerName(suggestedName);
+    } else {
+      updateOwnerNameDisplay();
+    }
     render();
     checkLock();
 
