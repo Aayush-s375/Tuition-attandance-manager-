@@ -383,6 +383,8 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .modeBtn{border:0;background:transparent;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:800;color:#687080;cursor:pointer;transition:.18s;}
 .modeBtn.active{background:#fff;color:#4b55c8;box-shadow:0 2px 8px rgba(0,0,0,.10);}
 .coachingHint{font-size:12px;color:#687080;margin:0 0 12px;text-align:center;}
+#coachingHomeSection{padding-bottom:20px;}
+#coachingFeesSection .emptyState{padding:40px 15px;}
 
 @media(max-width:390px){.featureGrid{gap:9px}.featureCard{padding:15px 13px;min-height:118px}.featureCard h3{font-size:15px}.featureIcon{font-size:27px}.studentActions .miniBtn{padding:7px 6px}.appTitle{font-size:21px}}
 
@@ -626,43 +628,62 @@ Reset PIN
         <p>Choose what you want to manage today.</p>
       </div>
       <div class="featureGrid">
-        <button class="featureCard cardStudents" onclick="showSection('studentsSection','studentsNav')">
+        <button class="featureCard cardStudents" onclick="openStudentsMode()">
           <span class="featureIcon">👨‍🎓</span><h3>Students</h3><p id="studentCountText">Manage your students</p>
         </button>
-        <button class="featureCard cardAttendance" onclick="showSection('attendanceSection','attendanceNav')">
+        <button class="featureCard cardAttendance" onclick="openAttendanceMode()">
           <span class="featureIcon">📅</span><h3>Attendance</h3><p>Mark today's attendance</p>
         </button>
-        <button class="featureCard cardFees" onclick="showSection('feesSection','feesNav')">
+        <button class="featureCard cardFees" onclick="openFeesMode()">
           <span class="featureIcon">₹</span><h3>Fees</h3><p>Record & manage fees</p>
         </button>
-        <button class="featureCard cardReports" onclick="showSection('reportsSection','reportsNav')">
+        <button class="featureCard cardReports" onclick="openReportsMode()">
           <span class="featureIcon">📊</span><h3>Reports</h3><p>View monthly reports</p>
         </button>
       </div>
-      <div id="coachingHomePanel" class="modernPanel" style="display:none;margin-top:16px;">
-        <h3 style="margin:0 0 6px;">🏫 Coaching Mode</h3>
-        <p class="coachingHint">Register-style attendance for your coaching batch.</p>
-        <button class="saveBtn" style="width:100%;margin-bottom:8px;" onclick="openCoachingAttendance()">📋 Take Attendance</button>
-        <button class="saveBtn" style="width:100%;background:#4b5563;" onclick="openCoachingReport()">📊 Attendance Register</button>
+    </section>
+
+    <section id="coachingHomeSection" class="section">
+      <div class="dashboardWelcome">
+        <h2>Welcome back 👋</h2>
+        <p>Choose what you want to manage today.</p>
       </div>
+      <div class="featureGrid">
+        <button class="featureCard cardStudents" onclick="openStudentsMode()">
+          <span class="featureIcon">👨‍🎓</span><h3>Students</h3><p id="coachingStudentCountText">Manage coaching students</p>
+        </button>
+        <button class="featureCard cardAttendance" onclick="openAttendanceMode()">
+          <span class="featureIcon">📅</span><h3>Take Attendance</h3><p>Mark today's P / A</p>
+        </button>
+        <button class="featureCard cardFees" onclick="openFeesMode()">
+          <span class="featureIcon">₹</span><h3>Fees</h3><p>Manage coaching fees</p>
+        </button>
+        <button class="featureCard cardReports" onclick="openReportsMode()">
+          <span class="featureIcon">📊</span><h3>Monthly Report</h3><p>View attendance register</p>
+        </button>
       </div>
     </section>
 
     <section id="coachingAttendanceSection" class="section">
-      <div class="pageHead"><div><h2>Coaching Attendance</h2><p>Mark P or A instantly for each student</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Take Attendance</h2><p>Tap P or A to save instantly</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
       <div class="attendanceDateBox"><label for="coachingAttDate">Attendance Date</label><input type="date" id="coachingAttDate" onchange="renderCoachingAttendance()"></div>
       <div id="coachingAttendanceArea" class="modernPanel"></div>
       <div id="coachingDaySummary" class="modernPanel" style="margin-top:12px;"></div>
     </section>
 
     <section id="coachingReportSection" class="section">
-      <div class="pageHead"><div><h2>Coaching Register</h2><p>Monthly register-style attendance</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Monthly Report</h2><p>Register-style monthly attendance</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
       <div class="modernPanel" style="padding:12px;"><div style="display:flex;gap:8px;"><select id="coachingReportMonth" style="flex:1;min-width:0;" onchange="renderCoachingReport()"></select><select id="coachingReportYear" style="flex:1;min-width:0;" onchange="renderCoachingReport()"></select></div></div>
       <div id="coachingReportArea" class="modernPanel" style="overflow-x:auto;"></div>
     </section>
 
+    <section id="coachingFeesSection" class="section">
+      <div class="pageHead"><div><h2>Fees</h2><p>Coaching fee records</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
+      <div id="coachingFeesArea" class="modernPanel"></div>
+    </section>
+
     <section id="studentsSection" class="section">
-      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
       <div class="modernPanel studentSearchPanel">
         <div class="searchWrap">
           <span class="searchIcon">🔍</span>
@@ -704,11 +725,11 @@ Reset PIN
 
 <nav class="bottomNav">
   <div class="bottomNavInner">
-    <button id="homeNav" class="navItem active" onclick="goHome()"><span>⌂</span><span>Home</span></button>
-    <button id="studentsNav" class="navItem" onclick="showSection('studentsSection','studentsNav')"><span>👥</span><span>Students</span></button>
-    <button id="attendanceNav" class="navItem" onclick="showSection('attendanceSection','attendanceNav')"><span>☑</span><span>Attendance</span></button>
-    <button id="feesNav" class="navItem" onclick="showSection('feesSection','feesNav')"><span>₹</span><span>Fees</span></button>
-    <button id="reportsNav" class="navItem" onclick="showSection('reportsSection','reportsNav')"><span>▦</span><span>Reports</span></button>
+    <button id="homeNav" class="navItem active" onclick="goModeHome()"><span>⌂</span><span>Home</span></button>
+    <button id="studentsNav" class="navItem" onclick="openStudentsMode()"><span>👥</span><span>Students</span></button>
+    <button id="attendanceNav" class="navItem" onclick="openAttendanceMode()"><span>☑</span><span>Attendance</span></button>
+    <button id="feesNav" class="navItem" onclick="openFeesMode()"><span>₹</span><span>Fees</span></button>
+    <button id="reportsNav" class="navItem" onclick="openReportsMode()"><span>▦</span><span>Reports</span></button>
   </div>
 </nav>
 
@@ -846,6 +867,10 @@ function getDataKey() {
   return currentAccountKey ? DATA_KEY_PREFIX + currentAccountKey : "tuitionData_v2";
 }
 
+function getCoachingKey() {
+  return currentAccountKey ? "coachingData_v1_" + currentAccountKey : "coachingData_v1";
+}
+
 function getPinKey() {
   return currentAccountKey ? PIN_KEY_PREFIX + currentAccountKey : "appPin_v2";
 }
@@ -878,6 +903,7 @@ function setDriveSyncStatus(text, type) {
 
 function saveLocalData(markPending = true) {
   localStorage.setItem(getDataKey(), JSON.stringify(students));
+  saveCoachingData(false);
 
   if (markPending && currentAccountKey) {
     const meta = getSyncMeta();
@@ -917,6 +943,7 @@ function loadAccountData() {
     if (!s.attendance) s.attendance = [];
     if (typeof s.active !== "boolean") s.active = true;
   });
+  loadCoachingAccountData();
 }
 
 function handleGoogleLogin(response) {
@@ -1140,7 +1167,10 @@ async function syncWithGoogleDrive() {
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt || Date.now(),
         appPin: localStorage.getItem(getPinKey()) || null,
-        students: students
+        students: students,
+        coachingStudents: coachingStudents,
+        coachingAttendance: coachingAttendance,
+        coachingFees: coachingFees
       };
 
       const created = await uploadDriveData(backup);
@@ -1161,7 +1191,10 @@ async function syncWithGoogleDrive() {
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt,
         appPin: localStorage.getItem(getPinKey()) || null,
-        students: students
+        students: students,
+        coachingStudents: coachingStudents,
+        coachingAttendance: coachingAttendance,
+        coachingFees: coachingFees
       };
 
       await uploadDriveData(backup, driveFile.id);
@@ -1176,6 +1209,11 @@ async function syncWithGoogleDrive() {
           if (typeof s.active !== "boolean") s.active = true;
         });
         localStorage.setItem(getDataKey(), JSON.stringify(students));
+        if(Array.isArray(driveBackup.coachingStudents)) coachingStudents=driveBackup.coachingStudents;
+        if(driveBackup.coachingAttendance && typeof driveBackup.coachingAttendance==='object') coachingAttendance=driveBackup.coachingAttendance;
+        if(driveBackup.coachingFees && typeof driveBackup.coachingFees==='object') coachingFees=driveBackup.coachingFees;
+        coachingStudents.forEach(st=>{if(typeof st.active!=='boolean')st.active=true;if(!st.fees)st.fees=[];});
+        saveCoachingData(false);
         if (Object.prototype.hasOwnProperty.call(driveBackup, "appPin")) {
           if (driveBackup.appPin) localStorage.setItem(getPinKey(), driveBackup.appPin);
           else localStorage.removeItem(getPinKey());
@@ -1289,8 +1327,15 @@ function toggleLock(){
 }
 
 function addStudent(){
-  const name = prompt("Student Name");
+  const name = prompt(teachingMode==='coaching' ? "Coaching Student Name" : "Student Name");
   if(!name) return;
+  if(teachingMode==='coaching'){
+    coachingStudents.push({name:name.trim(), active:true, fees:[]});
+    saveCoachingData();
+    renderCoachingStudentsPage();
+    updateModeUI();
+    return;
+  }
   students.push({
     name:name,
     fees: [],
@@ -1303,31 +1348,116 @@ function addStudent(){
 
 
 let teachingMode = localStorage.getItem('tuitionTeachingMode') || 'home';
-let coachingStudents = JSON.parse(localStorage.getItem('coachingStudents') || '[]');
-let coachingAttendance = JSON.parse(localStorage.getItem('coachingAttendance') || '{}');
-function saveCoachingData(){localStorage.setItem('coachingStudents',JSON.stringify(coachingStudents));localStorage.setItem('coachingAttendance',JSON.stringify(coachingAttendance));}
-function setTeachingMode(mode){
-  teachingMode=mode; localStorage.setItem('tuitionTeachingMode',mode);
-  const homeBtn=document.getElementById('homeModeBtn'), coachBtn=document.getElementById('coachingModeBtn');
-  if(homeBtn) homeBtn.classList.toggle('active',mode==='home');
-  if(coachBtn) coachBtn.classList.toggle('active',mode==='coaching');
-  const panel=document.getElementById('coachingHomePanel'); if(panel) panel.style.display=mode==='coaching'?'block':'none';
-  const title=document.querySelector('.appTitle'); const sub=document.querySelector('.appSubtitle');
-  if(title) title.textContent=mode==='coaching'?'Coaching Manager':'Tuition Manager';
-  if(sub) sub.textContent=mode==='coaching'?'Simple • Organized • Made for Coaching Teachers':'Simple • Organized • Made for Teachers';
-  if(mode==='coaching' && coachingStudents.length===0){
-    // Keep the existing cards visible, but provide a clear first action below them.
+let coachingStudents = [];
+let coachingAttendance = {};
+let coachingFees = {};
+function saveCoachingData(markPending=true){
+  localStorage.setItem(getCoachingKey(),JSON.stringify({students:coachingStudents,attendance:coachingAttendance,fees:coachingFees}));
+  if(markPending && currentAccountKey){
+    const meta=getSyncMeta();
+    meta.updatedAt=Date.now();
+    meta.pending=true;
+    setSyncMeta(meta);
+    scheduleDriveSync();
   }
 }
+function loadCoachingAccountData(){
+  let saved=localStorage.getItem(getCoachingKey());
+  if(!saved && currentAccountKey && !localStorage.getItem('coachingAccountMigration_v1')){
+    const legacy=localStorage.getItem('coachingStudents');
+    const legacyAttendance=localStorage.getItem('coachingAttendance');
+    const legacyFees=localStorage.getItem('coachingFees');
+    if(legacy || legacyAttendance || legacyFees){
+      saved=JSON.stringify({
+        students:JSON.parse(legacy||'[]'),
+        attendance:JSON.parse(legacyAttendance||'{}'),
+        fees:JSON.parse(legacyFees||'{}')
+      });
+      localStorage.setItem(getCoachingKey(),saved);
+    }
+    localStorage.setItem('coachingAccountMigration_v1','done');
+  }
+  try{
+    const obj=JSON.parse(saved||'{}');
+    coachingStudents=Array.isArray(obj)?obj:(Array.isArray(obj.students)?obj.students:[]);
+    coachingAttendance=Array.isArray(obj)?{}:(obj.attendance||{});
+    coachingFees=Array.isArray(obj)?{}:(obj.fees||{});
+  }catch(e){
+    coachingStudents=[]; coachingAttendance={}; coachingFees={};
+  }
+  coachingStudents.forEach(st=>{if(typeof st.active!=='boolean')st.active=true;if(!st.fees)st.fees=[];});
+}
+function updateModeUI(){
+  const homeBtn=document.getElementById('homeModeBtn'), coachBtn=document.getElementById('coachingModeBtn');
+  if(homeBtn) homeBtn.classList.toggle('active',teachingMode==='home');
+  if(coachBtn) coachBtn.classList.toggle('active',teachingMode==='coaching');
+  const title=document.querySelector('.appTitle'); const sub=document.querySelector('.appSubtitle');
+  if(title) title.textContent=teachingMode==='coaching'?'Coaching Manager':'Tuition Manager';
+  if(sub) sub.textContent=teachingMode==='coaching'?'Simple • Organized • Made for Coaching Teachers':'Simple • Organized • Made for Teachers';
+  const labels={
+    students:teachingMode==='coaching'?'Students':'Students',
+    attendance:teachingMode==='coaching'?'Take Attendance':'Attendance',
+    fees:'Fees',
+    reports:teachingMode==='coaching'?'Monthly Report':'Reports'
+  };
+  const a=document.getElementById('studentsNavLabel'); if(a)a.textContent=labels.students;
+  const b=document.getElementById('attendanceNavLabel'); if(b)b.textContent=labels.attendance;
+  const c=document.getElementById('feesNavLabel'); if(c)c.textContent=labels.fees;
+  const d=document.getElementById('reportsNavLabel'); if(d)d.textContent=labels.reports;
+  const home=document.getElementById('homeSection'), coachHome=document.getElementById('coachingHomeSection');
+  if(home) home.classList.toggle('active',teachingMode==='home' && currentSectionId==='homeSection');
+  if(coachHome) coachHome.classList.toggle('active',teachingMode==='coaching' && currentSectionId==='coachingHomeSection');
+  const count=document.getElementById('coachingStudentCountText');
+  if(count) count.textContent=`${coachingStudents.filter(s=>s.active!==false).length} active`;
+}
+function setTeachingMode(mode){
+  if(mode!=='home' && mode!=='coaching') mode='home';
+  const target=mode==='coaching'?'coachingHomeSection':'homeSection';
+  teachingMode=mode; localStorage.setItem('tuitionTeachingMode',mode);
+  updateModeUI();
+  if(currentSectionId!==target){
+    showSection(target,'homeNav');
+  }else{
+    document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+    const el=document.getElementById(target); if(el)el.classList.add('active');
+    updateModeUI();
+  }
+  if(mode==='coaching') renderCoachingStudentsPage();
+}
+function goModeHome(){
+  const target=teachingMode==='coaching'?'coachingHomeSection':'homeSection';
+  if(currentSectionId===target)return;
+  if(sectionHistoryStack.length){
+    pendingHomeNavigation=true;
+    history.go(-sectionHistoryStack.length);
+    return;
+  }
+  showSection(target,'homeNav',true);
+}
+function openStudentsMode(){
+  showSection('studentsSection','studentsNav');
+}
+function openAttendanceMode(){
+  if(teachingMode==='coaching') openCoachingAttendance();
+  else showSection('attendanceSection','attendanceNav');
+}
+function openFeesMode(){
+  if(teachingMode==='coaching'){
+    showSection('coachingFeesSection','feesNav');
+    renderCoachingFees();
+  }else showSection('feesSection','feesNav');
+}
+function openReportsMode(){
+  if(teachingMode==='coaching') openCoachingReport();
+  else showSection('reportsSection','reportsNav');
+}
 function openCoachingAttendance(){
-  if(!coachingStudents.length){
-    const raw=prompt('Enter student names separated by commas');
-    if(!raw) return;
-    coachingStudents=raw.split(',').map(x=>x.trim()).filter(Boolean).map(name=>({name}));
-    saveCoachingData();
+  if(!coachingStudents.filter(s=>s.active!==false).length){
+    alert('Add coaching students first using the + button.');
+    return;
   }
   const d=document.getElementById('coachingAttDate'); if(d && !d.value) d.value=new Date().toISOString().slice(0,10);
-  showSection('coachingAttendanceSection','homeNav'); renderCoachingAttendance();
+  showSection('coachingAttendanceSection','attendanceNav'); renderCoachingAttendance();
 }
 function coachingKey(date,index){return date+'|'+index;}
 function setCoachingStatus(index,status){
@@ -1337,24 +1467,53 @@ function setCoachingStatus(index,status){
 function renderCoachingAttendance(){
   const area=document.getElementById('coachingAttendanceArea'), sum=document.getElementById('coachingDaySummary'); if(!area) return;
   const d=document.getElementById('coachingAttDate')?.value || new Date().toISOString().slice(0,10);
-  const rows=coachingStudents.map((st,i)=>{const v=coachingAttendance[coachingKey(d,i)]||'';return `<div style="display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid #eee;"><div style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(st.name)}</div><button class="miniBtn" style="min-height:36px;border:2px solid #16a36a;${v==='P'?'background:#16a36a;color:#fff;':''}" onclick="setCoachingStatus(${i},'P')">P</button><button class="miniBtn" style="min-height:36px;border:2px solid #dc3545;${v==='A'?'background:#dc3545;color:#fff;':''}" onclick="setCoachingStatus(${i},'A')">A</button></div>`}).join('');
+  const active=coachingStudents.filter(s=>s.active!==false);
+  const rows=active.map((st)=>{const i=coachingStudents.indexOf(st);const v=coachingAttendance[coachingKey(d,i)]||'';return `<div style="display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid #eee;"><div style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(st.name)}</div><button class="miniBtn" style="min-height:36px;border:2px solid #16a36a;${v==='P'?'background:#16a36a;color:#fff;':''}" onclick="setCoachingStatus(${i},'P')">P</button><button class="miniBtn" style="min-height:36px;border:2px solid #dc3545;${v==='A'?'background:#dc3545;color:#fff;':''}" onclick="setCoachingStatus(${i},'A')">A</button></div>`}).join('');
   area.innerHTML=`<div style="display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;gap:6px;padding-bottom:8px;border-bottom:2px solid #ddd;font-weight:800;"><div>Student</div><div style="text-align:center;">P</div><div style="text-align:center;">A</div></div>${rows||'<div class="emptyState">No coaching students yet.</div>'}`;
-  let p=0,a=0; coachingStudents.forEach((_,i)=>{const v=coachingAttendance[coachingKey(d,i)];if(v==='P')p++;if(v==='A')a++;});
-  if(sum) sum.innerHTML=`<b>${coachingStudents.length} Students</b> &nbsp; • &nbsp; <span style="color:#16a36a;font-weight:800;">${p} Present</span> &nbsp; • &nbsp; <span style="color:#dc3545;font-weight:800;">${a} Absent</span>${coachingStudents.length?` &nbsp; • &nbsp; ${Math.round(p/coachingStudents.length*100)}% Present`:''}`;
+  let p=0,a=0; active.forEach(st=>{const i=coachingStudents.indexOf(st);const v=coachingAttendance[coachingKey(d,i)];if(v==='P')p++;if(v==='A')a++;});
+  if(sum) sum.innerHTML=`<b>${active.length} Students</b> &nbsp; • &nbsp; <span style="color:#16a36a;font-weight:800;">${p} Present</span> &nbsp; • &nbsp; <span style="color:#dc3545;font-weight:800;">${a} Absent</span>${active.length?` &nbsp; • &nbsp; ${Math.round(p/active.length*100)}% Present`:''}`;
 }
 function openCoachingReport(){
-  if(!coachingStudents.length){alert('Add coaching students first.');return;}
+  if(!coachingStudents.filter(s=>s.active!==false).length){alert('Add coaching students first using the + button.');return;}
   const m=document.getElementById('coachingReportMonth'), y=document.getElementById('coachingReportYear');
   if(m && !m.options.length)m.innerHTML=['January','February','March','April','May','June','July','August','September','October','November','December'].map((x,i)=>`<option value="${String(i+1).padStart(2,'0')}">${x}</option>`).join('');
   if(y && !y.options.length){let h='';for(let i=2025;i<=2035;i++)h+=`<option>${i}</option>`;y.innerHTML=h;y.value=String(new Date().getFullYear());}
-  showSection('coachingReportSection','homeNav'); renderCoachingReport();
+  showSection('coachingReportSection','reportsNav'); renderCoachingReport();
 }
 function renderCoachingReport(){
   const area=document.getElementById('coachingReportArea');if(!area)return; const m=document.getElementById('coachingReportMonth')?.value||String(new Date().getMonth()+1).padStart(2,'0'); const y=document.getElementById('coachingReportYear')?.value||new Date().getFullYear();
-  const days=new Date(Number(y),Number(m),0).getDate(); let h='<table style="border-collapse:collapse;min-width:max-content;font-size:12px;"><thead><tr><th style="position:sticky;left:0;background:#fff;border:1px solid #ddd;padding:7px;">Student</th>';
+  const days=new Date(Number(y),Number(m),0).getDate(); const active=coachingStudents.filter(s=>s.active!==false); let h='<div style="overflow-x:auto;"><table style="border-collapse:collapse;min-width:max-content;font-size:12px;"><thead><tr><th style="position:sticky;left:0;z-index:2;background:#fff;border:1px solid #ddd;padding:7px;">Student</th>';
   for(let d=1;d<=days;d++)h+=`<th style="border:1px solid #ddd;padding:7px;">${d}</th>`; h+='<th style="border:1px solid #ddd;padding:7px;">Total P</th></tr></thead><tbody>';
-  coachingStudents.forEach((st,i)=>{let p=0;h+=`<tr><td style="position:sticky;left:0;background:#fff;border:1px solid #ddd;padding:7px;font-weight:700;">${escapeHtml(st.name)}</td>`;for(let d=1;d<=days;d++){const date=`${y}-${m}-${String(d).padStart(2,'0')}`;const v=coachingAttendance[coachingKey(date,i)]||'';if(v==='P')p++;h+=`<td style="text-align:center;border:1px solid #ddd;padding:7px;font-weight:800;">${v}</td>`;}h+=`<td style="text-align:center;border:1px solid #ddd;padding:7px;font-weight:800;">${p}</td></tr>`});
-  h+='</tbody></table>';area.innerHTML=h;
+  active.forEach((st)=>{const i=coachingStudents.indexOf(st);let p=0;h+=`<tr><td style="position:sticky;left:0;z-index:1;background:#fff;border:1px solid #ddd;padding:7px;font-weight:700;">${escapeHtml(st.name)}</td>`;for(let d=1;d<=days;d++){const date=`${y}-${m}-${String(d).padStart(2,'0')}`;const v=coachingAttendance[coachingKey(date,i)]||'';if(v==='P')p++;h+=`<td style="text-align:center;border:1px solid #ddd;padding:7px;font-weight:800;">${v}</td>`;}h+=`<td style="text-align:center;border:1px solid #ddd;padding:7px;font-weight:800;">${p}</td></tr>`});
+  h+='</tbody></table></div>';
+  let monthP=0,monthA=0; active.forEach(st=>{const i=coachingStudents.indexOf(st);for(let d=1;d<=days;d++){const date=`${y}-${m}-${String(d).padStart(2,'0')}`;const v=coachingAttendance[coachingKey(date,i)];if(v==='P')monthP++;if(v==='A')monthA++;}});
+  const marked=monthP+monthA;
+  const pct=marked?Math.round(monthP/marked*100):0;
+  h+=`<div style="margin-top:12px;padding:12px;border-radius:14px;background:#f8f9fc;font-weight:700;"><div>Monthly Summary</div><div style="margin-top:6px;font-size:13px;"><span style="color:#16a36a;">Present: ${monthP}</span> &nbsp; • &nbsp; <span style="color:#dc3545;">Absent: ${monthA}</span> &nbsp; • &nbsp; Present: ${pct}%</div></div>`;
+  area.innerHTML=h;
+}
+function renderCoachingStudentsPage(){
+  const area=document.getElementById('studentsArea'); if(!area || teachingMode!=='coaching') return;
+  const active=coachingStudents.filter(s=>s.active!==false), inactive=coachingStudents.filter(s=>s.active===false);
+  const query=(document.getElementById('studentSearchInput')?.value||'').trim().toLowerCase();
+  const all=[...active,...inactive]; const list=query?all.filter(s=>(s.name||'').toLowerCase().includes(query)):all;
+  if(!coachingStudents.length){area.innerHTML='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap + at the top to add your first coaching student.</div></div>';return;}
+  if(!list.length){area.innerHTML='<div class="emptyState"><div style="font-size:34px;margin-bottom:8px;">🔎</div><b>No student found</b><div style="margin-top:5px;">No student matches “'+escapeHtml(query)+'”.</div></div>';return;}
+  area.innerHTML=list.map((st,displayIndex)=>{const idx=coachingStudents.indexOf(st);const initial=(st.name||'?').trim().charAt(0).toUpperCase();return `<div class="modernStudent"><div style="width:30px;font-weight:800;color:#6b7280;text-align:center;">${String(displayIndex+1).padStart(2,'0')}</div><div class="avatar">${initial}</div><div class="studentMain"><b>${escapeHtml(st.name)}</b><div class="studentMeta">${st.active===false?'Inactive':'Active'}</div></div><div class="studentActions"><button class="miniBtn" onclick="editCoachingStudent(${idx})">Edit</button><button class="miniBtn red" onclick="deleteCoachingStudent(${idx})">Delete</button></div></div>`}).join('');
+  const count=document.getElementById('studentCountText'); if(count && teachingMode==='coaching')count.textContent=`${active.length} active${coachingStudents.length!==active.length?' · '+(coachingStudents.length-active.length)+' inactive':''}`;
+  const c=document.getElementById('coachingStudentCountText');if(c)c.textContent=`${active.length} active`;
+}
+function editCoachingStudent(index){
+  const st=coachingStudents[index]; if(!st)return; const name=prompt('Student Name',st.name); if(!name||!name.trim())return; st.name=name.trim(); saveCoachingData(); renderCoachingStudentsPage();
+}
+function deleteCoachingStudent(index){
+  if(!coachingStudents[index])return;
+  if(confirm('Delete this coaching student?')){coachingStudents.splice(index,1);saveCoachingData();renderCoachingStudentsPage();updateModeUI();}
+}
+function renderCoachingFees(){
+  const area=document.getElementById('coachingFeesArea'); if(!area)return;
+  if(!coachingStudents.length){area.innerHTML='<div class="emptyState"><div style="font-size:38px;">₹</div><b>No coaching students yet</b><div style="margin-top:5px;">Add students using +.</div></div>';return;}
+  area.innerHTML='<div class="emptyState"><div style="font-size:38px;">₹</div><b>Coaching Fees</b><div style="margin-top:5px;">Student-wise coaching fee management is kept separate from Home Tuition.</div></div>';
 }
 
 let currentSectionId = 'homeSection';
@@ -1365,12 +1524,14 @@ let handlingSectionPop = false;
 function sectionNavId(sectionId){
   const map={
     homeSection:'homeNav',
+    coachingHomeSection:'homeNav',
     studentsSection:'studentsNav',
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
     reportsSection:'reportsNav',
     coachingAttendanceSection:'homeNav',
-    coachingReportSection:'homeNav'
+    coachingReportSection:'reportsNav',
+    coachingFeesSection:'feesNav'
   };
   return map[sectionId] || 'homeNav';
 }
@@ -1399,18 +1560,11 @@ function showSection(sectionId, navId, fromHistory){
 }
 
 function goHome(){
-  // Home is the root of the app. If we are several screens deep, jump back
-  // to the guard entry in one operation so Back on Home can behave normally.
-  if(currentSectionId==='homeSection') return;
-  if(sectionHistoryStack.length){
-    pendingHomeNavigation=true;
-    history.go(-sectionHistoryStack.length);
-    return;
-  }
-  showSection('homeSection','homeNav',true);
+  goModeHome();
 }
 
 function renderStudentsPage(){
+  if(teachingMode==='coaching'){ renderCoachingStudentsPage(); return; }
   const area=document.getElementById('studentsArea');
   if(!area) return;
   const active=students.filter(s=>s.active!==false);
@@ -2245,7 +2399,7 @@ window.addEventListener("popstate", function(event){
     pendingHomeNavigation=false;
     sectionHistoryStack=[];
     handlingSectionPop=true;
-    showSection('homeSection','homeNav',true);
+    showSection(teachingMode==='coaching'?'coachingHomeSection':'homeSection','homeNav',true);
     handlingSectionPop=false;
     return;
   }
@@ -2267,7 +2421,7 @@ window.addEventListener("popstate", function(event){
   if(currentSectionId!=='homeSection'){
     sectionHistoryStack=[];
     handlingSectionPop=true;
-    showSection('homeSection','homeNav',true);
+    showSection(teachingMode==='coaching'?'coachingHomeSection':'homeSection','homeNav',true);
     handlingSectionPop=false;
   }
   return;
@@ -2424,6 +2578,9 @@ function backupData(){
 
   const backup = {
     students: students,
+    coachingStudents: coachingStudents,
+    coachingAttendance: coachingAttendance,
+    coachingFees: coachingFees,
     appPin: localStorage.getItem(getPinKey())
   };
 
@@ -2474,6 +2631,11 @@ function restoreBackup(event){
         if(!s.attendance) s.attendance=[];
         if(typeof s.active !== "boolean") s.active=true;
       });
+
+      if(Array.isArray(backup.coachingStudents)) coachingStudents=backup.coachingStudents;
+      if(backup.coachingAttendance && typeof backup.coachingAttendance==='object') coachingAttendance=backup.coachingAttendance;
+      if(backup.coachingFees && typeof backup.coachingFees==='object') coachingFees=backup.coachingFees;
+      coachingStudents.forEach(st=>{if(typeof st.active!=='boolean')st.active=true;if(!st.fees)st.fees=[];});
 
       if(backup.appPin){
         localStorage.setItem(getPinKey(), backup.appPin);
@@ -2608,7 +2770,11 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
   
-try{setTeachingMode(teachingMode);}catch(e){}
+try{
+  updateModeUI();
+  if(teachingMode==='coaching'){ showSection('coachingHomeSection','homeNav',true); renderCoachingStudentsPage(); }
+  else { showSection('homeSection','homeNav',true); }
+}catch(e){console.warn(e);}
 </script>
 
 </body>  
