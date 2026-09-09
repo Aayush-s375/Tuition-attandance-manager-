@@ -388,7 +388,13 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .attendanceName{font-size:15px;font-weight:700;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .attendanceChoices{display:flex;align-items:center;gap:5px;flex:none;}
 .attendanceChoice{width:31px;height:31px;padding:0;border:1px solid #d8dce5;border-radius:9px;background:#f8f9fc;color:#4b5563;font-weight:800;font-size:12px;cursor:pointer;}
-.attendanceChoice.selected{background:#3947a7;color:#fff;border-color:#3947a7;box-shadow:0 0 0 2px rgba(57,71,167,.14);transform:scale(1.04);}
+.attendanceChoice.selected{color:#fff;transform:scale(1.04);box-shadow:0 0 0 2px rgba(0,0,0,.10);}
+.attendanceChoice.selected.statusP{background:green;border-color:green;}
+.attendanceChoice.selected.statusA{background:red;border-color:red;}
+.attendanceChoice.selected.statusL{background:purple;border-color:purple;}
+.attendanceChoice.selected.statusS{background:blue;border-color:blue;}
+.attendanceChoice.selected.statusM{background:green;border-color:green;}
+.attendanceChoice.selected.statusH{background:#ff8800;border-color:#ff8800;}
 @media(max-width:390px){.attendanceRow{gap:6px}.attendanceAvatar{width:37px;height:37px;border-radius:11px}.attendanceName{font-size:14px}.attendanceChoices{gap:3px}.attendanceChoice{width:29px;height:29px;font-size:11px;border-radius:8px;}}
 #sundayBtn{border-radius:11px!important;}
 #reportArea .student{background:#fff;border:0;border-radius:16px;padding:14px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin:0 0 12px;}
@@ -1519,9 +1525,9 @@ function attendanceStatusInfo(status){
 
 function getAttendanceStatusForDate(index,date){
   const s=students[index];
-  if(!s || !Array.isArray(s.attendance)) return "Present";
+  if(!s || !Array.isArray(s.attendance)) return "";
   const record=s.attendance.find(a=>a.date===date);
-  return record ? record.status : "Present";
+  return record ? record.status : "";
 }
 
 function renderAttendance(){
@@ -1546,12 +1552,12 @@ function renderAttendance(){
         <div class="attendanceAvatar" title="Student photo">${avatarContent}</div>
         <div class="attendanceName" title="${s.name}">${s.name}</div>
         <div class="attendanceChoices">
-          <button class="attendanceChoice ${selected==='P'?'selected':''}" title="Present" onclick="setAttendanceStatus(${index},'P')">P</button>
-          <button class="attendanceChoice ${selected==='A'?'selected':''}" title="Absent" onclick="setAttendanceStatus(${index},'A')">A</button>
-          <button class="attendanceChoice ${selected==='L'?'selected':''}" title="Leave" onclick="setAttendanceStatus(${index},'L')">L</button>
-          <button class="attendanceChoice ${selected==='S'?'selected':''}" title="Sunday" onclick="setAttendanceStatus(${index},'S')">S</button>
-          <button class="attendanceChoice ${selected==='M'?'selected':''}" title="Sunday Manage" onclick="setAttendanceStatus(${index},'M')">M</button>
-          <button class="attendanceChoice ${selected==='H'?'selected':''}" title="Custom" onclick="setAttendanceStatus(${index},'H')">H</button>
+          <button class="attendanceChoice ${selected==='P'?'selected statusP':''}" title="Present" onclick="setAttendanceStatus(${index},'P')">P</button>
+          <button class="attendanceChoice ${selected==='A'?'selected statusA':''}" title="Absent" onclick="setAttendanceStatus(${index},'A')">A</button>
+          <button class="attendanceChoice ${selected==='L'?'selected statusL':''}" title="Leave" onclick="setAttendanceStatus(${index},'L')">L</button>
+          <button class="attendanceChoice ${selected==='S'?'selected statusS':''}" title="Sunday" onclick="setAttendanceStatus(${index},'S')">S</button>
+          <button class="attendanceChoice ${selected==='M'?'selected statusM':''}" title="Sunday Manage" onclick="setAttendanceStatus(${index},'M')">M</button>
+          <button class="attendanceChoice ${selected==='H'?'selected statusH':''}" title="Custom" onclick="setAttendanceStatus(${index},'H')">H</button>
         </div>
       </div>`;
   });
