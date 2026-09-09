@@ -1587,7 +1587,11 @@ function setAttendanceStatus(index,code){
   }
 
   const existing=s.attendance.find(a=>a.date===date);
-  if(existing){
+
+  // Clicking the already-selected status again removes that attendance.
+  if(existing && attendanceStatusInfo(existing.status).code===code){
+    s.attendance=s.attendance.filter(a=>a.date!==date);
+  }else if(existing){
     existing.status=status;
   }else{
     s.attendance.push({date:date,status:status});
