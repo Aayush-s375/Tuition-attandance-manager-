@@ -371,50 +371,11 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 #sundayBtn{border-radius:11px!important;}
 #reportArea .student{background:#fff;border:0;border-radius:16px;padding:14px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin:0 0 12px;}
 #reportArea .summary{border-radius:10px;}
-
-/* Coaching register UI */
-.coachingAttendanceHeader,.coachingAttendanceRow{display:grid;grid-template-columns:42px minmax(0,1fr) 44px 44px;gap:7px;align-items:center;}
-.coachingAttendanceHeader{padding:9px 4px;border-bottom:2px solid #dfe3ea;font-weight:800;color:#4b5563;}
-.coachingAttendanceHeader>div:nth-child(3),.coachingAttendanceHeader>div:nth-child(4){text-align:center;}
-.coachingAttendanceRow{padding:8px 4px;border-bottom:1px solid #eceef2;}
-.coachingStudentNo{font-size:12px;font-weight:800;color:#7a8190;text-align:center;}
-.coachingStudentName{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.coachingStatusBtn{height:38px;border-radius:9px;background:#fff;font-weight:900;font-size:15px;cursor:pointer;}
-.coachingP{border:2px solid #16a36a;color:#168a5a;}
-.coachingA{border:2px solid #dc3545;color:#c52e3d;}
-.coachingP.selected{background:#16a36a;color:#fff;}
-.coachingA.selected{background:#dc3545;color:#fff;}
-.coachingReportScroller{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:12px;}
-.coachingRegisterTable{border-collapse:collapse;min-width:max-content;font-size:11px;background:#fff;}
-.coachingRegisterTable th,.coachingRegisterTable td{border:1px solid #dfe3e8;padding:6px 7px;text-align:center;min-width:24px;height:28px;box-sizing:border-box;}
-.coachingRegisterTable th{font-weight:900;background:#f4f6fa;}
-.coachingRegisterTable .stickyStudentCol{position:sticky;left:0;z-index:3;background:#fff;min-width:42px;}
-.coachingRegisterTable .stickyNameCol{position:sticky;left:42px;z-index:3;background:#fff;text-align:left;min-width:125px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.coachingRegisterTable th.stickyStudentCol,.coachingRegisterTable th.stickyNameCol{background:#f4f6fa;z-index:4;}
-.coachingRegisterTable .totalPresentCol{font-weight:900;min-width:72px;background:#f8f9fc;}
-.coachingRegisterTable .pCell{color:#168a5a;font-weight:900;}
-.coachingRegisterTable .aCell{color:#c52e3d;font-weight:900;}
-.coachingRegisterTable .registerSummaryRow td{background:#f8f9fc;font-weight:800;}
-.coachingRegisterTable .registerSummaryRow .stickyStudentCol{background:#f8f9fc;}
-.summaryP{color:#168a5a;font-weight:900;}
-.coachingMonthlySummary{margin-top:12px;padding:12px;border-radius:14px;background:#f8f9fc;font-size:13px;}
-@media(max-width:420px){.coachingAttendanceHeader,.coachingAttendanceRow{grid-template-columns:34px minmax(0,1fr) 40px 40px;gap:5px;}.coachingStatusBtn{height:36px;}.coachingRegisterTable .stickyNameCol{min-width:115px;left:34px;}.coachingRegisterTable .stickyStudentCol{min-width:34px;}}
-
 .bottomNav{position:fixed;left:0;right:0;bottom:0;height:66px;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid #e7e9ee;display:flex;justify-content:center;z-index:5000;box-shadow:0 -4px 18px rgba(20,30,60,.08);}
 .bottomNavInner{width:100%;max-width:720px;display:grid;grid-template-columns:repeat(5,1fr);}
 .navItem{border:0;background:none;color:#858b98;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;}
 .navItem span:first-child{font-size:21px;line-height:1;}
 .navItem.active{color:#3947a7;}
-
-/* Mode switch */
-.modeSwitchWrap{margin:14px 0 18px;display:flex;justify-content:center;}
-.modeSwitch{display:flex;align-items:center;gap:4px;padding:4px;background:#f1f3f8;border-radius:14px;box-shadow:inset 0 1px 3px rgba(0,0,0,.08);}
-.modeBtn{border:0;background:transparent;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:800;color:#687080;cursor:pointer;transition:.18s;}
-.modeBtn.active{background:#fff;color:#4b55c8;box-shadow:0 2px 8px rgba(0,0,0,.10);}
-.coachingHint{font-size:12px;color:#687080;margin:0 0 12px;text-align:center;}
-#coachingHomeSection{padding-bottom:20px;}
-#coachingFeesSection .emptyState{padding:40px 15px;}
-
 @media(max-width:390px){.featureGrid{gap:9px}.featureCard{padding:15px 13px;min-height:118px}.featureCard h3{font-size:15px}.featureIcon{font-size:27px}.studentActions .miniBtn{padding:7px 6px}.appTitle{font-size:21px}}
 
 </style>  
@@ -602,10 +563,6 @@ Reset PIN
       <div>
         <div class="appTitle">Tuition Manager</div>
         <div class="appSubtitle">Simple • Organized • Made for Teachers</div>
-        <div class="modeSwitchWrap"><div class="modeSwitch" role="tablist" aria-label="Teaching mode">
-          <button id="homeModeBtn" class="modeBtn active" onclick="setTeachingMode('home')">🏠 Home Tuition</button>
-          <button id="coachingModeBtn" class="modeBtn" onclick="setTeachingMode('coaching')">🏫 Coaching</button>
-        </div></div>
       </div>
       <div class="headerActions">
         <button class="headerIconBtn headerAdd" onclick="addStudent()" title="Add Student">+</button>
@@ -657,73 +614,24 @@ Reset PIN
         <p>Choose what you want to manage today.</p>
       </div>
       <div class="featureGrid">
-        <button class="featureCard cardStudents" onclick="openStudentsMode()">
+        <button class="featureCard cardStudents" onclick="showSection('studentsSection','studentsNav')">
           <span class="featureIcon">👨‍🎓</span><h3>Students</h3><p id="studentCountText">Manage your students</p>
         </button>
-        <button class="featureCard cardAttendance" onclick="openAttendanceMode()">
+        <button class="featureCard cardAttendance" onclick="showSection('attendanceSection','attendanceNav')">
           <span class="featureIcon">📅</span><h3>Attendance</h3><p>Mark today's attendance</p>
         </button>
-        <button class="featureCard cardFees" onclick="openFeesMode()">
+        <button class="featureCard cardFees" onclick="showSection('feesSection','feesNav')">
           <span class="featureIcon">₹</span><h3>Fees</h3><p>Record & manage fees</p>
         </button>
-        <button class="featureCard cardReports" onclick="openReportsMode()">
+        <button class="featureCard cardReports" onclick="showSection('reportsSection','reportsNav')">
           <span class="featureIcon">📊</span><h3>Reports</h3><p>View monthly reports</p>
         </button>
       </div>
-    </section>
-
-    <section id="coachingHomeSection" class="section">
-      <div class="dashboardWelcome">
-        <h2>Welcome back 👋</h2>
-        <p>Choose what you want to manage today.</p>
       </div>
-      <div class="featureGrid">
-        <button class="featureCard cardStudents" onclick="openStudentsMode()">
-          <span class="featureIcon">👨‍🎓</span><h3>Students</h3><p id="coachingStudentCountText">Manage coaching students</p>
-        </button>
-        <button class="featureCard cardAttendance" onclick="openAttendanceMode()">
-          <span class="featureIcon">📅</span><h3>Take Attendance</h3><p>Mark today's P / A</p>
-        </button>
-        <button class="featureCard cardFees" onclick="openFeesMode()">
-          <span class="featureIcon">₹</span><h3>Fees</h3><p>Manage coaching fees</p>
-        </button>
-        <button class="featureCard cardReports" onclick="openReportsMode()">
-          <span class="featureIcon">📊</span><h3>Monthly Report</h3><p>View attendance register</p>
-        </button>
-      </div>
-    </section>
-
-    <section id="coachingAttendanceSection" class="section">
-      <div class="pageHead"><div><h2>Take Attendance</h2><p>Tap P or A to save instantly</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
-      <div class="attendanceDateBox"><label for="coachingAttDate">Attendance Date</label><input type="date" id="coachingAttDate" onchange="renderCoachingAttendance()"></div>
-      <div id="coachingAttendanceArea" class="modernPanel"></div>
-      <div id="coachingDaySummary" class="modernPanel" style="margin-top:12px;"></div>
-    </section>
-
-    <section id="coachingReportSection" class="section">
-      <div class="pageHead"><div><h2>Monthly Report</h2><p>Register-style monthly attendance</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
-      <div class="modernPanel" style="padding:12px;"><div style="display:flex;gap:8px;"><select id="coachingReportMonth" style="flex:1;min-width:0;" onchange="renderCoachingReport()"></select><select id="coachingReportYear" style="flex:1;min-width:0;" onchange="renderCoachingReport()"></select></div></div>
-      <div id="coachingReportArea" class="modernPanel" style="overflow-x:auto;"></div>
-    </section>
-
-    <section id="coachingFeesSection" class="section">
-      <div class="pageHead"><div><h2>Fees</h2><p>Coaching fee records</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
-      <div id="coachingFeesArea" class="modernPanel"></div>
-    </section>
-
-    <section id="coachingStudentsSection" class="section">
-      <div class="pageHead"><div><h2>Students</h2><p>Manage your coaching students</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
-      <div class="modernPanel studentSearchPanel">
-        <div class="searchWrap">
-          <span class="searchIcon">🔍</span>
-          <input id="coachingStudentSearchInput" type="search" placeholder="Search student..." oninput="renderCoachingStudentsPage()" autocomplete="off">
-        </div>
-      </div>
-      <div id="coachingStudentsArea" class="modernPanel"></div>
     </section>
 
     <section id="studentsSection" class="section">
-      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div class="modernPanel studentSearchPanel">
         <div class="searchWrap">
           <span class="searchIcon">🔍</span>
@@ -765,11 +673,11 @@ Reset PIN
 
 <nav class="bottomNav">
   <div class="bottomNavInner">
-    <button id="homeNav" class="navItem active" onclick="goModeHome()"><span>⌂</span><span>Home</span></button>
-    <button id="studentsNav" class="navItem" onclick="openStudentsMode()"><span>👥</span><span>Students</span></button>
-    <button id="attendanceNav" class="navItem" onclick="openAttendanceMode()"><span>☑</span><span>Attendance</span></button>
-    <button id="feesNav" class="navItem" onclick="openFeesMode()"><span>₹</span><span>Fees</span></button>
-    <button id="reportsNav" class="navItem" onclick="openReportsMode()"><span>▦</span><span>Reports</span></button>
+    <button id="homeNav" class="navItem active" onclick="goHome()"><span>⌂</span><span>Home</span></button>
+    <button id="studentsNav" class="navItem" onclick="showSection('studentsSection','studentsNav')"><span>👥</span><span>Students</span></button>
+    <button id="attendanceNav" class="navItem" onclick="showSection('attendanceSection','attendanceNav')"><span>☑</span><span>Attendance</span></button>
+    <button id="feesNav" class="navItem" onclick="showSection('feesSection','feesNav')"><span>₹</span><span>Fees</span></button>
+    <button id="reportsNav" class="navItem" onclick="showSection('reportsSection','reportsNav')"><span>▦</span><span>Reports</span></button>
   </div>
 </nav>
 
@@ -907,10 +815,6 @@ function getDataKey() {
   return currentAccountKey ? DATA_KEY_PREFIX + currentAccountKey : "tuitionData_v2";
 }
 
-function getCoachingKey() {
-  return currentAccountKey ? "coachingData_v2_" + currentAccountKey : "coachingData_v2";
-}
-
 function getPinKey() {
   return currentAccountKey ? PIN_KEY_PREFIX + currentAccountKey : "appPin_v2";
 }
@@ -943,7 +847,6 @@ function setDriveSyncStatus(text, type) {
 
 function saveLocalData(markPending = true) {
   localStorage.setItem(getDataKey(), JSON.stringify(students));
-  saveCoachingData(false);
 
   if (markPending && currentAccountKey) {
     const meta = getSyncMeta();
@@ -983,7 +886,6 @@ function loadAccountData() {
     if (!s.attendance) s.attendance = [];
     if (typeof s.active !== "boolean") s.active = true;
   });
-  loadCoachingAccountData();
 }
 
 function handleGoogleLogin(response) {
@@ -1203,15 +1105,11 @@ async function syncWithGoogleDrive() {
     if (!driveFile) {
       const backup = {
         schemaVersion: 1,
-        coachingDataVersion: 2,
         accountSub: currentAccountSub,
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt || Date.now(),
         appPin: localStorage.getItem(getPinKey()) || null,
-        students: students,
-        coachingStudents: coachingStudents,
-        coachingAttendance: coachingAttendance,
-        coachingFees: coachingFees
+        students: students
       };
 
       const created = await uploadDriveData(backup);
@@ -1228,15 +1126,11 @@ async function syncWithGoogleDrive() {
     if (localUpdatedAt > driveUpdatedAt) {
       const backup = {
         schemaVersion: 1,
-        coachingDataVersion: 2,
         accountSub: currentAccountSub,
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt,
         appPin: localStorage.getItem(getPinKey()) || null,
-        students: students,
-        coachingStudents: coachingStudents,
-        coachingAttendance: coachingAttendance,
-        coachingFees: coachingFees
+        students: students
       };
 
       await uploadDriveData(backup, driveFile.id);
@@ -1251,15 +1145,6 @@ async function syncWithGoogleDrive() {
           if (typeof s.active !== "boolean") s.active = true;
         });
         localStorage.setItem(getDataKey(), JSON.stringify(students));
-        if(driveBackup.coachingDataVersion===2){
-          if(Array.isArray(driveBackup.coachingStudents)) coachingStudents=driveBackup.coachingStudents;
-          if(driveBackup.coachingAttendance && typeof driveBackup.coachingAttendance==='object') coachingAttendance=driveBackup.coachingAttendance;
-          if(driveBackup.coachingFees && typeof driveBackup.coachingFees==='object') coachingFees=driveBackup.coachingFees;
-        }else{
-          coachingStudents=[]; coachingAttendance={}; coachingFees={};
-        }
-        coachingStudents.forEach(st=>{if(typeof st.active!=='boolean')st.active=true;if(!st.fees)st.fees=[];});
-        saveCoachingData(false);
         if (Object.prototype.hasOwnProperty.call(driveBackup, "appPin")) {
           if (driveBackup.appPin) localStorage.setItem(getPinKey(), driveBackup.appPin);
           else localStorage.removeItem(getPinKey());
@@ -1373,16 +1258,8 @@ function toggleLock(){
 }
 
 function addStudent(){
-  const name = prompt(teachingMode==='coaching' ? "Coaching Student Name" : "Student Name");
+  const name = prompt("Student Name");
   if(!name) return;
-  if(teachingMode==='coaching'){
-    coachingStudents.push({name:name.trim(), active:true, fees:[]});
-    saveCoachingData();
-    updateModeUI();
-    showSection('coachingStudentsSection','studentsNav');
-    renderCoachingStudentsPage();
-    return;
-  }
   students.push({
     name:name,
     fees: [],
@@ -1393,246 +1270,6 @@ function addStudent(){
   render();
 }
 
-
-let teachingMode = localStorage.getItem('tuitionTeachingMode') || 'home';
-let coachingStudents = [];
-let coachingAttendance = {};
-let coachingFees = {};
-function saveCoachingData(markPending=true){
-  localStorage.setItem(getCoachingKey(),JSON.stringify({
-    schemaVersion:2,
-    students:coachingStudents,
-    attendance:coachingAttendance,
-    fees:coachingFees
-  }));
-  if(markPending && currentAccountKey){
-    const meta=getSyncMeta();
-    meta.updatedAt=Date.now();
-    meta.pending=true;
-    setSyncMeta(meta);
-    scheduleDriveSync();
-  }
-}
-function loadCoachingAccountData(){
-  const saved=localStorage.getItem(getCoachingKey());
-  // Coaching data intentionally starts in its own v2 namespace.
-  // Older v1 data could contain Home Tuition students because of the
-  // previous mode implementation, so it must never be imported here.
-  try{
-    const obj=JSON.parse(saved||'{}');
-    if(obj && obj.schemaVersion===2){
-      coachingStudents=Array.isArray(obj.students)?obj.students:[];
-      coachingAttendance=obj.attendance && typeof obj.attendance==='object' ? obj.attendance : {};
-      coachingFees=obj.fees && typeof obj.fees==='object' ? obj.fees : {};
-    }else{
-      coachingStudents=[]; coachingAttendance={}; coachingFees={};
-    }
-  }catch(e){
-    coachingStudents=[]; coachingAttendance={}; coachingFees={};
-  }
-  coachingStudents.forEach(st=>{if(typeof st.active!=='boolean')st.active=true;if(!st.fees)st.fees=[];});
-}
-function updateModeUI(){
-  const homeBtn=document.getElementById('homeModeBtn'), coachBtn=document.getElementById('coachingModeBtn');
-  if(homeBtn) homeBtn.classList.toggle('active',teachingMode==='home');
-  if(coachBtn) coachBtn.classList.toggle('active',teachingMode==='coaching');
-  const title=document.querySelector('.appTitle'); const sub=document.querySelector('.appSubtitle');
-  if(title) title.textContent=teachingMode==='coaching'?'Coaching Manager':'Tuition Manager';
-  if(sub) sub.textContent=teachingMode==='coaching'?'Simple • Organized • Made for Coaching Teachers':'Simple • Organized • Made for Teachers';
-  const labels={
-    students:teachingMode==='coaching'?'Students':'Students',
-    attendance:teachingMode==='coaching'?'Take Attendance':'Attendance',
-    fees:'Fees',
-    reports:teachingMode==='coaching'?'Monthly Report':'Reports'
-  };
-  const a=document.getElementById('studentsNavLabel'); if(a)a.textContent=labels.students;
-  const b=document.getElementById('attendanceNavLabel'); if(b)b.textContent=labels.attendance;
-  const c=document.getElementById('feesNavLabel'); if(c)c.textContent=labels.fees;
-  const d=document.getElementById('reportsNavLabel'); if(d)d.textContent=labels.reports;
-  const home=document.getElementById('homeSection'), coachHome=document.getElementById('coachingHomeSection');
-  if(home) home.classList.toggle('active',teachingMode==='home' && currentSectionId==='homeSection');
-  if(coachHome) coachHome.classList.toggle('active',teachingMode==='coaching' && currentSectionId==='coachingHomeSection');
-  const count=document.getElementById('coachingStudentCountText');
-  if(count) count.textContent=`${coachingStudents.filter(s=>s.active!==false).length} active`;
-  const homeCount=document.getElementById('studentCountText');
-  if(homeCount && teachingMode==='home'){
-    const activeHome=students.filter(s=>s.active!==false);
-    homeCount.textContent=`${activeHome.length} active${students.length!==activeHome.length?' · '+(students.length-activeHome.length)+' inactive':''}`;
-  }
-}
-function setTeachingMode(mode){
-  if(mode!=='home' && mode!=='coaching') mode='home';
-  const target=mode==='coaching'?'coachingHomeSection':'homeSection';
-  teachingMode=mode; localStorage.setItem('tuitionTeachingMode',mode);
-  updateModeUI();
-  if(currentSectionId!==target){
-    showSection(target,'homeNav');
-  }else{
-    document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
-    const el=document.getElementById(target); if(el)el.classList.add('active');
-    updateModeUI();
-  }
-  // Coaching has its own Students section; never reuse the Home Tuition section.
-  if(mode==='coaching'){
-    const homeArea=document.getElementById('studentsArea');
-    if(homeArea) homeArea.innerHTML='';
-  }
-}
-function goModeHome(){
-  const target=teachingMode==='coaching'?'coachingHomeSection':'homeSection';
-  if(currentSectionId===target)return;
-  if(sectionHistoryStack.length){
-    pendingHomeNavigation=true;
-    history.go(-sectionHistoryStack.length);
-    return;
-  }
-  showSection(target,'homeNav',true);
-}
-function openStudentsMode(){
-  if(teachingMode==='coaching') showSection('coachingStudentsSection','studentsNav');
-  else showSection('studentsSection','studentsNav');
-}
-function openAttendanceMode(){
-  if(teachingMode==='coaching') openCoachingAttendance();
-  else showSection('attendanceSection','attendanceNav');
-}
-function openFeesMode(){
-  if(teachingMode==='coaching'){
-    showSection('coachingFeesSection','feesNav');
-    renderCoachingFees();
-  }else showSection('feesSection','feesNav');
-}
-function openReportsMode(){
-  if(teachingMode==='coaching') openCoachingReport();
-  else showSection('reportsSection','reportsNav');
-}
-function openCoachingAttendance(){
-  if(!coachingStudents.filter(s=>s.active!==false).length){
-    alert('Add coaching students first using the + button.');
-    return;
-  }
-  const d=document.getElementById('coachingAttDate'); if(d && !d.value) d.value=new Date().toISOString().slice(0,10);
-  showSection('coachingAttendanceSection','attendanceNav'); renderCoachingAttendance();
-}
-function coachingKey(date,index){return date+'|'+index;}
-function setCoachingStatus(index,status){
-  const d=document.getElementById('coachingAttDate')?.value; if(!d) return;
-  coachingAttendance[coachingKey(d,index)]=status; saveCoachingData(); renderCoachingAttendance();
-}
-function renderCoachingAttendance(){
-  const area=document.getElementById('coachingAttendanceArea'), sum=document.getElementById('coachingDaySummary');
-  if(!area) return;
-  const d=document.getElementById('coachingAttDate')?.value || new Date().toISOString().slice(0,10);
-  const active=coachingStudents.filter(s=>s.active!==false);
-  const rows=active.map((st,displayIndex)=>{
-    const i=coachingStudents.indexOf(st);
-    const v=coachingAttendance[coachingKey(d,i)]||'';
-    return `<div class="coachingAttendanceRow">
-      <div class="coachingStudentNo">${String(displayIndex+1).padStart(2,'0')}</div>
-      <div class="coachingStudentName">${escapeHtml(st.name)}</div>
-      <button class="coachingStatusBtn coachingP ${v==='P'?'selected':''}" onclick="setCoachingStatus(${i},'P')">P</button>
-      <button class="coachingStatusBtn coachingA ${v==='A'?'selected':''}" onclick="setCoachingStatus(${i},'A')">A</button>
-    </div>`;
-  }).join('');
-  area.innerHTML=`
-    <div class="coachingAttendanceHeader">
-      <div>No.</div><div>Student</div><div>P</div><div>A</div>
-    </div>
-    ${rows||'<div class="emptyState">No coaching students yet. Add students using +.</div>'}`;
-  let p=0,a=0;
-  active.forEach(st=>{
-    const i=coachingStudents.indexOf(st);
-    const v=coachingAttendance[coachingKey(d,i)];
-    if(v==='P')p++; if(v==='A')a++;
-  });
-  const pct=active.length?Math.round(p/active.length*100):0;
-  if(sum) sum.innerHTML=`
-    <div style="font-weight:800;margin-bottom:7px;">Daily Summary</div>
-    <div><b>${active.length}</b> Students &nbsp; • &nbsp; <span style="color:#16a36a;font-weight:800;">${p} Present</span> &nbsp; • &nbsp; <span style="color:#dc3545;font-weight:800;">${a} Absent</span></div>
-    <div style="margin-top:5px;">Present: <b>${pct}%</b> &nbsp; • &nbsp; Absent: <b>${active.length?p===active.length?0:Math.round(a/active.length*100):0}%</b></div>`;
-}
-function openCoachingReport(){
-  if(!coachingStudents.filter(s=>s.active!==false).length){alert('Add coaching students first using the + button.');return;}
-  const m=document.getElementById('coachingReportMonth'), y=document.getElementById('coachingReportYear');
-  if(m && !m.options.length)m.innerHTML=['January','February','March','April','May','June','July','August','September','October','November','December'].map((x,i)=>`<option value="${String(i+1).padStart(2,'0')}">${x}</option>`).join('');
-  if(y && !y.options.length){let h='';for(let i=2025;i<=2035;i++)h+=`<option>${i}</option>`;y.innerHTML=h;y.value=String(new Date().getFullYear());}
-  showSection('coachingReportSection','reportsNav'); renderCoachingReport();
-}
-function renderCoachingReport(){
-  const area=document.getElementById('coachingReportArea');
-  if(!area)return;
-  const m=document.getElementById('coachingReportMonth')?.value||String(new Date().getMonth()+1).padStart(2,'0');
-  const y=document.getElementById('coachingReportYear')?.value||new Date().getFullYear();
-  const days=new Date(Number(y),Number(m),0).getDate();
-  const active=coachingStudents.filter(s=>s.active!==false);
-  if(!active.length){
-    area.innerHTML='<div class="emptyState"><div style="font-size:38px;">📊</div><b>No coaching students yet</b><div style="margin-top:5px;">Add students using + first.</div></div>';
-    return;
-  }
-  let h='<div class="coachingReportScroller"><table class="coachingRegisterTable"><thead><tr><th class="stickyStudentCol">No.</th><th class="stickyNameCol">Student</th>';
-  for(let d=1;d<=days;d++) h+=`<th>${d}</th>`;
-  h+='<th class="totalPresentCol">Total Present</th></tr></thead><tbody>';
-
-  active.forEach((st,displayIndex)=>{
-    const i=coachingStudents.indexOf(st);
-    let p=0;
-    h+=`<tr><td class="stickyStudentCol">${String(displayIndex+1).padStart(2,'0')}</td><td class="stickyNameCol">${escapeHtml(st.name)}</td>`;
-    for(let d=1;d<=days;d++){
-      const date=`${y}-${m}-${String(d).padStart(2,'0')}`;
-      const v=coachingAttendance[coachingKey(date,i)]||'';
-      if(v==='P')p++;
-      h+=`<td class="${v==='P'?'pCell':v==='A'?'aCell':''}">${v}</td>`;
-    }
-    h+=`<td class="totalPresentCol">${p}</td></tr>`;
-  });
-
-  // Final row: summary for each date across the whole batch.
-  h+='<tr class="registerSummaryRow"><td colspan="2" class="stickyStudentCol">Summary</td>';
-  let grandP=0,grandA=0;
-  for(let d=1;d<=days;d++){
-    const date=`${y}-${m}-${String(d).padStart(2,'0')}`;
-    let p=0,a=0;
-    active.forEach(st=>{const i=coachingStudents.indexOf(st);const v=coachingAttendance[coachingKey(date,i)];if(v==='P')p++;if(v==='A')a++;});
-    grandP+=p; grandA+=a;
-    const pct=active.length?Math.round(p/active.length*100):0;
-    h+=`<td title="${p} Present, ${a} Absent"><span class="summaryP">${pct}%</span><br><small>${p}P/${a}A</small></td>`;
-  }
-  h+=`<td class="totalPresentCol">${grandP}</td></tr></tbody></table></div>`;
-  const possible=active.length*days;
-  const overallPct=possible?Math.round(grandP/possible*100):0;
-  h+=`<div class="coachingMonthlySummary">
-    <div><b>Monthly Summary</b></div>
-    <div style="margin-top:7px;">Present: <b>${grandP}</b> &nbsp; • &nbsp; Absent: <b>${grandA}</b> &nbsp; • &nbsp; Present: <b>${overallPct}%</b></div>
-  </div>`;
-  area.innerHTML=h;
-}
-function renderCoachingStudentsPage(){
-  const area=document.getElementById('coachingStudentsArea');
-  if(!area || teachingMode!=='coaching') return;
-  // IMPORTANT: this function reads ONLY coachingStudents.
-  // It must never fall back to the Home Tuition `students` array.
-  const active=coachingStudents.filter(s=>s.active!==false), inactive=coachingStudents.filter(s=>s.active===false);
-  const query=(document.getElementById('coachingStudentSearchInput')?.value||'').trim().toLowerCase();
-  const all=[...active,...inactive]; const list=query?all.filter(s=>(s.name||'').toLowerCase().includes(query)):all;
-  if(!coachingStudents.length){area.innerHTML='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap + at the top to add your first coaching student.</div></div>';return;}
-  if(!list.length){area.innerHTML='<div class="emptyState"><div style="font-size:34px;margin-bottom:8px;">🔎</div><b>No student found</b><div style="margin-top:5px;">No student matches “'+escapeHtml(query)+'”.</div></div>';return;}
-  area.innerHTML=list.map((st,displayIndex)=>{const idx=coachingStudents.indexOf(st);const initial=(st.name||'?').trim().charAt(0).toUpperCase();return `<div class="modernStudent"><div style="width:30px;font-weight:800;color:#6b7280;text-align:center;">${String(displayIndex+1).padStart(2,'0')}</div><div class="avatar">${initial}</div><div class="studentMain"><b>${escapeHtml(st.name)}</b><div class="studentMeta">${st.active===false?'Inactive':'Active'}</div></div><div class="studentActions"><button class="miniBtn" onclick="editCoachingStudent(${idx})">Edit</button><button class="miniBtn red" onclick="deleteCoachingStudent(${idx})">Delete</button></div></div>`}).join('');
-  const count=document.getElementById('studentCountText'); if(count && teachingMode==='coaching')count.textContent=`${active.length} active${coachingStudents.length!==active.length?' · '+(coachingStudents.length-active.length)+' inactive':''}`;
-  const c=document.getElementById('coachingStudentCountText');if(c)c.textContent=`${active.length} active`;
-}
-function editCoachingStudent(index){
-  const st=coachingStudents[index]; if(!st)return; const name=prompt('Student Name',st.name); if(!name||!name.trim())return; st.name=name.trim(); saveCoachingData(); renderCoachingStudentsPage();
-}
-function deleteCoachingStudent(index){
-  if(!coachingStudents[index])return;
-  if(confirm('Delete this coaching student?')){coachingStudents.splice(index,1);saveCoachingData();renderCoachingStudentsPage();updateModeUI();}
-}
-function renderCoachingFees(){
-  const area=document.getElementById('coachingFeesArea'); if(!area)return;
-  if(!coachingStudents.length){area.innerHTML='<div class="emptyState"><div style="font-size:38px;">₹</div><b>No coaching students yet</b><div style="margin-top:5px;">Add students using +.</div></div>';return;}
-  area.innerHTML='<div class="emptyState"><div style="font-size:38px;">₹</div><b>Coaching Fees</b><div style="margin-top:5px;">Student-wise coaching fee management is kept separate from Home Tuition.</div></div>';
-}
-
 let currentSectionId = 'homeSection';
 let sectionHistoryStack = [];
 let pendingHomeNavigation = false;
@@ -1641,14 +1278,10 @@ let handlingSectionPop = false;
 function sectionNavId(sectionId){
   const map={
     homeSection:'homeNav',
-    coachingHomeSection:'homeNav',
     studentsSection:'studentsNav',
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
-    reportsSection:'reportsNav',
-    coachingAttendanceSection:'homeNav',
-    coachingReportSection:'reportsNav',
-    coachingFeesSection:'feesNav'
+    reportsSection:'reportsNav'
   };
   return map[sectionId] || 'homeNav';
 }
@@ -1672,22 +1305,23 @@ function showSection(sectionId, navId, fromHistory){
   if(nav) nav.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(sectionId==='studentsSection') renderStudentsPage();
-   if(sectionId==='coachingStudentsSection') renderCoachingStudentsPage();
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='reportsSection') renderReports();
 }
 
 function goHome(){
-  goModeHome();
+  // Home is the root of the app. If we are several screens deep, jump back
+  // to the guard entry in one operation so Back on Home can behave normally.
+  if(currentSectionId==='homeSection') return;
+  if(sectionHistoryStack.length){
+    pendingHomeNavigation=true;
+    history.go(-sectionHistoryStack.length);
+    return;
+  }
+  showSection('homeSection','homeNav',true);
 }
 
 function renderStudentsPage(){
-  // Home Tuition and Coaching use completely separate student stores.
-  // Never render Home Tuition students while Coaching mode is active.
-  if(teachingMode==='coaching'){
-    renderCoachingStudentsPage();
-    return;
-  }
   const area=document.getElementById('studentsArea');
   if(!area) return;
   const active=students.filter(s=>s.active!==false);
@@ -1721,7 +1355,6 @@ function renderStudentsPage(){
 }
 
 function renderFeesPage(){
-  if(teachingMode==='coaching') return;
   const area=document.getElementById('feesArea');
   if(!area) return;
   if(!students.length){
@@ -1742,7 +1375,6 @@ function renderFeesPage(){
 }
 
 function render(){
-  if(teachingMode==='coaching') return;
   const attendanceArea = document.getElementById("attendanceArea");
   attendanceArea.innerHTML="";
 
@@ -1842,7 +1474,6 @@ function populateReportYears(){
 }
 
 function renderReports(){
-  if(teachingMode==='coaching') return;
   const reportArea = document.getElementById("reportArea");
   reportArea.innerHTML="";
 
@@ -2525,7 +2156,7 @@ window.addEventListener("popstate", function(event){
     pendingHomeNavigation=false;
     sectionHistoryStack=[];
     handlingSectionPop=true;
-    showSection(teachingMode==='coaching'?'coachingHomeSection':'homeSection','homeNav',true);
+    showSection('homeSection','homeNav',true);
     handlingSectionPop=false;
     return;
   }
@@ -2547,7 +2178,7 @@ window.addEventListener("popstate", function(event){
   if(currentSectionId!=='homeSection'){
     sectionHistoryStack=[];
     handlingSectionPop=true;
-    showSection(teachingMode==='coaching'?'coachingHomeSection':'homeSection','homeNav',true);
+    showSection('homeSection','homeNav',true);
     handlingSectionPop=false;
   }
   return;
@@ -2703,12 +2334,7 @@ function backupData(){
   document.getElementById("menuPopup").style.display="none";
 
   const backup = {
-    schemaVersion: 2,
     students: students,
-    coachingDataVersion: 2,
-    coachingStudents: coachingStudents,
-    coachingAttendance: coachingAttendance,
-    coachingFees: coachingFees,
     appPin: localStorage.getItem(getPinKey())
   };
 
@@ -2759,15 +2385,6 @@ function restoreBackup(event){
         if(!s.attendance) s.attendance=[];
         if(typeof s.active !== "boolean") s.active=true;
       });
-
-      if(backup.coachingDataVersion===2){
-        if(Array.isArray(backup.coachingStudents)) coachingStudents=backup.coachingStudents;
-        if(backup.coachingAttendance && typeof backup.coachingAttendance==='object') coachingAttendance=backup.coachingAttendance;
-        if(backup.coachingFees && typeof backup.coachingFees==='object') coachingFees=backup.coachingFees;
-      }else{
-        coachingStudents=[]; coachingAttendance={}; coachingFees={};
-      }
-      coachingStudents.forEach(st=>{if(typeof st.active!=='boolean')st.active=true;if(!st.fees)st.fees=[];});
 
       if(backup.appPin){
         localStorage.setItem(getPinKey(), backup.appPin);
@@ -2868,7 +2485,7 @@ async function initializeApp(){
     String(today.getMonth() + 1).padStart(2, "0");
 
   if (loggedIn && savedSub) {
-    if(teachingMode==='home') render();
+    render();
     checkLock();
 
     // Re-obtain a short-lived Drive token after every page load.
@@ -2901,13 +2518,243 @@ onchange="restoreBackup(event)">
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
-  
-try{
-  updateModeUI();
-  if(teachingMode==='coaching'){ showSection('coachingHomeSection','homeNav',true); }
-  else { showSection('homeSection','homeNav',true); }
-}catch(e){console.warn(e);}
+  </script>
+
+<style>
+/* Coaching Mode - isolated UI */
+.modeSwitchWrap{display:flex;align-items:center;gap:6px;margin-top:8px;}
+#appModeSwitch{width:auto;min-width:155px;margin:0;padding:7px 10px;border-radius:10px;border:1px solid #d8dee8;background:#fff;font-weight:700;font-size:13px;}
+#coachingApp{display:none;padding-bottom:90px;}
+.coachPage{display:none;}
+.coachPage.active{display:block;}
+.coachHero{margin:12px 0 15px;padding:16px;border-radius:16px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.coachHero h2{font-size:21px;margin-bottom:5px}.coachHero p{color:#666;font-size:14px;}
+.coachGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.coachCard{border:none;border-radius:16px;padding:18px 12px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);text-align:left;min-height:120px;}
+.coachCard .coachIcon{font-size:30px;display:block;margin-bottom:8px}.coachCard h3{font-size:17px;margin-bottom:4px}.coachCard p{font-size:13px;color:#666;}
+.coachHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 15px;}
+.coachHead h2{font-size:21px}.coachBack{border:none;background:#fff;border:1px solid #ddd;border-radius:9px;padding:8px 12px;font-weight:600;}
+.coachPanel{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.08);padding:12px;margin-bottom:12px;}
+.coachStudentRow{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #eee;}.coachStudentRow:last-child{border-bottom:none;}
+.coachNo{width:28px;font-weight:700;color:#666;font-size:13px}.coachStudentName{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.coachMini{border:none;border-radius:8px;padding:7px 10px;font-weight:700;background:#eef3f8;}.coachDelete{background:#fee2e2;color:#b42318}.coachPlus{background:#0d6efd;color:#fff;border-radius:50%;width:34px;height:34px;padding:0;font-size:20px;}
+.coachAttendanceRow{display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid #eee;}.coachAttendanceRow:last-child{border-bottom:none;}
+.coachPA{display:flex;gap:5px}.coachPA button{border:none;border-radius:7px;width:34px;height:30px;font-weight:800;background:#f0f0f0}.coachPA .selectedP{background:#d1f7dc;color:#137333}.coachPA .selectedA{background:#ffd9d9;color:#b42318}
+.coachSummary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.coachStat{background:#f5f7fa;border-radius:10px;padding:10px;text-align:center}.coachStat b{display:block;font-size:18px}.coachStat span{font-size:12px;color:#666}
+.coachFilters{display:flex;gap:8px}.coachFilters select{flex:1;margin:0;}
+.coachTableWrap{overflow-x:auto;border-radius:10px;border:1px solid #e3e7ed}.coachTable{border-collapse:collapse;width:max-content;min-width:100%;font-size:12px}.coachTable th,.coachTable td{border:1px solid #e3e7ed;padding:7px;text-align:center;white-space:nowrap}.coachTable th{background:#f5f7fa;position:sticky;top:0;z-index:1}.coachTable .nameCol{text-align:left;position:sticky;left:0;background:#fff;z-index:2;min-width:130px}.coachTable th.nameCol{background:#f5f7fa;z-index:3}.coachP{color:#198754;font-weight:800}.coachA{color:#dc3545;font-weight:800}.coachDash{color:#aaa}.coachOverall{margin-top:12px;padding:12px;border-radius:10px;background:#eaf7ef;font-weight:700;text-align:center;}
+@media(max-width:420px){.coachGrid{gap:9px}.coachCard{padding:15px 10px;min-height:112px}.coachCard h3{font-size:16px}.coachSummary{grid-template-columns:1fr 1fr}.coachSummary .coachStat:last-child{grid-column:1/-1}}
+</style>
+<script>
+/* ==================== COACHING MODE ==================== */
+const COACH_DATA_KEY_PREFIX = "tuitionCoaching_v1_";
+let coachingStudents = [];
+let appMode = "home";
+let coachingView = "home";
+let coachingSelectedStudent = null;
+let coachingFeeStudent = null;
+let coachingFeeMonth = String(new Date().getMonth()+1).padStart(2,"0");
+let coachingFeeYear = String(new Date().getFullYear());
+
+function getCoachingDataKey(){
+  return currentAccountKey ? COACH_DATA_KEY_PREFIX + currentAccountKey : "tuitionCoaching_v1";
+}
+function saveCoachingData(markPending=true){
+  localStorage.setItem(getCoachingDataKey(), JSON.stringify(coachingStudents));
+  if(markPending && currentAccountKey){
+    const meta=getSyncMeta(); meta.updatedAt=Date.now(); meta.pending=true; setSyncMeta(meta); scheduleDriveSync();
+  }
+}
+function loadCoachingData(){
+  coachingStudents=[];
+  const raw=localStorage.getItem(getCoachingDataKey());
+  if(raw){try{coachingStudents=JSON.parse(raw)||[]}catch{coachingStudents=[];}}
+  coachingStudents.forEach(s=>{if(!Array.isArray(s.attendance))s.attendance=[];if(!Array.isArray(s.fees))s.fees=[];});
+}
+function escapeCoach(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
+function injectCoachingUI(){
+  const title=document.querySelector(".appTitle");
+  if(title && !document.getElementById("appModeSwitch")){
+    const wrap=document.createElement("div"); wrap.className="modeSwitchWrap";
+    wrap.innerHTML='<span style="font-size:12px;color:#666;">Mode</span><select id="appModeSwitch" onchange="switchAppMode(this.value)"><option value="home">🏠 Home Tuition</option><option value="coaching">🏫 Coaching</option></select>';
+    title.parentElement.appendChild(wrap);
+  }
+  if(document.getElementById("coachingApp")) return;
+  const shell=document.querySelector(".appShell");
+  if(!shell) return;
+  const coach=document.createElement("div"); coach.id="coachingApp";
+  coach.innerHTML=`
+    <section id="coachHome" class="coachPage active">
+      <div class="coachHero"><h2>Coaching Dashboard</h2><p>Manage your coaching students, attendance and fees separately.</p></div>
+      <div class="coachGrid">
+        <button class="coachCard" onclick="openCoachingView('students')"><span class="coachIcon">👨‍🎓</span><h3>Students</h3><p id="coachStudentCount">Manage students</p></button>
+        <button class="coachCard" onclick="openCoachingView('attendance')"><span class="coachIcon">📅</span><h3>Take Attendance</h3><p>Mark P/A instantly</p></button>
+        <button class="coachCard" onclick="openCoachingView('fees')"><span class="coachIcon">₹</span><h3>Fees</h3><p>Monthly fee status</p></button>
+        <button class="coachCard" onclick="openCoachingView('report')"><span class="coachIcon">📊</span><h3>Monthly Report</h3><p>Register-style P/A report</p></button>
+      </div>
+    </section>
+    <section id="coachStudents" class="coachPage">
+      <div class="coachHead"><h2>Coaching Students</h2><button class="coachBack" onclick="coachingGoHome()">Home</button></div>
+      <div class="coachPanel"><input id="coachStudentSearch" type="search" placeholder="Search student..." oninput="renderCoachingStudents()" autocomplete="off"></div>
+      <div id="coachStudentsArea" class="coachPanel"></div>
+    </section>
+    <section id="coachAttendance" class="coachPage">
+      <div class="coachHead"><h2>Take Attendance</h2><button class="coachBack" onclick="coachingGoHome()">Home</button></div>
+      <div class="coachPanel"><label style="font-weight:700;display:block;">Attendance Date</label><input id="coachAttDate" type="date" onchange="renderCoachingAttendance()"></div>
+      <div id="coachAttendanceArea" class="coachPanel"></div>
+      <div id="coachAttendanceSummary"></div>
+    </section>
+    <section id="coachFees" class="coachPage">
+      <div class="coachHead"><h2>Coaching Fees</h2><button class="coachBack" onclick="coachingGoHome()">Home</button></div>
+      <div class="coachPanel"><div class="coachFilters"><select id="coachFeeMonth" onchange="coachingFeeMonth=this.value;renderCoachingFees()"><option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select><select id="coachFeeYear" onchange="coachingFeeYear=this.value;renderCoachingFees()"></select></div></div>
+      <div id="coachFeesArea" class="coachPanel"></div>
+    </section>
+    <section id="coachReport" class="coachPage">
+      <div class="coachHead"><h2>Monthly Report</h2><button class="coachBack" onclick="coachingGoHome()">Home</button></div>
+      <div class="coachPanel"><div class="coachFilters"><select id="coachReportMonth" onchange="renderCoachingReport()"><option value="01">January</option><option value="02">February</option><option value="03">March</option><option value="04">April</option><option value="05">May</option><option value="06">June</option><option value="07">July</option><option value="08">August</option><option value="09">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select><select id="coachReportYear" onchange="renderCoachingReport()"></select></div></div>
+      <div id="coachReportArea" class="coachPanel"></div>
+    </section>`;
+  shell.appendChild(coach);
+}
+function populateCoachYears(){
+  ["coachFeeYear","coachReportYear"].forEach(id=>{const el=document.getElementById(id);if(!el)return;const old=el.value;const now=new Date().getFullYear();el.innerHTML="";for(let y=2025;y<=2035;y++){const o=document.createElement("option");o.value=String(y);o.textContent=String(y);el.appendChild(o);}el.value=(old&&+old>=2025&&+old<=2035)?old:(now>=2025&&now<=2035?String(now):"2026");});
+}
+function setCoachTodayDefaults(){
+  const now=new Date(), d=now.toISOString().slice(0,10), m=String(now.getMonth()+1).padStart(2,"0"), y=String(now.getFullYear());
+  const att=document.getElementById("coachAttDate");if(att&&!att.value)att.value=d;
+  const fm=document.getElementById("coachFeeMonth"),fy=document.getElementById("coachFeeYear"),rm=document.getElementById("coachReportMonth"),ry=document.getElementById("coachReportYear");
+  if(fm)fm.value=m;if(fy)fy.value=y;if(rm)rm.value=m;if(ry)ry.value=y; coachingFeeMonth=m;coachingFeeYear=y;
+}
+function switchAppMode(mode,fromHistory=false){
+  injectCoachingUI();
+  if(mode!=="coaching") mode="home";
+  if(!fromHistory && mode!==appMode) history.pushState({appMode:mode,coachingView:"home"},"",location.href);
+  appMode=mode;
+  const sw=document.getElementById("appModeSwitch");if(sw)sw.value=mode;
+  const main=document.querySelector(".appShell main"), nav=document.querySelector(".bottomNav"), coach=document.getElementById("coachingApp");
+  if(mode==="coaching"){
+    if(main)main.style.display="none"; if(nav)nav.style.display="none"; if(coach)coach.style.display="block";
+    coachingView="home"; renderCoaching(); window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    if(main)main.style.display=""; if(nav)nav.style.display=""; if(coach)coach.style.display="none";
+    const active=document.querySelector(".appShell main .section.active"); if(!active) showSection("homeSection","homeNav",true);
+    render();
+  }
+}
+function renderCoaching(){
+  injectCoachingUI(); populateCoachYears(); setCoachTodayDefaults();
+  document.querySelectorAll(".coachPage").forEach(x=>x.classList.remove("active"));
+  const page=document.getElementById("coach"+coachingView.charAt(0).toUpperCase()+coachingView.slice(1));
+  if(page)page.classList.add("active");
+  const count=document.getElementById("coachStudentCount");if(count)count.textContent=`${coachingStudents.length} student${coachingStudents.length===1?'':'s'}`;
+  if(coachingView==="students")renderCoachingStudents();
+  if(coachingView==="attendance")renderCoachingAttendance();
+  if(coachingView==="fees")renderCoachingFees();
+  if(coachingView==="report")renderCoachingReport();
+}
+function openCoachingView(view){
+  if(appMode!=="coaching")return;
+  if(view===coachingView)return;
+  history.pushState({appMode:"coaching",coachingView:view},"",location.href); coachingView=view; renderCoaching(); window.scrollTo({top:0,behavior:"smooth"});
+}
+function coachingGoHome(){
+  if(coachingView==="home")return;
+  history.back();
+}
+function addCoachingStudent(){
+  const name=prompt("Student Name"); if(!name||!name.trim())return;
+  coachingStudents.push({name:name.trim(),attendance:[],fees:[]}); saveCoachingData(true); renderCoaching();
+}
+function editCoachingStudent(index){const s=coachingStudents[index];if(!s)return;const n=prompt("Edit Student Name",s.name);if(n&&n.trim()){s.name=n.trim();saveCoachingData(true);renderCoaching();}}
+function deleteCoachingStudent(index){if(!coachingStudents[index])return;if(confirm("Delete Coaching Student?\n\nAll attendance and fee records for this student will also be deleted.")){coachingStudents.splice(index,1);saveCoachingData(true);renderCoaching();}}
+function renderCoachingStudents(){
+  const area=document.getElementById("coachStudentsArea");if(!area)return;const q=(document.getElementById("coachStudentSearch")?.value||"").trim().toLowerCase();
+  const list=coachingStudents.map((s,i)=>({s,i})).filter(x=>!q||(x.s.name||"").toLowerCase().includes(q));
+  if(!coachingStudents.length){area.innerHTML='<div style="text-align:center;padding:25px;color:#666;">No coaching students yet.<br>Tap + at the top to add one.</div>';return;}
+  if(!list.length){area.innerHTML='<div style="text-align:center;padding:25px;color:#666;">No student found.</div>';return;}
+  area.innerHTML=list.map(({s,i})=>`<div class="coachStudentRow"><div class="coachNo">${String(i+1).padStart(2,"0")}</div><div class="coachStudentName">${escapeCoach(s.name)}</div><button class="coachMini" onclick="editCoachingStudent(${i})">Edit</button><button class="coachMini coachDelete" onclick="deleteCoachingStudent(${i})">Delete</button></div>`).join("");
+}
+function getCoachRecord(s,date){return (s.attendance||[]).find(a=>a.date===date);}
+function setCoachAttendance(index,status){
+  const date=document.getElementById("coachAttDate")?.value;if(!date)return alert("Select Date");const s=coachingStudents[index];if(!s)return;
+  let r=getCoachRecord(s,date);if(!r){r={date,status};s.attendance.push(r);}else r.status=status;saveCoachingData(true);renderCoachingAttendance();
+}
+function renderCoachingAttendance(){
+  const area=document.getElementById("coachAttendanceArea"), summary=document.getElementById("coachAttendanceSummary");if(!area||!summary)return;const date=document.getElementById("coachAttDate")?.value;
+  if(!coachingStudents.length){area.innerHTML='<div style="text-align:center;padding:25px;color:#666;">No coaching students yet.</div>';summary.innerHTML="";return;}
+  let p=0,a=0;let html="";coachingStudents.forEach((s,i)=>{const r=getCoachRecord(s,date);if(r?.status==="P")p++;if(r?.status==="A")a++;html+=`<div class="coachAttendanceRow"><div class="coachNo">${String(i+1).padStart(2,"0")}</div><div class="coachStudentName">${escapeCoach(s.name)}</div><div class="coachPA"><button class="${r?.status==='P'?'selectedP':''}" onclick="setCoachAttendance(${i},'P')">P</button><button class="${r?.status==='A'?'selectedA':''}" onclick="setCoachAttendance(${i},'A')">A</button></div></div>`;});
+  area.innerHTML=html;const total=coachingStudents.length, pp=total?((p/total)*100).toFixed(0):0, ap=total?((a/total)*100).toFixed(0):0;summary.innerHTML=`<div class="coachSummary"><div class="coachStat"><b>${total}</b><span>Total Students</span></div><div class="coachStat"><b>${p} (${pp}%)</b><span>Present</span></div><div class="coachStat"><b>${a} (${ap}%)</b><span>Absent</span></div></div>`;
+}
+function monthDays(year,month){const n=new Date(year,month,0).getDate();const now=new Date();if(year===now.getFullYear()&&month===now.getMonth()+1)return now.getDate();if(year>now.getFullYear()||(year===now.getFullYear()&&month>now.getMonth()+1))return 0;return n;}
+function renderCoachingReport(){
+  const area=document.getElementById("coachReportArea");if(!area)return;const month=+(document.getElementById("coachReportMonth")?.value||1),year=+(document.getElementById("coachReportYear")?.value||new Date().getFullYear()),days=monthDays(year,month);
+  if(!coachingStudents.length){area.innerHTML='<div style="text-align:center;padding:25px;color:#666;">No coaching students yet.</div>';return;}
+  if(days===0){area.innerHTML='<div style="text-align:center;padding:25px;color:#666;">No dates available for this month yet.</div>';return;}
+  let h='<div class="coachTableWrap"><table class="coachTable"><thead><tr><th class="nameCol">Student</th>';for(let d=1;d<=days;d++)h+=`<th>${String(d).padStart(2,'0')}</th>`;h+='<th>Total Present</th></tr></thead><tbody>';
+  const dayStats=Array.from({length:days},()=>({p:0,a:0}));let overallP=0,overallA=0;
+  coachingStudents.forEach((s,i)=>{let totalP=0;h+=`<tr><td class="nameCol"><b>${String(i+1).padStart(2,'0')}</b> ${escapeCoach(s.name)}</td>`;for(let d=1;d<=days;d++){const date=`${year}-${String(month).padStart(2,'0')}-${String(d).padStart(2,'0')}`,r=getCoachRecord(s,date);if(r?.status==='P'){totalP++;dayStats[d-1].p++;overallP++;h+='<td class="coachP">P</td>';}else if(r?.status==='A'){dayStats[d-1].a++;overallA++;h+='<td class="coachA">A</td>';}else h+='<td class="coachDash">—</td>';}h+=`<td><b>${totalP}</b></td></tr>`;});
+  h+='<tr><th class="nameCol">Summary</th>';dayStats.forEach(x=>{const t=x.p+x.a;h+=`<td>${t?Math.round(x.p/t*100)+'%':'—'}<br><span style="font-size:10px;">${x.p}P/${x.a}A</span></td>`;});h+=`<th>${overallP}P / ${overallA}A</th></tr></tbody></table></div>`;
+  const total=overallP+overallA;h+=`<div class="coachOverall">Monthly Overall: ${overallP} Present / ${overallA} Absent${total?` · Present ${Math.round(overallP/total*100)}% · Absent ${Math.round(overallA/total*100)}%`:''}</div>`;area.innerHTML=h;
+}
+function findCoachFee(s,month,year){return (s.fees||[]).find(f=>{const p=(f.date||"").split("-");return p[0]===year&&p[1]===month;});}
+function openCoachingFee(index){
+  coachingFeeStudent=index;const m=document.getElementById("coachFeeMonth")?.value||coachingFeeMonth,y=document.getElementById("coachFeeYear")?.value||coachingFeeYear;coachingFeeMonth=m;coachingFeeYear=y;
+  document.getElementById("feeMode").value="";document.getElementById("feeAmount").value="";
+  const now=new Date(),today=now.toISOString().slice(0,10),date=(m===String(now.getMonth()+1).padStart(2,"0")&&y===String(now.getFullYear()))?today:`${y}-${m}-01`;
+  document.getElementById("feeDate").value=date;document.getElementById("feePopup").style.display="flex";
+}
+function renderCoachingFees(){
+  const area=document.getElementById("coachFeesArea");if(!area)return;const m=document.getElementById("coachFeeMonth")?.value||coachingFeeMonth,y=document.getElementById("coachFeeYear")?.value||coachingFeeYear;coachingFeeMonth=m;coachingFeeYear=y;
+  if(!coachingStudents.length){area.innerHTML='<div style="text-align:center;padding:25px;color:#666;">No coaching students yet.</div>';return;}
+  area.innerHTML=coachingStudents.map((s,i)=>{const f=findCoachFee(s,m,y);const status=f?`<button class="coachMini" style="background:#d1f7dc;color:#137333;" onclick="openCoachingFeeStatus(${i})">Credited</button>`:'<span style="color:#b42318;font-weight:700;">Pending</span>';return `<div class="coachStudentRow"><div class="coachNo">${String(i+1).padStart(2,"0")}</div><div class="coachStudentName">${escapeCoach(s.name)}</div><button class="coachMini coachPlus" onclick="openCoachingFee(${i})">+</button>${status}</div>`;}).join("");
+}
+function openCoachingFeeStatus(index){coachingFeeStudent=index;document.getElementById("feeStatusPopup").style.display="flex";}
+function saveCoachingFee(){
+  const mode=document.getElementById("feeMode").value,amount=document.getElementById("feeAmount").value,date=document.getElementById("feeDate").value,s=coachingStudents[coachingFeeStudent];if(!s)return;if(!mode||!amount||!date){alert("Fill all details");return;}
+  if(!Array.isArray(s.fees))s.fees=[];const existing=s.fees.find(f=>f.date===date);if(existing){existing.amount=amount;existing.mode=mode;}else s.fees.push({amount,mode,date});
+  document.getElementById("feePopup").style.display="none";saveCoachingData(true);renderCoachingFees();
+}
+function deleteCoachingFeeStatus(){
+  const s=coachingStudents[coachingFeeStudent];if(!s)return;const m=document.getElementById("coachFeeMonth")?.value||coachingFeeMonth,y=document.getElementById("coachFeeYear")?.value||coachingFeeYear;if(!confirm("Are you sure you want to delete this fee status?"))return;s.fees=(s.fees||[]).filter(f=>{const p=(f.date||"").split("-");return !(p[0]===y&&p[1]===m);});saveCoachingData(true);document.getElementById("feeStatusPopup").style.display="none";renderCoachingFees();
+}
+function addStudent(){if(appMode==="coaching"){addCoachingStudent();return;}const name=prompt("Student Name");if(!name)return;students.push({name:name,fees:[],attendance:[],active:true});saveLocalData(true);render();}
+function openFee(index){if(appMode==="coaching"){openCoachingFee(index);return;}currentStudent=index;document.getElementById("feePopup").style.display="flex";}
+function saveFee(){if(appMode==="coaching"){saveCoachingFee();return;}const mode=document.getElementById("feeMode").value,amount=document.getElementById("feeAmount").value,date=document.getElementById("feeDate").value;if(!mode||!amount||!date){alert("Fill all details");return;}if(!students[currentStudent].fees)students[currentStudent].fees=[];const existingFee=students[currentStudent].fees.find(f=>f.date===date);if(existingFee){existingFee.amount=amount;existingFee.mode=mode;}else students[currentStudent].fees.push({amount,mode,date});document.getElementById("feePopup").style.display="none";saveLocalData(true);renderReports();}
+function deleteFeeStatus(){if(appMode==="coaching"){deleteCoachingFeeStatus();return;}const selectedMonth=document.getElementById("reportMonth").value,selectedYear=document.getElementById("reportYear").value,student=students[currentStudent];if(!student||!student.fees)return;if(!confirm("Are you sure you want to delete this fee status?"))return;student.fees=student.fees.filter(f=>{const parts=f.date.split("-");return !(parts[0]===selectedYear&&parts[1]===selectedMonth);});saveLocalData(true);closeFeeStatus();renderReports();}
+function renderStudentsPage(){if(appMode==="coaching")return;const area=document.getElementById('studentsArea');if(!area)return;const active=students.filter(s=>s.active!==false),inactive=students.filter(s=>s.active===false),query=(document.getElementById('studentSearchInput')?.value||'').trim().toLowerCase(),allList=[...active,...inactive],list=query?allList.filter(s=>(s.name||'').toLowerCase().includes(query)):allList;let html='';if(!students.length)html='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap + at the top to add your first student.</div></div>';else if(!list.length)html='<div class="emptyState"><div style="font-size:34px;margin-bottom:8px;">🔎</div><b>No student found</b></div>';else html=list.map(s=>{const index=students.indexOf(s),initial=(s.name||'?').trim().charAt(0).toUpperCase();return `<div class="modernStudent"><div class="avatar">${initial}</div><div class="studentMain"><b>${escapeHtml(s.name)}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div><div class="studentActions"><button class="miniBtn" onclick="openStudentDetails(${index})">View</button><button class="miniBtn" onclick="editStudent(${index})">Edit</button></div></div>`}).join('');area.innerHTML=html;const count=document.getElementById('studentCountText');if(count)count.textContent=`${active.length} active${students.length!==active.length?' · '+(students.length-active.length)+' inactive':''}`;}
+function unusedShowSectionWrapper(sectionId,navId,fromHistory){if(appMode==="coaching")return;}
+/* Preserve the original section navigation implementation under a stable name. */
+function unusedRenderWrapper(){if(appMode==="coaching")renderCoaching();}
+function saveLocalData(markPending=true){localStorage.setItem(getDataKey(),JSON.stringify(students));if(markPending&&currentAccountKey){const meta=getSyncMeta();meta.updatedAt=Date.now();meta.pending=true;setSyncMeta(meta);scheduleDriveSync();}}
+function loadAccountData(){let saved=localStorage.getItem(getDataKey());if(!saved&&currentAccountKey&&!localStorage.getItem("tuitionAccountMigration_v1")){const legacy=localStorage.getItem("tuitionData_v2");if(legacy){saved=legacy;localStorage.setItem(getDataKey(),legacy);localStorage.setItem("tuitionAccountMigration_v1","done");}}students=[];if(saved){try{students=JSON.parse(saved)||[]}catch{students=[];}}students.forEach(s=>{if(!s.fees)s.fees=[];if(!s.attendance)s.attendance=[];if(typeof s.active!=="boolean")s.active=true;});loadCoachingData();}
+async function syncWithGoogleDrive(){if(!currentAccountKey||!navigator.onLine||syncInProgress)return;syncInProgress=true;setDriveSyncStatus("Syncing…","working");try{await getDriveToken(false);const localMeta=getSyncMeta(),localUpdatedAt=Number(localMeta.updatedAt||0),driveFile=await findDriveDataFile();const makeBackup=()=>({schemaVersion:2,accountSub:currentAccountSub,email:localStorage.getItem("googleEmail")||"",updatedAt:localUpdatedAt||Date.now(),appPin:localStorage.getItem(getPinKey())||null,students:students,coachingStudents:coachingStudents});if(!driveFile){const b=makeBackup(),created=await uploadDriveData(b);setSyncMeta({updatedAt:Number(b.updatedAt),pending:false,driveFileId:created.id});setDriveSyncStatus("Synced with Google Drive","ok");return;}const driveBackup=await readDriveData(driveFile.id),driveUpdatedAt=Number(driveBackup?.updatedAt||0);if(localUpdatedAt>driveUpdatedAt){const b=makeBackup();await uploadDriveData(b,driveFile.id);setSyncMeta({updatedAt:localUpdatedAt,pending:false,driveFileId:driveFile.id});setDriveSyncStatus("Synced with Google Drive","ok");}else if(driveUpdatedAt>localUpdatedAt){if(Array.isArray(driveBackup.students)){students=driveBackup.students;students.forEach(s=>{if(!s.fees)s.fees=[];if(!s.attendance)s.attendance=[];if(typeof s.active!=="boolean")s.active=true;});localStorage.setItem(getDataKey(),JSON.stringify(students));}if(Array.isArray(driveBackup.coachingStudents))coachingStudents=driveBackup.coachingStudents;coachingStudents.forEach(s=>{if(!s.fees)s.fees=[];if(!s.attendance)s.attendance=[];});if(Object.prototype.hasOwnProperty.call(driveBackup,"appPin")){if(driveBackup.appPin)localStorage.setItem(getPinKey(),driveBackup.appPin);else localStorage.removeItem(getPinKey());}localStorage.setItem(getCoachingDataKey(),JSON.stringify(coachingStudents));setSyncMeta({updatedAt:driveUpdatedAt,pending:false,driveFileId:driveFile.id});render();}else{setSyncMeta({updatedAt:localUpdatedAt,pending:false,driveFileId:driveFile.id});setDriveSyncStatus("Synced with Google Drive","ok");}}catch(error){console.error("Drive sync failed:",error);setDriveSyncStatus("Offline / sync pending","error");const meta=getSyncMeta();meta.pending=true;setSyncMeta(meta);}finally{syncInProgress=false;}}
+async function restoreFromGoogleDrive(){document.getElementById("menuPopup").style.display="none";try{await getDriveToken(false);const f=await findDriveDataFile();if(!f){alert("No Google Drive data found for this Google account.");return;}const b=await readDriveData(f.id);if(!Array.isArray(b.students)){alert("Invalid Google Drive data.");return;}if(!confirm("Google Drive data mil gaya.\n\nKya aap is data ko restore karna chahte hain?\n\nCurrent local data will be replaced."))return;students=b.students;students.forEach(s=>{if(!s.fees)s.fees=[];if(!s.attendance)s.attendance=[];if(typeof s.active!=="boolean")s.active=true;});coachingStudents=Array.isArray(b.coachingStudents)?b.coachingStudents:[];coachingStudents.forEach(s=>{if(!s.fees)s.fees=[];if(!s.attendance)s.attendance=[];});localStorage.setItem(getDataKey(),JSON.stringify(students));localStorage.setItem(getCoachingDataKey(),JSON.stringify(coachingStudents));if(Object.prototype.hasOwnProperty.call(b,"appPin")){if(b.appPin)localStorage.setItem(getPinKey(),b.appPin);else localStorage.removeItem(getPinKey());}setSyncMeta({updatedAt:Number(b.updatedAt||Date.now()),pending:false,driveFileId:f.id});render();if(appMode==="coaching")renderCoaching();alert("Google Drive data restored successfully.");}catch(e){console.error(e);alert("Google Drive restore failed. Your local data is safe.");}}
+function backupData(){document.getElementById("menuPopup").style.display="none";const backup={schemaVersion:2,students:students,coachingStudents:coachingStudents,appPin:localStorage.getItem(getPinKey())};const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a"),today=new Date();a.href=url;a.download="Tuition_Backup_"+today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0")+".json";a.click();URL.revokeObjectURL(url);alert("Backup Created Successfully");}
+function restoreBackup(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){try{const b=JSON.parse(e.target.result);if(!b.students){alert("Invalid Backup File");return;}students=b.students;students.forEach(s=>{if(!s.fees)s.fees=[];if(!s.attendance)s.attendance=[];if(typeof s.active!=="boolean")s.active=true;});coachingStudents=Array.isArray(b.coachingStudents)?b.coachingStudents:[];coachingStudents.forEach(s=>{if(!s.fees)s.fees=[];if(!s.attendance)s.attendance=[];});if(b.appPin)localStorage.setItem(getPinKey(),b.appPin);else localStorage.removeItem(getPinKey());localStorage.setItem(getDataKey(),JSON.stringify(students));localStorage.setItem(getCoachingDataKey(),JSON.stringify(coachingStudents));const meta=getSyncMeta();meta.updatedAt=Date.now();meta.pending=true;setSyncMeta(meta);scheduleDriveSync();render();if(appMode==="coaching")renderCoaching();document.getElementById("lockSwitch").checked=!!localStorage.getItem(getPinKey());alert("Backup Restored Successfully");}catch{alert("Invalid Backup File");}document.getElementById("restoreFile").value="";};reader.readAsText(file);}
+function editStudent(index){if(appMode==="coaching"){editCoachingStudent(index);return;}const newName=prompt("Edit Student Name",students[index].name);if(newName){students[index].name=newName;saveLocalData(true);render();}}
+function deleteStudent(index){if(appMode==="coaching"){deleteCoachingStudent(index);return;}if(confirm("Delete Student?")){students.splice(index,1);saveLocalData(true);render();}}
+function openStudentDetails(index){if(appMode==="coaching")return;selectedStudentDetails=index;const st=students[index];if(typeof st.mobile==="undefined")st.mobile="";if(typeof st.address==="undefined")st.address="";document.getElementById("studentDetailsName").textContent=st.name;updateStudentActiveButton();document.getElementById("studentDetailsView").style.display="block";renderStudentDetails();document.getElementById("studentDetailsPopup").style.display="flex";}
+window.addEventListener("popstate",function(e){if(appMode==="coaching"||e.state?.appMode==="coaching"){if(e.state?.appMode==="coaching"){appMode="coaching";coachingView=e.state.coachingView||"home";switchAppMode("coaching",true);return;}if(appMode==="coaching"){switchAppMode("home",true);}}});
+/* Capture the original navigation functions safely by replacing the wrappers once. */
+(function(){
+  const oldShow=window.showSection;
+  window.showSection=function(sectionId,navId,fromHistory){if(appMode==="coaching")return;return oldShow(sectionId,navId,fromHistory);};
+  const oldGoHome=window.goHome;
+  window.goHome=function(){if(appMode==="coaching")return coachingGoHome();return oldGoHome();};
+  const oldRender=window.render;
+  window.render=function(){if(appMode==="coaching")return renderCoaching();return oldRender();};
+})();
+/* Final overrides for header mode and runtime startup. */
+const _oldInitializeApp=window.initializeApp;
+window.initializeApp=async function(){injectCoachingUI();loadCoachingData();if(_oldInitializeApp)await _oldInitializeApp();if(appMode==="coaching")renderCoaching();};
+const _oldHandleGoogleLogin=window.handleGoogleLogin;
+window.handleGoogleLogin=function(response){const r=_oldHandleGoogleLogin(response);return r;};
+const _oldSaveLocalData=window.saveLocalData;
+window.saveLocalData=function(markPending=true){_oldSaveLocalData(markPending);};
+/* Coaching mode fee/status popup functions are routed by the wrappers above. */
+document.addEventListener("DOMContentLoaded",function(){injectCoachingUI();});
 </script>
+
 
 </body>  
 </html>
