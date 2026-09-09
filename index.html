@@ -2522,8 +2522,12 @@ if ("serviceWorker" in navigator) {
 
 <style>
 /* Coaching Mode - isolated UI */
-.modeSwitchWrap{display:flex;align-items:center;gap:6px;margin-top:8px;}
-#appModeSwitch{width:auto;min-width:155px;margin:0;padding:7px 10px;border-radius:10px;border:1px solid #d8dee8;background:#fff;font-weight:700;font-size:13px;}
+.modeSwitchWrap{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+#appModeSwitch{display:none;}
+.modeSwitch{display:flex;align-items:center;gap:4px;padding:4px;background:#f1f3f8;border-radius:14px;box-shadow:inset 0 1px 3px rgba(0,0,0,.08);}
+.modeBtn{border:0;background:transparent;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:800;color:#687080;cursor:pointer;transition:.18s;white-space:nowrap;}
+.modeBtn.active{background:#fff;color:#4b55c8;box-shadow:0 2px 8px rgba(0,0,0,.10);}
+
 #coachingApp{display:none;padding-bottom:90px;}
 .coachPage{display:none;}
 .coachPage.active{display:block;}
@@ -2574,9 +2578,9 @@ function loadCoachingData(){
 function escapeCoach(v){return String(v??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));}
 function injectCoachingUI(){
   const title=document.querySelector(".appTitle");
-  if(title && !document.getElementById("appModeSwitch")){
+  if(title && !document.getElementById("homeModeBtn")){
     const wrap=document.createElement("div"); wrap.className="modeSwitchWrap";
-    wrap.innerHTML='<span style="font-size:12px;color:#666;">Mode</span><select id="appModeSwitch" onchange="switchAppMode(this.value)"><option value="home">🏠 Home Tuition</option><option value="coaching">🏫 Coaching</option></select>';
+    wrap.innerHTML=`<span style="font-size:12px;color:#666;">Mode</span><div class="modeSwitch" role="tablist" aria-label="Teaching mode"><button type="button" id="homeModeBtn" class="modeBtn active" onclick="switchAppMode('home')">🏠 Home Tuition</button><button type="button" id="coachingModeBtn" class="modeBtn" onclick="switchAppMode('coaching')">🏫 Coaching</button></div>`;
     title.parentElement.appendChild(wrap);
   }
   if(document.getElementById("coachingApp")) return;
@@ -2630,7 +2634,9 @@ function switchAppMode(mode,fromHistory=false){
   if(mode!=="coaching") mode="home";
   if(!fromHistory && mode!==appMode) history.pushState({appMode:mode,coachingView:"home"},"",location.href);
   appMode=mode;
-  const sw=document.getElementById("appModeSwitch");if(sw)sw.value=mode;
+  const homeBtn=document.getElementById("homeModeBtn"), coachBtn=document.getElementById("coachingModeBtn");
+  if(homeBtn)homeBtn.classList.toggle("active",mode==="home");
+  if(coachBtn)coachBtn.classList.toggle("active",mode==="coaching");
   const main=document.querySelector(".appShell main"), nav=document.querySelector(".bottomNav"), coach=document.getElementById("coachingApp");
   if(mode==="coaching"){
     if(main)main.style.display="none"; if(nav)nav.style.display="none"; if(coach)coach.style.display="block";
@@ -2639,6 +2645,7 @@ function switchAppMode(mode,fromHistory=false){
     if(main)main.style.display=""; if(nav)nav.style.display=""; if(coach)coach.style.display="none";
     const active=document.querySelector(".appShell main .section.active"); if(!active) showSection("homeSection","homeNav",true);
     render();
+    if(currentSectionId==="studentsSection") renderStudentsPage();
   }
 }
 function renderCoaching(){
@@ -2721,7 +2728,51 @@ function addStudent(){if(appMode==="coaching"){addCoachingStudent();return;}cons
 function openFee(index){if(appMode==="coaching"){openCoachingFee(index);return;}currentStudent=index;document.getElementById("feePopup").style.display="flex";}
 function saveFee(){if(appMode==="coaching"){saveCoachingFee();return;}const mode=document.getElementById("feeMode").value,amount=document.getElementById("feeAmount").value,date=document.getElementById("feeDate").value;if(!mode||!amount||!date){alert("Fill all details");return;}if(!students[currentStudent].fees)students[currentStudent].fees=[];const existingFee=students[currentStudent].fees.find(f=>f.date===date);if(existingFee){existingFee.amount=amount;existingFee.mode=mode;}else students[currentStudent].fees.push({amount,mode,date});document.getElementById("feePopup").style.display="none";saveLocalData(true);renderReports();}
 function deleteFeeStatus(){if(appMode==="coaching"){deleteCoachingFeeStatus();return;}const selectedMonth=document.getElementById("reportMonth").value,selectedYear=document.getElementById("reportYear").value,student=students[currentStudent];if(!student||!student.fees)return;if(!confirm("Are you sure you want to delete this fee status?"))return;student.fees=student.fees.filter(f=>{const parts=f.date.split("-");return !(parts[0]===selectedYear&&parts[1]===selectedMonth);});saveLocalData(true);closeFeeStatus();renderReports();}
-function renderStudentsPage(){if(appMode==="coaching")return;const area=document.getElementById('studentsArea');if(!area)return;const active=students.filter(s=>s.active!==false),inactive=students.filter(s=>s.active===false),query=(document.getElementById('studentSearchInput')?.value||'').trim().toLowerCase(),allList=[...active,...inactive],list=query?allList.filter(s=>(s.name||'').toLowerCase().includes(query)):allList;let html='';if(!students.length)html='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap + at the top to add your first student.</div></div>';else if(!list.length)html='<div class="emptyState"><div style="font-size:34px;margin-bottom:8px;">🔎</div><b>No student found</b></div>';else html=list.map(s=>{const index=students.indexOf(s),initial=(s.name||'?').trim().charAt(0).toUpperCase();return `<div class="modernStudent"><div class="avatar">${initial}</div><div class="studentMain"><b>${escapeHtml(s.name)}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div><div class="studentActions"><button class="miniBtn" onclick="openStudentDetails(${index})">View</button><button class="miniBtn" onclick="editStudent(${index})">Edit</button></div></div>`}).join('');area.innerHTML=html;const count=document.getElementById('studentCountText');if(count)count.textContent=`${active.length} active${students.length!==active.length?' · '+(students.length-active.length)+' inactive':''}`;}
+function renderStudentsPage(){
+  if(appMode==="coaching") return;
+  const area=document.getElementById("studentsArea");
+  if(!area) return;
+
+  // Home Tuition Students is kept completely independent from Coaching.
+  if(!Array.isArray(students)) students=[];
+  students.forEach(s=>{
+    if(!s || typeof s!=="object") return;
+    if(!Array.isArray(s.fees)) s.fees=[];
+    if(!Array.isArray(s.attendance)) s.attendance=[];
+    if(typeof s.active!=="boolean") s.active=true;
+  });
+
+  const active=students.filter(s=>s && s.active!==false);
+  const inactive=students.filter(s=>s && s.active===false);
+  const query=(document.getElementById("studentSearchInput")?.value||"").trim().toLowerCase();
+  const allList=[...active,...inactive];
+  const list=query ? allList.filter(s=>(s.name||"").toLowerCase().includes(query)) : allList;
+
+  let html="";
+  if(!students.length){
+    html='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap + at the top to add your first student.</div></div>';
+  }else if(!list.length){
+    html='<div class="emptyState"><div style="font-size:34px;margin-bottom:8px;">🔎</div><b>No student found</b><div style="margin-top:5px;">No student matches “'+escapeHtml(query)+'”.</div></div>';
+  }else{
+    html=list.map(s=>{
+      const index=students.indexOf(s);
+      const initial=(s.name||"?").trim().charAt(0).toUpperCase();
+      return `<div class="modernStudent">
+        <div class="avatar">${escapeHtml(initial)}</div>
+        <div class="studentMain"><b>${escapeHtml(s.name||"")}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
+        <div class="studentActions">
+          <button class="miniBtn" onclick="openStudentDetails(${index})">View</button>
+          <button class="miniBtn" onclick="editStudent(${index})">Edit</button>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  area.innerHTML=html;
+  const count=document.getElementById("studentCountText");
+  if(count) count.textContent=`${active.length} active${students.length!==active.length?' · '+(students.length-active.length)+' inactive':''}`;
+}
+
 function unusedShowSectionWrapper(sectionId,navId,fromHistory){if(appMode==="coaching")return;}
 /* Preserve the original section navigation implementation under a stable name. */
 function unusedRenderWrapper(){if(appMode==="coaching")renderCoaching();}
