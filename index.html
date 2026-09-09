@@ -1571,27 +1571,30 @@ function setAttendanceStatus(index,code){
   if(!s || s.active === false) return;
   if(!s.attendance) s.attendance=[];
 
+  const existing=s.attendance.find(a=>a.date===date);
+
+  // Clicking the already-selected status again removes that attendance.
+  // For Custom (H), this also prevents the prompt from opening again.
+  if(existing && attendanceStatusInfo(existing.status).code===code){
+    s.attendance=s.attendance.filter(a=>a.date!==date);
+    saveLocalData(true);
+    renderAttendance();
+    renderReports();
+    return;
+  }
+
   let status="Present";
   if(code==='A') status="Absent ❌";
   if(code==='L') status="Leave";
   if(code==='S') status="Sunday";
   if(code==='M') status="Sunday Manage ✅";
   if(code==='H'){
-    const current=s.attendance.find(a=>a.date===date);
-    const oldCustom=current && String(current.status||"").startsWith("EH|")
-      ? String(current.status).split("|").slice(1).join("|")
-      : "";
-    const text=prompt("Enter Custom Attendance",oldCustom);
+    const text=prompt("Enter Custom Attendance","");
     if(text===null || !text.trim()) return;
     status="EH|"+text.trim();
   }
 
-  const existing=s.attendance.find(a=>a.date===date);
-
-  // Clicking the already-selected status again removes that attendance.
-  if(existing && attendanceStatusInfo(existing.status).code===code){
-    s.attendance=s.attendance.filter(a=>a.date!==date);
-  }else if(existing){
+  if(existing){
     existing.status=status;
   }else{
     s.attendance.push({date:date,status:status});
