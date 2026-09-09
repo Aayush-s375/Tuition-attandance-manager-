@@ -1514,12 +1514,13 @@ function renderFeesPage(){
 }
 
 function attendanceStatusInfo(status){
+  if(!status) return {code:"", label:""};
   if(status === "Present") return {code:"P", label:"Present"};
   if(status === "Absent ❌" || status === "Absent") return {code:"A", label:"Absent"};
   if(status === "Leave") return {code:"L", label:"Leave"};
   if(status === "Sunday") return {code:"S", label:"Sunday"};
   if(status === "Sunday Manage ✅" || status === "Sunday Manage") return {code:"M", label:"Sunday Manage"};
-  if(String(status || "").startsWith("EH|")) return {code:"H", label:String(status).split("|").slice(1).join("|") || "Custom"};
+  if(String(status).startsWith("EH|")) return {code:"H", label:String(status).split("|").slice(1).join("|") || "Custom"};
   return {code:"H", label:"Custom"};
 }
 
