@@ -366,6 +366,12 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .studentActions{display:flex;gap:5px;}
 .miniBtn{border:0;border-radius:9px;padding:8px 9px;background:#eef2ff;color:#3947a7;font-weight:700;font-size:12px;}
 .miniBtn.red{background:#fff0f0;color:#d33;}
+
+.photoViewer{position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
+.photoViewer img{max-width:92vw;max-height:72vh;object-fit:contain;border-radius:14px;}
+.photoViewerTop{position:absolute;top:18px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center;}
+.photoViewerBtn{border:0;border-radius:9px;padding:9px 13px;background:#fff;color:#333;font-weight:700;}
+.photoViewerChange{margin-top:18px;border:0;border-radius:9px;padding:10px 16px;background:#3947a7;color:#fff;font-weight:700;}
 .emptyState{text-align:center;padding:28px 10px;color:#777;}
 .attendanceDateBox{background:#fff;border-radius:18px;padding:15px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin-bottom:13px;}
 .attendanceDateBox label{display:block;font-size:13px;font-weight:700;color:#606775;margin-bottom:6px;}
@@ -820,6 +826,7 @@ let currentStudent = null;
 let selectedAttendanceStudent = null;
 let selectedAttendanceDate = null;
 let selectedStudentDetails = null;
+let selectedPhotoStudent = null;
 
 function accountKeyFromSub(sub) {
   return encodeURIComponent(String(sub || "unknown"));
@@ -1439,7 +1446,7 @@ function renderStudentsPage(){
         ? `<img src="${s.photo}" alt="Student photo">`
         : initial;
       return `<div class="modernStudent">
-        <div class="avatar" onclick="document.getElementById('studentPhotoInput${index}').click()" title="Change student photo">${avatarContent}</div>
+        <div class="avatar" onclick="handleStudentPhotoBoxClick(${index})" title="Student photo">${avatarContent}</div>
         <input id="studentPhotoInput${index}" type="file" accept="image/*" style="display:none;" onchange="uploadStudentPhoto(event,${index})">
         <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
         <div class="studentActions">
@@ -1879,6 +1886,38 @@ function editStudent(index){
   }
 }
 
+function handleStudentPhotoBoxClick(index){
+  const st=students[index];
+  if(!st) return;
+  if(st.photo){
+    openStudentPhoto(index);
+  }else{
+    const input=document.getElementById("studentPhotoInput"+index);
+    if(input) input.click();
+  }
+}
+
+function openStudentPhoto(index){
+  const st=students[index];
+  if(!st || !st.photo) return;
+  selectedPhotoStudent=index;
+  document.getElementById("studentPhotoLarge").src=st.photo;
+  document.getElementById("studentPhotoTitle").textContent=st.name||"Student";
+  document.getElementById("studentPhotoViewer").style.display="flex";
+}
+
+function closeStudentPhoto(){
+  const viewer=document.getElementById("studentPhotoViewer");
+  if(viewer) viewer.style.display="none";
+  selectedPhotoStudent=null;
+}
+
+function changeStudentPhoto(){
+  if(selectedPhotoStudent===null) return;
+  const input=document.getElementById("studentPhotoInput"+selectedPhotoStudent);
+  if(input) input.click();
+}
+
 function uploadStudentPhoto(event,index){
   const file = event.target.files && event.target.files[0];
   if(!file) return;
@@ -2031,7 +2070,16 @@ function downloadPDF(index){
         </a>
       </div>
     </div>
-  </body></html>`);
+  
+<div id="studentPhotoViewer" class="photoViewer">
+  <div class="photoViewerTop">
+    <button class="photoViewerBtn" onclick="closeStudentPhoto()">← Back</button>
+    <b id="studentPhotoTitle" style="color:white;font-size:17px;"></b>
+  </div>
+  <img id="studentPhotoLarge" src="" alt="Student photo">
+  <button class="photoViewerChange" onclick="changeStudentPhoto()">Change Photo</button>
+</div>
+</body></html>`);
   reportWindow.document.close();
 }
 
