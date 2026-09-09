@@ -1436,10 +1436,11 @@ function renderStudentsPage(){
       const initial=(s.name||'?').trim().charAt(0).toUpperCase();
       return `<div class="modernStudent">
         <div class="avatar">${initial}</div>
-        <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
+        <div class="studentMain"><b onclick="openStudentDetails(${index})" style="cursor:pointer;">${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
         <div class="studentActions">
           <button class="miniBtn" onclick="openStudentDetails(${index})">View</button>
           <button class="miniBtn" onclick="editStudent(${index})">Edit</button>
+          <button class="miniBtn red" onclick="deleteStudent(${index})">🗑️</button>
         </div>
       </div>`;
     }).join('');
