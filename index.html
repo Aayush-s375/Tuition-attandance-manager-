@@ -711,6 +711,17 @@ Reset PIN
       <div id="coachingFeesArea" class="modernPanel"></div>
     </section>
 
+    <section id="coachingStudentsSection" class="section">
+      <div class="pageHead"><div><h2>Students</h2><p>Manage your coaching students</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
+      <div class="modernPanel studentSearchPanel">
+        <div class="searchWrap">
+          <span class="searchIcon">🔍</span>
+          <input id="coachingStudentSearchInput" type="search" placeholder="Search student..." oninput="renderCoachingStudentsPage()" autocomplete="off">
+        </div>
+      </div>
+      <div id="coachingStudentsArea" class="modernPanel"></div>
+    </section>
+
     <section id="studentsSection" class="section">
       <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="goModeHome()">Home</button></div>
       <div class="modernPanel studentSearchPanel">
@@ -1368,7 +1379,7 @@ function addStudent(){
     coachingStudents.push({name:name.trim(), active:true, fees:[]});
     saveCoachingData();
     updateModeUI();
-    showSection('studentsSection','studentsNav');
+    showSection('coachingStudentsSection','studentsNav');
     renderCoachingStudentsPage();
     return;
   }
@@ -1461,10 +1472,10 @@ function setTeachingMode(mode){
     const el=document.getElementById(target); if(el)el.classList.add('active');
     updateModeUI();
   }
+  // Coaching has its own Students section; never reuse the Home Tuition section.
   if(mode==='coaching'){
-    const area=document.getElementById('studentsArea');
-    if(area) area.innerHTML='';
-    renderCoachingStudentsPage();
+    const homeArea=document.getElementById('studentsArea');
+    if(homeArea) homeArea.innerHTML='';
   }
 }
 function goModeHome(){
@@ -1478,7 +1489,8 @@ function goModeHome(){
   showSection(target,'homeNav',true);
 }
 function openStudentsMode(){
-  showSection('studentsSection','studentsNav');
+  if(teachingMode==='coaching') showSection('coachingStudentsSection','studentsNav');
+  else showSection('studentsSection','studentsNav');
 }
 function openAttendanceMode(){
   if(teachingMode==='coaching') openCoachingAttendance();
@@ -1595,12 +1607,12 @@ function renderCoachingReport(){
   area.innerHTML=h;
 }
 function renderCoachingStudentsPage(){
-  const area=document.getElementById('studentsArea');
+  const area=document.getElementById('coachingStudentsArea');
   if(!area || teachingMode!=='coaching') return;
   // IMPORTANT: this function reads ONLY coachingStudents.
   // It must never fall back to the Home Tuition `students` array.
   const active=coachingStudents.filter(s=>s.active!==false), inactive=coachingStudents.filter(s=>s.active===false);
-  const query=(document.getElementById('studentSearchInput')?.value||'').trim().toLowerCase();
+  const query=(document.getElementById('coachingStudentSearchInput')?.value||'').trim().toLowerCase();
   const all=[...active,...inactive]; const list=query?all.filter(s=>(s.name||'').toLowerCase().includes(query)):all;
   if(!coachingStudents.length){area.innerHTML='<div class="emptyState"><div style="font-size:38px;margin-bottom:8px;">👨‍🎓</div><b>No students yet</b><div style="margin-top:5px;">Tap + at the top to add your first coaching student.</div></div>';return;}
   if(!list.length){area.innerHTML='<div class="emptyState"><div style="font-size:34px;margin-bottom:8px;">🔎</div><b>No student found</b><div style="margin-top:5px;">No student matches “'+escapeHtml(query)+'”.</div></div>';return;}
@@ -1660,6 +1672,7 @@ function showSection(sectionId, navId, fromHistory){
   if(nav) nav.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(sectionId==='studentsSection') renderStudentsPage();
+   if(sectionId==='coachingStudentsSection') renderCoachingStudentsPage();
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='reportsSection') renderReports();
 }
@@ -1708,6 +1721,7 @@ function renderStudentsPage(){
 }
 
 function renderFeesPage(){
+  if(teachingMode==='coaching') return;
   const area=document.getElementById('feesArea');
   if(!area) return;
   if(!students.length){
@@ -1728,6 +1742,7 @@ function renderFeesPage(){
 }
 
 function render(){
+  if(teachingMode==='coaching') return;
   const attendanceArea = document.getElementById("attendanceArea");
   attendanceArea.innerHTML="";
 
@@ -1827,6 +1842,7 @@ function populateReportYears(){
 }
 
 function renderReports(){
+  if(teachingMode==='coaching') return;
   const reportArea = document.getElementById("reportArea");
   reportArea.innerHTML="";
 
@@ -2852,7 +2868,7 @@ async function initializeApp(){
     String(today.getMonth() + 1).padStart(2, "0");
 
   if (loggedIn && savedSub) {
-    render();
+    if(teachingMode==='home') render();
     checkLock();
 
     // Re-obtain a short-lived Drive token after every page load.
@@ -2888,7 +2904,7 @@ if ("serviceWorker" in navigator) {
   
 try{
   updateModeUI();
-  if(teachingMode==='coaching'){ showSection('coachingHomeSection','homeNav',true); renderCoachingStudentsPage(); }
+  if(teachingMode==='coaching'){ showSection('coachingHomeSection','homeNav',true); }
   else { showSection('homeSection','homeNav',true); }
 }catch(e){console.warn(e);}
 </script>
