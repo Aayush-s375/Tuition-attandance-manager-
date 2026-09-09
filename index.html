@@ -376,6 +376,14 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .navItem{border:0;background:none;color:#858b98;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;}
 .navItem span:first-child{font-size:21px;line-height:1;}
 .navItem.active{color:#3947a7;}
+
+/* Mode switch */
+.modeSwitchWrap{margin:14px 0 18px;display:flex;justify-content:center;}
+.modeSwitch{display:flex;align-items:center;gap:4px;padding:4px;background:#f1f3f8;border-radius:14px;box-shadow:inset 0 1px 3px rgba(0,0,0,.08);}
+.modeBtn{border:0;background:transparent;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:800;color:#687080;cursor:pointer;transition:.18s;}
+.modeBtn.active{background:#fff;color:#4b55c8;box-shadow:0 2px 8px rgba(0,0,0,.10);}
+.coachingHint{font-size:12px;color:#687080;margin:0 0 12px;text-align:center;}
+
 @media(max-width:390px){.featureGrid{gap:9px}.featureCard{padding:15px 13px;min-height:118px}.featureCard h3{font-size:15px}.featureIcon{font-size:27px}.studentActions .miniBtn{padding:7px 6px}.appTitle{font-size:21px}}
 
 </style>  
@@ -563,6 +571,10 @@ Reset PIN
       <div>
         <div class="appTitle">Tuition Manager</div>
         <div class="appSubtitle">Simple • Organized • Made for Teachers</div>
+        <div class="modeSwitchWrap"><div class="modeSwitch" role="tablist" aria-label="Teaching mode">
+          <button id="homeModeBtn" class="modeBtn active" onclick="setTeachingMode('home')">🏠 Home Tuition</button>
+          <button id="coachingModeBtn" class="modeBtn" onclick="setTeachingMode('coaching')">🏫 Coaching</button>
+        </div></div>
       </div>
       <div class="headerActions">
         <button class="headerIconBtn headerAdd" onclick="addStudent()" title="Add Student">+</button>
@@ -627,7 +639,26 @@ Reset PIN
           <span class="featureIcon">📊</span><h3>Reports</h3><p>View monthly reports</p>
         </button>
       </div>
+      <div id="coachingHomePanel" class="modernPanel" style="display:none;margin-top:16px;">
+        <h3 style="margin:0 0 6px;">🏫 Coaching Mode</h3>
+        <p class="coachingHint">Register-style attendance for your coaching batch.</p>
+        <button class="saveBtn" style="width:100%;margin-bottom:8px;" onclick="openCoachingAttendance()">📋 Take Attendance</button>
+        <button class="saveBtn" style="width:100%;background:#4b5563;" onclick="openCoachingReport()">📊 Attendance Register</button>
       </div>
+      </div>
+    </section>
+
+    <section id="coachingAttendanceSection" class="section">
+      <div class="pageHead"><div><h2>Coaching Attendance</h2><p>Mark P or A instantly for each student</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="attendanceDateBox"><label for="coachingAttDate">Attendance Date</label><input type="date" id="coachingAttDate" onchange="renderCoachingAttendance()"></div>
+      <div id="coachingAttendanceArea" class="modernPanel"></div>
+      <div id="coachingDaySummary" class="modernPanel" style="margin-top:12px;"></div>
+    </section>
+
+    <section id="coachingReportSection" class="section">
+      <div class="pageHead"><div><h2>Coaching Register</h2><p>Monthly register-style attendance</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="modernPanel" style="padding:12px;"><div style="display:flex;gap:8px;"><select id="coachingReportMonth" style="flex:1;min-width:0;" onchange="renderCoachingReport()"></select><select id="coachingReportYear" style="flex:1;min-width:0;" onchange="renderCoachingReport()"></select></div></div>
+      <div id="coachingReportArea" class="modernPanel" style="overflow-x:auto;"></div>
     </section>
 
     <section id="studentsSection" class="section">
@@ -1270,6 +1301,62 @@ function addStudent(){
   render();
 }
 
+
+let teachingMode = localStorage.getItem('tuitionTeachingMode') || 'home';
+let coachingStudents = JSON.parse(localStorage.getItem('coachingStudents') || '[]');
+let coachingAttendance = JSON.parse(localStorage.getItem('coachingAttendance') || '{}');
+function saveCoachingData(){localStorage.setItem('coachingStudents',JSON.stringify(coachingStudents));localStorage.setItem('coachingAttendance',JSON.stringify(coachingAttendance));}
+function setTeachingMode(mode){
+  teachingMode=mode; localStorage.setItem('tuitionTeachingMode',mode);
+  const homeBtn=document.getElementById('homeModeBtn'), coachBtn=document.getElementById('coachingModeBtn');
+  if(homeBtn) homeBtn.classList.toggle('active',mode==='home');
+  if(coachBtn) coachBtn.classList.toggle('active',mode==='coaching');
+  const panel=document.getElementById('coachingHomePanel'); if(panel) panel.style.display=mode==='coaching'?'block':'none';
+  const title=document.querySelector('.appTitle'); const sub=document.querySelector('.appSubtitle');
+  if(title) title.textContent=mode==='coaching'?'Coaching Manager':'Tuition Manager';
+  if(sub) sub.textContent=mode==='coaching'?'Simple • Organized • Made for Coaching Teachers':'Simple • Organized • Made for Teachers';
+  if(mode==='coaching' && coachingStudents.length===0){
+    // Keep the existing cards visible, but provide a clear first action below them.
+  }
+}
+function openCoachingAttendance(){
+  if(!coachingStudents.length){
+    const raw=prompt('Enter student names separated by commas');
+    if(!raw) return;
+    coachingStudents=raw.split(',').map(x=>x.trim()).filter(Boolean).map(name=>({name}));
+    saveCoachingData();
+  }
+  const d=document.getElementById('coachingAttDate'); if(d && !d.value) d.value=new Date().toISOString().slice(0,10);
+  showSection('coachingAttendanceSection','homeNav'); renderCoachingAttendance();
+}
+function coachingKey(date,index){return date+'|'+index;}
+function setCoachingStatus(index,status){
+  const d=document.getElementById('coachingAttDate')?.value; if(!d) return;
+  coachingAttendance[coachingKey(d,index)]=status; saveCoachingData(); renderCoachingAttendance();
+}
+function renderCoachingAttendance(){
+  const area=document.getElementById('coachingAttendanceArea'), sum=document.getElementById('coachingDaySummary'); if(!area) return;
+  const d=document.getElementById('coachingAttDate')?.value || new Date().toISOString().slice(0,10);
+  const rows=coachingStudents.map((st,i)=>{const v=coachingAttendance[coachingKey(d,i)]||'';return `<div style="display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid #eee;"><div style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(st.name)}</div><button class="miniBtn" style="min-height:36px;border:2px solid #16a36a;${v==='P'?'background:#16a36a;color:#fff;':''}" onclick="setCoachingStatus(${i},'P')">P</button><button class="miniBtn" style="min-height:36px;border:2px solid #dc3545;${v==='A'?'background:#dc3545;color:#fff;':''}" onclick="setCoachingStatus(${i},'A')">A</button></div>`}).join('');
+  area.innerHTML=`<div style="display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;gap:6px;padding-bottom:8px;border-bottom:2px solid #ddd;font-weight:800;"><div>Student</div><div style="text-align:center;">P</div><div style="text-align:center;">A</div></div>${rows||'<div class="emptyState">No coaching students yet.</div>'}`;
+  let p=0,a=0; coachingStudents.forEach((_,i)=>{const v=coachingAttendance[coachingKey(d,i)];if(v==='P')p++;if(v==='A')a++;});
+  if(sum) sum.innerHTML=`<b>${coachingStudents.length} Students</b> &nbsp; • &nbsp; <span style="color:#16a36a;font-weight:800;">${p} Present</span> &nbsp; • &nbsp; <span style="color:#dc3545;font-weight:800;">${a} Absent</span>${coachingStudents.length?` &nbsp; • &nbsp; ${Math.round(p/coachingStudents.length*100)}% Present`:''}`;
+}
+function openCoachingReport(){
+  if(!coachingStudents.length){alert('Add coaching students first.');return;}
+  const m=document.getElementById('coachingReportMonth'), y=document.getElementById('coachingReportYear');
+  if(m && !m.options.length)m.innerHTML=['January','February','March','April','May','June','July','August','September','October','November','December'].map((x,i)=>`<option value="${String(i+1).padStart(2,'0')}">${x}</option>`).join('');
+  if(y && !y.options.length){let h='';for(let i=2025;i<=2035;i++)h+=`<option>${i}</option>`;y.innerHTML=h;y.value=String(new Date().getFullYear());}
+  showSection('coachingReportSection','homeNav'); renderCoachingReport();
+}
+function renderCoachingReport(){
+  const area=document.getElementById('coachingReportArea');if(!area)return; const m=document.getElementById('coachingReportMonth')?.value||String(new Date().getMonth()+1).padStart(2,'0'); const y=document.getElementById('coachingReportYear')?.value||new Date().getFullYear();
+  const days=new Date(Number(y),Number(m),0).getDate(); let h='<table style="border-collapse:collapse;min-width:max-content;font-size:12px;"><thead><tr><th style="position:sticky;left:0;background:#fff;border:1px solid #ddd;padding:7px;">Student</th>';
+  for(let d=1;d<=days;d++)h+=`<th style="border:1px solid #ddd;padding:7px;">${d}</th>`; h+='<th style="border:1px solid #ddd;padding:7px;">Total P</th></tr></thead><tbody>';
+  coachingStudents.forEach((st,i)=>{let p=0;h+=`<tr><td style="position:sticky;left:0;background:#fff;border:1px solid #ddd;padding:7px;font-weight:700;">${escapeHtml(st.name)}</td>`;for(let d=1;d<=days;d++){const date=`${y}-${m}-${String(d).padStart(2,'0')}`;const v=coachingAttendance[coachingKey(date,i)]||'';if(v==='P')p++;h+=`<td style="text-align:center;border:1px solid #ddd;padding:7px;font-weight:800;">${v}</td>`;}h+=`<td style="text-align:center;border:1px solid #ddd;padding:7px;font-weight:800;">${p}</td></tr>`});
+  h+='</tbody></table>';area.innerHTML=h;
+}
+
 let currentSectionId = 'homeSection';
 let sectionHistoryStack = [];
 let pendingHomeNavigation = false;
@@ -1281,7 +1368,9 @@ function sectionNavId(sectionId){
     studentsSection:'studentsNav',
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
-    reportsSection:'reportsNav'
+    reportsSection:'reportsNav',
+    coachingAttendanceSection:'homeNav',
+    coachingReportSection:'homeNav'
   };
   return map[sectionId] || 'homeNav';
 }
@@ -2518,7 +2607,9 @@ onchange="restoreBackup(event)">
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
-  </script>
+  
+try{setTeachingMode(teachingMode);}catch(e){}
+</script>
 
 </body>  
 </html>
