@@ -379,10 +379,17 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .attendanceDateBox{background:#fff;border-radius:18px;padding:15px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin-bottom:13px;}
 .attendanceDateBox label{display:block;font-size:13px;font-weight:700;color:#606775;margin-bottom:6px;}
 .attendanceDateBox input{margin:0!important;}
-#attendanceArea .student{border:0;border-bottom:1px solid #edf0f4;border-left:0;padding:12px 0;border-radius:0;margin:0;}
-#attendanceArea .student b{display:block;margin-bottom:7px;font-size:15px;}
-#attendanceArea select{margin:0!important;background:#f8f9fc;}
-.saveAttendanceBtn{margin-top:4px!important;}
+#attendanceLegend{font-size:12px;color:#606775;line-height:1.7;margin-bottom:10px;}
+#attendanceLegend b{color:#3947a7;}
+.attendanceRow{display:flex;align-items:center;gap:9px;padding:11px 0;border-bottom:1px solid #edf0f4;min-width:0;}
+.attendanceRow:last-child{border-bottom:0;}
+.attendanceAvatar{width:40px;height:40px;border-radius:13px;background:#eef2ff;color:#4b4fc4;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex:none;overflow:hidden;}
+.attendanceAvatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.attendanceName{font-size:15px;font-weight:700;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.attendanceChoices{display:flex;align-items:center;gap:5px;flex:none;}
+.attendanceChoice{width:31px;height:31px;padding:0;border:1px solid #d8dce5;border-radius:9px;background:#f8f9fc;color:#4b5563;font-weight:800;font-size:12px;cursor:pointer;}
+.attendanceChoice.selected{background:#3947a7;color:#fff;border-color:#3947a7;box-shadow:0 0 0 2px rgba(57,71,167,.14);transform:scale(1.04);}
+@media(max-width:390px){.attendanceRow{gap:6px}.attendanceAvatar{width:37px;height:37px;border-radius:11px}.attendanceName{font-size:14px}.attendanceChoices{gap:3px}.attendanceChoice{width:29px;height:29px;font-size:11px;border-radius:8px;}}
 #sundayBtn{border-radius:11px!important;}
 #reportArea .student{background:#fff;border:0;border-radius:16px;padding:14px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin:0 0 12px;}
 #reportArea .summary{border-radius:10px;}
@@ -670,7 +677,10 @@ Reset PIN
         <input type="date" id="attDate">
         <button id="sundayBtn" class="saveBtn" style="display:none;background:#6f42c1;margin-bottom:0;" onclick="markAllSunday()">Mark All Sunday</button>
       </div>
-      <div class="modernPanel"><div id="attendanceArea"></div><button class="saveBtn saveAttendanceBtn" onclick="saveAttendance()">Save Attendance</button></div>
+      <div class="modernPanel">
+        <div id="attendanceLegend"><b>P</b> = Present &nbsp; <b>A</b> = Absent &nbsp; <b>L</b> = Leave &nbsp; <b>S</b> = Sunday &nbsp; <b>M</b> = Sunday Manage &nbsp; <b>H</b> = Custom</div>
+        <div id="attendanceArea"></div>
+      </div>
     </section>
 
     <section id="feesSection" class="section">
@@ -1311,11 +1321,22 @@ function checkSundayButton(){
 }
 
 function markAllSunday(){
-  students.forEach((s,index)=>{
+  const date = document.getElementById("attDate").value;
+  if(!date) return;
+
+  students.forEach(s=>{
     if(s.active === false) return;
-    const select = document.getElementById("status"+index);
-    if (select) select.value = "Sunday";
+    if(!s.attendance) s.attendance=[];
+    const existing = s.attendance.find(a=>a.date===date);
+    if(existing){
+      existing.status = "Sunday";
+    }else{
+      s.attendance.push({date:date,status:"Sunday"});
+    }
   });
+
+  saveLocalData(true);
+  renderAttendance();
 }
 
 function toggleLock(){
@@ -1486,28 +1507,92 @@ function renderFeesPage(){
   area.innerHTML=html;
 }
 
-function render(){
+function attendanceStatusInfo(status){
+  if(status === "Present") return {code:"P", label:"Present"};
+  if(status === "Absent ❌" || status === "Absent") return {code:"A", label:"Absent"};
+  if(status === "Leave") return {code:"L", label:"Leave"};
+  if(status === "Sunday") return {code:"S", label:"Sunday"};
+  if(status === "Sunday Manage ✅" || status === "Sunday Manage") return {code:"M", label:"Sunday Manage"};
+  if(String(status || "").startsWith("EH|")) return {code:"H", label:String(status).split("|").slice(1).join("|") || "Custom"};
+  return {code:"H", label:"Custom"};
+}
+
+function getAttendanceStatusForDate(index,date){
+  const s=students[index];
+  if(!s || !Array.isArray(s.attendance)) return "Present";
+  const record=s.attendance.find(a=>a.date===date);
+  return record ? record.status : "Present";
+}
+
+function renderAttendance(){
   const attendanceArea = document.getElementById("attendanceArea");
+  if(!attendanceArea) return;
   attendanceArea.innerHTML="";
+
+  const date=document.getElementById("attDate")?.value || "";
 
   students.forEach((s,index)=>{
     if(s.active === false) return;
 
-    attendanceArea.innerHTML += `
-      <div class="student">
-        <b>${s.name}</b>
-        <select id="status${index}" onchange="customStatus(${index})">
-          <option>Present</option>
-          <option>Absent ❌</option>
-          <option>Leave</option>
-          <option>Sunday</option>
-          <option>Sunday Manage ✅</option>
-          <option>Custom</option>
-        </select>
-      </div>
-    `;
-  });
+    const initial=(s.name||"?").trim().charAt(0).toUpperCase();
+    const avatarContent=s.photo
+      ? `<img src="${s.photo}" alt="Student photo">`
+      : initial;
+    const currentStatus=getAttendanceStatusForDate(index,date);
+    const selected=attendanceStatusInfo(currentStatus).code;
 
+    attendanceArea.innerHTML += `
+      <div class="attendanceRow">
+        <div class="attendanceAvatar" title="Student photo">${avatarContent}</div>
+        <div class="attendanceName" title="${s.name}">${s.name}</div>
+        <div class="attendanceChoices">
+          <button class="attendanceChoice ${selected==='P'?'selected':''}" title="Present" onclick="setAttendanceStatus(${index},'P')">P</button>
+          <button class="attendanceChoice ${selected==='A'?'selected':''}" title="Absent" onclick="setAttendanceStatus(${index},'A')">A</button>
+          <button class="attendanceChoice ${selected==='L'?'selected':''}" title="Leave" onclick="setAttendanceStatus(${index},'L')">L</button>
+          <button class="attendanceChoice ${selected==='S'?'selected':''}" title="Sunday" onclick="setAttendanceStatus(${index},'S')">S</button>
+          <button class="attendanceChoice ${selected==='M'?'selected':''}" title="Sunday Manage" onclick="setAttendanceStatus(${index},'M')">M</button>
+          <button class="attendanceChoice ${selected==='H'?'selected':''}" title="Custom" onclick="setAttendanceStatus(${index},'H')">H</button>
+        </div>
+      </div>`;
+  });
+}
+
+function setAttendanceStatus(index,code){
+  const date=document.getElementById("attDate").value;
+  if(!date) return;
+  const s=students[index];
+  if(!s || s.active === false) return;
+  if(!s.attendance) s.attendance=[];
+
+  let status="Present";
+  if(code==='A') status="Absent ❌";
+  if(code==='L') status="Leave";
+  if(code==='S') status="Sunday";
+  if(code==='M') status="Sunday Manage ✅";
+  if(code==='H'){
+    const current=s.attendance.find(a=>a.date===date);
+    const oldCustom=current && String(current.status||"").startsWith("EH|")
+      ? String(current.status).split("|").slice(1).join("|")
+      : "";
+    const text=prompt("Enter Custom Attendance",oldCustom);
+    if(text===null || !text.trim()) return;
+    status="EH|"+text.trim();
+  }
+
+  const existing=s.attendance.find(a=>a.date===date);
+  if(existing){
+    existing.status=status;
+  }else{
+    s.attendance.push({date:date,status:status});
+  }
+
+  saveLocalData(true);
+  renderAttendance();
+  renderReports();
+}
+
+function render(){
+  renderAttendance();
   renderReports();
   renderStudentsPage();
   renderFeesPage();
@@ -2709,7 +2794,10 @@ async function initializeApp(){
   document.getElementById("attDate").valueAsDate = today;
   checkSundayButton();
 
-  document.getElementById("attDate").addEventListener("change", checkSundayButton);
+  document.getElementById("attDate").addEventListener("change", function(){
+    checkSundayButton();
+    renderAttendance();
+  });
   document.getElementById("reportMonth").value =
     String(today.getMonth() + 1).padStart(2, "0");
 
