@@ -793,6 +793,7 @@ Reset PIN
   </div>
 </div>
 <div class="popup" id="feeStatusPopup">
+  <input type="date" id="joiningDatePicker" aria-label="Tuition Joining Date" onchange="saveJoiningDateFromPicker(this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
   <div class="popupContent" style="max-height:90vh;overflow:auto;">
     <div style="display:flex;justify-content:flex-end;align-items:center;">
       <button onclick="closeFeeStatus()" style="border:none;background:none;font-size:22px;font-weight:bold;">✕</button>
@@ -2190,11 +2191,23 @@ function renderFeeDetails(st){
 function editJoiningDate(){
   const st=students[currentStudent];
   if(!st) return;
-  const value=prompt('Enter Tuition Joining Date (YYYY-MM-DD)',st.joiningDate||'');
-  if(value===null) return;
-  const clean=value.trim();
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(clean) || !feeDateObj(clean)){ alert('Enter a valid date.'); return; }
-  st.joiningDate=clean;
+  const picker=document.getElementById('joiningDatePicker');
+  if(!picker) return;
+  picker.value=st.joiningDate || new Date().toISOString().slice(0,10);
+  if(typeof picker.showPicker==='function'){
+    try{ picker.showPicker(); return; }catch(e){}
+  }
+  picker.click();
+}
+
+function saveJoiningDateFromPicker(value){
+  const st=students[currentStudent];
+  if(!st || !value) return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(value) || !feeDateObj(value)){
+    alert('Please select a valid date.');
+    return;
+  }
+  st.joiningDate=value;
   saveLocalData(true);
   renderFeesPage();
   renderFeeDetails(st);
