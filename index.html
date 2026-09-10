@@ -730,64 +730,71 @@ Reset PIN
   </div>
 </div>
 
-<div class="popup" id="feePopup">  <div class="popupContent">
-
-<div style="text-align:right;">
-<button onclick="closeFeePopup()"
-style="
-border:none;
-background:none;
-font-size:22px;
-font-weight:bold;
-">
-✕
-</button>
-</div>
-
-<h3>Update Fee</h3>   <select id="feeMode">  
-<option value="">Select Mode</option>  
-<option>Cash</option>  
-<option>UPI</option>  
-</select>  <input type="number"  
-id="feeAmount"  
-placeholder="Amount">
-
-<input type="date"  
-id="feeDate">
-
-<button class="popupSave"  
-onclick="saveFee()">
-Save Fee
-</button>
-
-</div>  </div>
-<div class="popup" id="feeStatusPopup">
-  <div class="popupContent">
-
-    <h3>Fee Status</h3>
-
-    <div style="
-      display:flex;
-      gap:10px;
-      margin-top:20px;
-    ">
-
-      <button
-        class="saveBtn"
-        style="background:gray;"
-        onclick="closeFeeStatus()">
-        Cancel
-      </button>
-
-      <button
-        class="saveBtn"
-        style="background:red;"
-        onclick="deleteFeeStatus()">
-        Delete Status
-      </button>
-
+<div class="popup" id="feePopup">
+  <div class="popupContent" style="max-height:90vh;overflow:auto;">
+    <div style="text-align:right;">
+      <button onclick="closeFeePopup()" style="border:none;background:none;font-size:22px;font-weight:bold;">✕</button>
     </div>
 
+    <h3>Fee Update</h3>
+
+    <div style="margin-top:12px;padding:12px;background:#f6f7fb;border-radius:12px;text-align:left;">
+      <b>Student Fee Settings</b>
+      <label style="display:block;margin-top:10px;font-size:13px;font-weight:600;">Monthly Fee</label>
+      <input type="number" id="studentMonthlyFee" placeholder="Monthly Fee" min="0" step="0.01">
+      <label style="display:block;margin-top:8px;font-size:13px;font-weight:600;">Fee Cycle</label>
+      <select id="studentFeeCycle" onchange="toggleFeeUpdateModeFromStudentSetting()">
+        <option value="month">Calendar Month (1st to month end)</option>
+        <option value="period">Joining/Custom Period</option>
+      </select>
+      <label style="display:block;margin-top:8px;font-size:13px;font-weight:600;">Tuition Joining Date</label>
+      <input type="date" id="studentJoiningDate">
+      <button class="saveBtn" style="margin-top:10px;background:#3947a7;" onclick="saveStudentFeeSettings()">Save Fee Settings</button>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:14px;">
+      <button id="feeMonthModeBtn" class="saveBtn" style="flex:1;background:#3947a7;" onclick="selectFeeUpdateMode('month')">Select Fee Month</button>
+      <button id="feePeriodModeBtn" class="saveBtn" style="flex:1;background:#adb5bd;" onclick="selectFeeUpdateMode('period')">Fee Period</button>
+    </div>
+
+    <div id="feeMonthFields" style="margin-top:12px;text-align:left;">
+      <label style="font-size:13px;font-weight:600;">Fee Month</label>
+      <select id="feeMonthSelect"></select>
+    </div>
+
+    <div id="feePeriodFields" style="margin-top:12px;text-align:left;display:none;">
+      <label style="font-size:13px;font-weight:600;">Fee Period</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="date" id="feePeriodStart">
+        <span>to</span>
+        <input type="date" id="feePeriodEnd">
+      </div>
+      <div id="savedFeeIntervals" style="margin-top:8px;"></div>
+      <label style="display:flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;">
+        <input type="checkbox" id="saveFeeIntervalFuture" style="width:auto;"> Save this fee interval for future
+      </label>
+    </div>
+
+    <button id="feeCreditedBtn" class="saveBtn" style="margin-top:14px;background:#198754;" onclick="toggleFeeCredited()">✓ Credited</button>
+
+    <select id="feeMode" style="margin-top:10px;">
+      <option value="">Select Mode</option>
+      <option>Cash</option>
+      <option>UPI</option>
+    </select>
+    <input type="number" id="feeAmount" placeholder="Amount" min="0" step="0.01">
+    <input type="date" id="feeDate">
+
+    <button class="popupSave" onclick="saveFee()">Save Fee</button>
+  </div>
+</div>
+<div class="popup" id="feeStatusPopup">
+  <div class="popupContent" style="max-height:90vh;overflow:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <h3 id="feeDetailsTitle" style="margin:0;"></h3>
+      <button onclick="closeFeeStatus()" style="border:none;background:none;font-size:22px;font-weight:bold;">✕</button>
+    </div>
+    <div id="feeDetailsContent" style="margin-top:14px;text-align:left;"></div>
   </div>
 </div>
 
@@ -998,6 +1005,10 @@ function loadAccountData() {
     if (!s.fees) s.fees = [];
     if (!s.attendance) s.attendance = [];
     if (typeof s.active !== "boolean") s.active = true;
+    if (typeof s.monthlyFee === "undefined") s.monthlyFee = 0;
+    if (!s.feeCycle) s.feeCycle = "month";
+    if (!s.joiningDate) s.joiningDate = new Date().toISOString().slice(0,10);
+    if (!s.savedFeeInterval) s.savedFeeInterval = null;
   });
 }
 
@@ -1398,7 +1409,11 @@ function addStudent(){
     name:name,
     fees: [],
     attendance:[],
-    active:true
+    active:true,
+    monthlyFee:0,
+    feeCycle:"month",
+    joiningDate:new Date().toISOString().slice(0,10),
+    savedFeeInterval:null
   });
   saveLocalData(true);
   render();
@@ -1493,6 +1508,127 @@ function renderStudentsPage(){
   if(count) count.textContent=`${active.length} active${students.length!==active.length?' · '+(students.length-active.length)+' inactive':''}`;
 }
 
+function feeDateObj(date){
+  if(!date) return null;
+  const d=new Date(date+'T00:00:00');
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function formatFeeDate(date){
+  const d=feeDateObj(date);
+  if(!d) return date||"";
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+function formatFeeShortDate(date){
+  const d=feeDateObj(date);
+  if(!d) return date||"";
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function daysBetweenDates(start,end){
+  const a=feeDateObj(start), b=feeDateObj(end);
+  if(!a || !b) return 0;
+  return Math.round((b-a)/86400000)+1;
+}
+
+function addDaysToDate(date,days){
+  const d=feeDateObj(date);
+  if(!d) return "";
+  d.setDate(d.getDate()+days);
+  return d.toISOString().slice(0,10);
+}
+
+function monthKey(year,month){
+  return String(year)+'-'+String(month).padStart(2,'0');
+}
+
+function feeMonthLabel(key){
+  const [y,m]=String(key||'').split('-');
+  const d=new Date(Number(y),Number(m)-1,1);
+  return isNaN(d.getTime()) ? key : d.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+}
+
+function getFeeRecordForMonth(student,key){
+  return (student.fees||[]).find(f => f.type==='month' && f.monthKey===key);
+}
+
+function getFeeRecordForPeriod(student,start,end){
+  return (student.fees||[]).find(f => f.type==='period' && f.periodStart===start && f.periodEnd===end);
+}
+
+function getCompletedFeeItems(student, today){
+  const result=[];
+  const join=student.joiningDate;
+  if(!join) return result;
+  const joinDate=feeDateObj(join), todayDate=feeDateObj(today);
+  if(!joinDate || !todayDate || todayDate < joinDate) return result;
+
+  if((student.feeCycle||'month')==='month'){
+    let cursor=new Date(joinDate.getFullYear(),joinDate.getMonth(),1);
+    const firstMonthKey=monthKey(joinDate.getFullYear(),joinDate.getMonth()+1);
+    while(cursor <= todayDate){
+      const y=cursor.getFullYear(), m=cursor.getMonth()+1;
+      const key=monthKey(y,m);
+      let periodStart, periodEnd;
+      if(key===firstMonthKey && joinDate.getDate()!==1){
+        periodStart=join;
+        periodEnd=new Date(y,m,0).toISOString().slice(0,10);
+      }else{
+        periodStart=monthKey(y,m)+'-01';
+        periodEnd=new Date(y,m,0).toISOString().slice(0,10);
+      }
+      const endDate=feeDateObj(periodEnd);
+      if(endDate && todayDate >= endDate){
+        result.push({kind:'month',key,label:key===firstMonthKey && joinDate.getDate()!==1 ? `${new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long'})} (${formatFeeShortDate(join)}–${formatFeeShortDate(periodEnd)})` : feeMonthLabel(key),start:periodStart,end:periodEnd,record:getFeeRecordForMonth(student,key)});
+      }
+      cursor.setMonth(cursor.getMonth()+1);
+    }
+  }else{
+    let startDate=join;
+    const savedDays=student.savedFeeInterval && Number(student.savedFeeInterval.days)>0 ? Number(student.savedFeeInterval.days) : 0;
+    let guard=0;
+    while(guard<240){
+      let endDate;
+      if(savedDays){
+        endDate=addDaysToDate(startDate,savedDays-1);
+      }else{
+        const sd=feeDateObj(startDate);
+        const next=new Date(sd.getFullYear(),sd.getMonth()+1,sd.getDate());
+        if(next.getDate()!==sd.getDate()) next.setDate(0);
+        endDate=next.toISOString().slice(0,10);
+      }
+      if(!endDate || feeDateObj(endDate)>todayDate) break;
+      const days=daysBetweenDates(startDate,endDate);
+      result.push({kind:'period',days,label:`${formatFeeShortDate(startDate)} – ${formatFeeShortDate(endDate)} (${days} days)`,start:startDate,end:endDate,record:getFeeRecordForPeriod(student,startDate,endDate)});
+      startDate=addDaysToDate(endDate,1);
+      guard++;
+    }
+  }
+  return result;
+}
+
+function getCurrentFeeDisplayItems(student){
+  const today=new Date().toISOString().slice(0,10);
+  const items=getCompletedFeeItems(student,today);
+  if(!items.length) return [];
+  return items.slice(-2).reverse();
+}
+
+function feeItemStatusText(item, student){
+  const amount=Number(item.record?.amount || student.monthlyFee || 0);
+  if(item.record && item.record.status==='credited'){
+    if(item.kind==='month') return `${item.label} Fee Credited · ₹${amount}`;
+    return `${item.label} Fee Credited · ₹${amount}`;
+  }
+  return `${item.label} Fee Pending${amount ? ` · ₹${amount}` : ''}`;
+}
+
+function feeItemMetaText(item){
+  if(!item.record || item.record.status!=='credited') return '';
+  return `${item.record.date ? formatFeeShortDate(item.record.date) : ''}${item.record.mode ? ` · ${item.record.mode}` : ''}`;
+}
+
 function renderFeesPage(){
   const area=document.getElementById('feesArea');
   if(!area) return;
@@ -1503,11 +1639,20 @@ function renderFeesPage(){
   let html='';
   students.forEach((s,index)=>{
     if(!s.fees) s.fees=[];
-    const last=s.fees.length?s.fees[s.fees.length-1]:null;
-    html+=`<div class="modernStudent">
+    const items=getCurrentFeeDisplayItems(s);
+    let feeLines='';
+    if(!items.length){
+      feeLines='<div class="studentMeta">No completed fee period yet</div>';
+    }else{
+      feeLines=items.map(item=>{
+        const credited=item.record && item.record.status==='credited';
+        return `<div style="font-size:12px;font-weight:700;color:${credited?'#198754':'#b02a37'};margin-top:3px;">${feeItemStatusText(item,s)}</div>${credited && feeItemMetaText(item) ? `<div style="font-size:11px;color:#606775;">${feeItemMetaText(item)}</div>` : ''}`;
+      }).join('');
+    }
+    html+=`<div class="modernStudent" onclick="openFeeStatus(${index})" style="cursor:pointer;">
       <div class="avatar" style="background:#fff4df;color:#e58b00;">₹</div>
-      <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${last?`Last payment ₹${last.amount} · ${last.date}`:'No payment recorded'}</div></div>
-      <button class="miniBtn" onclick="openFee(${index})">Add Fee</button>
+      <div class="studentMain"><b>${s.name}</b>${feeLines}</div>
+      <button class="miniBtn" onclick="event.stopPropagation();openFee(${index})">Update</button>
     </div>`;
   });
   area.innerHTML=html;
@@ -1801,104 +1946,213 @@ function renderReports(){
   });
 }
 
+function populateFeeMonthSelect(student){
+  const select=document.getElementById('feeMonthSelect');
+  if(!select) return;
+  const today=new Date();
+  const join=feeDateObj(student.joiningDate) || new Date(today.getFullYear(),today.getMonth(),1);
+  const startYear=Math.max(2025,join.getFullYear());
+  const endYear=Math.max(2035,today.getFullYear()+1);
+  select.innerHTML='';
+  for(let y=startYear;y<=endYear;y++){
+    for(let m=1;m<=12;m++){
+      const opt=document.createElement('option');
+      opt.value=monthKey(y,m);
+      opt.textContent=feeMonthLabel(opt.value);
+      select.appendChild(opt);
+    }
+  }
+  const target=monthKey(today.getFullYear(),today.getMonth()+1);
+  if([...select.options].some(o=>o.value===target)) select.value=target;
+}
+
+function selectFeeUpdateMode(mode){
+  const monthBtn=document.getElementById('feeMonthModeBtn');
+  const periodBtn=document.getElementById('feePeriodModeBtn');
+  const monthFields=document.getElementById('feeMonthFields');
+  const periodFields=document.getElementById('feePeriodFields');
+  if(!monthBtn||!periodBtn||!monthFields||!periodFields) return;
+  const isMonth=mode==='month';
+  monthFields.style.display=isMonth?'block':'none';
+  periodFields.style.display=isMonth?'none':'block';
+  monthBtn.style.background=isMonth?'#3947a7':'#adb5bd';
+  periodBtn.style.background=isMonth?'#adb5bd':'#3947a7';
+  document.getElementById('feePopup').dataset.updateMode=mode;
+  if(!isMonth) renderSavedFeeIntervals();
+}
+
+function toggleFeeUpdateModeFromStudentSetting(){
+  const mode=document.getElementById('studentFeeCycle')?.value || 'month';
+  selectFeeUpdateMode(mode);
+  const st=students[currentStudent];
+  if(st && mode==='period'){
+    const today=new Date().toISOString().slice(0,10);
+    if(!document.getElementById('feePeriodStart').value) document.getElementById('feePeriodStart').value=st.joiningDate||today;
+    if(!document.getElementById('feePeriodEnd').value) document.getElementById('feePeriodEnd').value=addDaysToDate(document.getElementById('feePeriodStart').value,30);
+  }
+}
+
+function renderSavedFeeIntervals(){
+  const box=document.getElementById('savedFeeIntervals');
+  if(!box) return;
+  const st=students[currentStudent];
+  const saved=st?.savedFeeInterval;
+  if(!saved || !saved.days){ box.innerHTML=''; return; }
+  box.innerHTML=`<button type="button" class="miniBtn" style="width:100%;" onclick="useSavedFeeInterval()">Use saved interval · ${saved.days} days</button>`;
+}
+
+function useSavedFeeInterval(){
+  const st=students[currentStudent];
+  const start=document.getElementById('feePeriodStart').value || st?.joiningDate;
+  if(!st || !start || !st.savedFeeInterval) return;
+  document.getElementById('feePeriodStart').value=start;
+  document.getElementById('feePeriodEnd').value=addDaysToDate(start,Number(st.savedFeeInterval.days)-1);
+}
+
 function openFee(index){
   currentStudent=index;
-  document.getElementById("feePopup").style.display="flex";
+  const st=students[index];
+  if(!st) return;
+  if(!st.fees) st.fees=[];
+  if(typeof st.monthlyFee==='undefined') st.monthlyFee=0;
+  if(!st.feeCycle) st.feeCycle='month';
+  if(!st.joiningDate) st.joiningDate=new Date().toISOString().slice(0,10);
+  document.getElementById('studentMonthlyFee').value=st.monthlyFee||'';
+  document.getElementById('studentFeeCycle').value=st.feeCycle;
+  document.getElementById('studentJoiningDate').value=st.joiningDate;
+  populateFeeMonthSelect(st);
+  document.getElementById('feeMode').value='';
+  document.getElementById('feeAmount').value=st.monthlyFee||'';
+  document.getElementById('feeDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('feePeriodStart').value=st.joiningDate;
+  document.getElementById('feePeriodEnd').value=addDaysToDate(st.joiningDate,30);
+  document.getElementById('saveFeeIntervalFuture').checked=false;
+  document.getElementById('feePopup').dataset.updateMode=st.feeCycle==='period'?'period':'month';
+  selectFeeUpdateMode(st.feeCycle==='period'?'period':'month');
+  renderSavedFeeIntervals();
+  document.getElementById('feePopup').style.display='flex';
 }
 
 function closeFeePopup(){
-  document.getElementById("feePopup").style.display = "none";
+  document.getElementById('feePopup').style.display='none';
 }
 
 function openFeeStatus(index){
-  currentStudent = index;
-  document.getElementById("feeStatusPopup").style.display = "flex";
+  currentStudent=index;
+  const st=students[index];
+  if(!st) return;
+  renderFeeDetails(st);
+  document.getElementById('feeStatusPopup').style.display='flex';
 }
 
 function closeFeeStatus(){
-  document.getElementById("feeStatusPopup").style.display = "none";
+  document.getElementById('feeStatusPopup').style.display='none';
+}
+
+function renderFeeDetails(st){
+  const title=document.getElementById('feeDetailsTitle');
+  const content=document.getElementById('feeDetailsContent');
+  if(!title||!content) return;
+  title.textContent=st.name+' · Fee Details';
+  const year=new Date().getFullYear();
+  const completed=getCompletedFeeItems(st,new Date().toISOString().slice(0,10));
+  const credited=(st.fees||[]).filter(f=>f.status==='credited');
+  let totalCredited=0,totalPending=0;
+  let rows='';
+  const items=completed.filter(item=>{
+    const refDate=item.end||item.record?.date||item.start;
+    return refDate && refDate.startsWith(String(year));
+  });
+  if(!items.length){ rows='<div style="padding:10px 0;color:#666;">No completed fee period in this year yet.</div>'; }
+  items.forEach(item=>{
+    const rec=item.record;
+    const amount=Number(rec?.amount || st.monthlyFee || 0);
+    if(rec?.status==='credited') totalCredited+=amount; else totalPending+=amount;
+    if(rec?.status==='credited'){
+      rows+=`<div style="padding:9px 0;border-bottom:1px solid #edf0f4;"><b>${item.label}</b><br><span style="color:#198754;font-weight:700;">Credited · ₹${amount}</span><br><span style="font-size:12px;color:#606775;">${formatFeeShortDate(rec.date)} · ${rec.mode||'Mode not set'}</span></div>`;
+    }else{
+      rows+=`<div style="padding:9px 0;border-bottom:1px solid #edf0f4;"><b>${item.label}</b><br><span style="color:#b02a37;font-weight:700;">Pending · ₹${amount}</span></div>`;
+    }
+  });
+  const directFuture=credited.filter(f=>f.date && f.date.startsWith(String(year)) && (!f.type || (f.type==='month' && !items.some(i=>i.record===f))));
+  directFuture.forEach(f=>{ totalCredited+=Number(f.amount||0); });
+  content.innerHTML=`<div style="font-size:13px;line-height:1.7;margin-bottom:10px;"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)}<br><b>Fee Cycle:</b> ${(st.feeCycle||'month')==='month'?'Calendar Month':'Fee Period'}<br><b>Monthly Fee:</b> ₹${st.monthlyFee||0}</div><div style="display:flex;gap:8px;margin-bottom:10px;"><button class="saveBtn" style="flex:1;background:#3947a7;" onclick="openFee(${currentStudent});closeFeeStatus();">Update Fee</button></div><h4 style="margin:8px 0;">${year} Fee Status</h4>${rows}<div style="margin-top:12px;padding:10px;background:#f6f7fb;border-radius:10px;font-weight:700;">Total Credited: ₹${totalCredited}<br>Total Pending: ₹${totalPending}</div>`;
 }
 
 function deleteFeeStatus(){
   if(!confirm("Are you sure you want to delete this fee status?")) return;
-
-  const selectedMonth = document.getElementById("reportMonth").value;
-  const selectedYear = document.getElementById("reportYear").value;
-  const student = students[currentStudent];
-
-  if(!student || !student.fees) return;
-
-  student.fees = student.fees.filter(f=>{
-    const parts = f.date.split("-");
-    return !(parts[0] === selectedYear && parts[1] === selectedMonth);
-  });
-
+  const student=students[currentStudent];
+  if(!student || !student.fees || !student.fees.length) return;
+  const credited=student.fees.filter(f=>f.status==='credited');
+  if(!credited.length) return;
+  const latest=credited[credited.length-1];
+  student.fees=student.fees.filter(f=>f!==latest);
   saveLocalData(true);
-  closeFeeStatus();
+  renderFeesPage();
   renderReports();
+  renderFeeDetails(student);
 }
 
-function openAttendanceStatus(index,date){
-  selectedAttendanceStudent = index;
-  selectedAttendanceDate = date;
-
-  const student = students[index];
-  const record = student && (student.attendance || []).find(a=>a.date===date);
-  const statusText = record ? (record.status.startsWith("EH|") ? record.status.split("|")[1] : record.status) : "";
-
-  document.getElementById("attendanceStatusText").textContent =
-    `${date.split("-")[2]} - ${statusText}`;
-  document.getElementById("attendanceStatusPopup").style.display = "flex";
+function saveStudentFeeSettings(){
+  const st=students[currentStudent];
+  if(!st) return;
+  const amount=Number(document.getElementById('studentMonthlyFee').value||0);
+  const cycle=document.getElementById('studentFeeCycle').value;
+  const joining=document.getElementById('studentJoiningDate').value;
+  if(!joining){ alert('Select Tuition Joining Date'); return; }
+  st.monthlyFee=amount;
+  st.feeCycle=cycle;
+  st.joiningDate=joining;
+  saveLocalData(true);
+  renderFeesPage();
+  alert('Fee settings saved');
 }
 
-function closeAttendanceStatus(){
-  document.getElementById("attendanceStatusPopup").style.display = "none";
-  selectedAttendanceStudent = null;
-  selectedAttendanceDate = null;
-}
-
-function deleteAttendanceStatus(){
-  if(!confirm("Are you sure you want to delete this attendance?")) return;
-
-  const student = students[selectedAttendanceStudent];
-  if(student && student.attendance){
-    student.attendance = student.attendance.filter(
-      a => a.date !== selectedAttendanceDate
-    );
-    saveLocalData(true);
-  }
-
-  closeAttendanceStatus();
-  renderReports();
+function toggleFeeCredited(){
+  const btn=document.getElementById('feeCreditedBtn');
+  if(!btn) return;
+  const active=btn.dataset.credited!=='false';
+  btn.dataset.credited=active?'false':'true';
+  btn.textContent=active?'○ Credited':'✓ Credited';
+  btn.style.background=active?'#adb5bd':'#198754';
 }
 
 function saveFee(){
-  const mode = document.getElementById("feeMode").value;
-  const amount = document.getElementById("feeAmount").value;
-  const date = document.getElementById("feeDate").value;
+  const st=students[currentStudent];
+  if(!st) return;
+  const mode=document.getElementById('feeMode').value;
+  const amount=document.getElementById('feeAmount').value;
+  const date=document.getElementById('feeDate').value;
+  const credited=document.getElementById('feeCreditedBtn').dataset.credited!=='false';
+  const updateMode=document.getElementById('feePopup').dataset.updateMode || st.feeCycle || 'month';
+  if(!credited){ alert('Select Credited before saving the payment.'); return; }
+  if(!mode || !amount || !date){ alert('Fill all payment details'); return; }
+  if(Number(amount)<=0){ alert('Amount must be greater than 0'); return; }
+  if(!st.fees) st.fees=[];
 
-  if(!mode || !amount || !date){
-    alert("Fill all details");
-    return;
-  }
-
-  if(!students[currentStudent].fees) students[currentStudent].fees=[];
-
-  const existingFee = students[currentStudent].fees.find(f => f.date === date);
-
-  if(existingFee){
-    existingFee.amount = amount;
-    existingFee.mode = mode;
+  let record;
+  if(updateMode==='month'){
+    const key=document.getElementById('feeMonthSelect').value;
+    if(!key){ alert('Select Fee Month'); return; }
+    record={type:'month',monthKey:key,status:'credited',amount:String(amount),mode,date};
+    const old=st.fees.find(f=>f.type==='month' && f.monthKey===key);
+    if(old) Object.assign(old,record); else st.fees.push(record);
   }else{
-    students[currentStudent].fees.push({
-      amount: amount,
-      mode: mode,
-      date: date
-    });
+    const start=document.getElementById('feePeriodStart').value;
+    const end=document.getElementById('feePeriodEnd').value;
+    if(!start || !end){ alert('Select Fee Period'); return; }
+    if(feeDateObj(end)<feeDateObj(start)){ alert('End date must be after start date'); return; }
+    const days=daysBetweenDates(start,end);
+    record={type:'period',periodStart:start,periodEnd:end,days,status:'credited',amount:String(amount),mode,date};
+    const old=st.fees.find(f=>f.type==='period' && f.periodStart===start && f.periodEnd===end);
+    if(old) Object.assign(old,record); else st.fees.push(record);
+    if(document.getElementById('saveFeeIntervalFuture').checked && days>=25 && days<=40){
+      st.savedFeeInterval={days};
+    }
   }
-
-  document.getElementById("feePopup").style.display="none";
   saveLocalData(true);
+  closeFeePopup();
+  renderFeesPage();
   renderReports();
 }
 
