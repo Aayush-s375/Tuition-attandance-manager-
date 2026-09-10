@@ -1565,6 +1565,12 @@ function getFeeCycleMode(student){
   return student && student.feeCycle==='period' ? 'period' : 'month';
 }
 
+function getKnownFeeAmount(student){
+  if(!student) return 0;
+  const amount=Number(student.monthlyFee);
+  return Number.isFinite(amount) && amount>0 ? amount : 0;
+}
+
 function getCompletedFeeItems(student, today){
   const result=[];
   const join=student.joiningDate;
