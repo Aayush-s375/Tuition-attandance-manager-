@@ -1571,6 +1571,11 @@ function getKnownFeeAmount(student){
   return Number.isFinite(amount) && amount>0 ? amount : 0;
 }
 
+function getLocalFeeToday(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
 function getCompletedFeeItems(student, today){
   const result=[];
   const join=student.joiningDate;
@@ -1584,19 +1589,31 @@ function getCompletedFeeItems(student, today){
     while(cursor <= todayDate){
       const y=cursor.getFullYear(), m=cursor.getMonth()+1;
       const key=monthKey(y,m);
-      let periodStart, periodEnd;
+      let periodStart, periodEnd, label;
+
       if(key===firstMonthKey && joinDate.getDate()!==1){
         periodStart=join;
-        periodEnd=new Date(y,m,0).toISOString().slice(0,10);
+        periodEnd=`${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
+        label=`${formatFeeShortDate(periodStart)} – ${formatFeeShortDate(periodEnd)}`;
       }else{
-        periodStart=monthKey(y,m)+'-01';
-        periodEnd=new Date(y,m,0).toISOString().slice(0,10);
+        periodStart=`${key}-01`;
+        const monthEnd=new Date(y,m,0).getDate();
+        const fullMonthEnd=`${key}-${String(monthEnd).padStart(2,'0')}`;
+        periodEnd=fullMonthEnd;
+        label=feeMonthLabel(key);
       }
+
+      // Every date from joining date to today must be represented. The
+      // current month is shown only up to today's date.
+      if(y===todayDate.getFullYear() && m===todayDate.getMonth()+1){
+        periodEnd=today;
+        label=(key===firstMonthKey && joinDate.getDate()!==1)
+          ? `${formatFeeShortDate(periodStart)} – ${formatFeeShortDate(periodEnd)}`
+          : `${formatFeeShortDate(periodStart)} – ${formatFeeShortDate(periodEnd)}`;
+      }
+
       const endDate=feeDateObj(periodEnd);
-      if(endDate && todayDate >= endDate){
-        const label=(key===firstMonthKey && joinDate.getDate()!==1)
-          ? `${new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long'})} (${formatFeeShortDate(join)}–${formatFeeShortDate(periodEnd)})`
-          : feeMonthLabel(key);
+      if(endDate && endDate>=joinDate && endDate<=todayDate){
         result.push({kind:'month',key,label,start:periodStart,end:periodEnd,record:getFeeRecordForMonth(student,key)});
       }
       cursor.setMonth(cursor.getMonth()+1);
@@ -1605,7 +1622,7 @@ function getCompletedFeeItems(student, today){
     let startDate=join;
     const savedDays=student.savedFeeInterval && Number(student.savedFeeInterval.days)>0 ? Number(student.savedFeeInterval.days) : 0;
     let guard=0;
-    while(guard<240){
+    while(guard<240 && feeDateObj(startDate)<=todayDate){
       let endDate;
       if(savedDays){
         endDate=addDaysToDate(startDate,savedDays-1);
@@ -1613,11 +1630,13 @@ function getCompletedFeeItems(student, today){
         const sd=feeDateObj(startDate);
         const next=new Date(sd.getFullYear(),sd.getMonth()+1,sd.getDate());
         if(next.getDate()!==sd.getDate()) next.setDate(0);
-        endDate=next.toISOString().slice(0,10);
+        endDate=`${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}-${String(next.getDate()).padStart(2,'0')}`;
       }
-      if(!endDate || feeDateObj(endDate)>todayDate) break;
+      if(!endDate) break;
+      if(feeDateObj(endDate)>todayDate) endDate=today;
       const days=daysBetweenDates(startDate,endDate);
-      result.push({kind:'period',days,label:`${formatFeeShortDate(startDate)} – ${formatFeeShortDate(endDate)} (${days} days)`,start:startDate,end:endDate,record:getFeeRecordForPeriod(student,startDate,endDate)});
+      result.push({kind:'period',days,label:`${formatFeeShortDate(startDate)} – ${formatFeeShortDate(endDate)}`,start:startDate,end:endDate,record:getFeeRecordForPeriod(student,startDate,endDate)});
+      if(endDate===today) break;
       startDate=addDaysToDate(endDate,1);
       guard++;
     }
@@ -1626,7 +1645,7 @@ function getCompletedFeeItems(student, today){
 }
 
 function getCurrentFeeDisplayItems(student){
-  const today=new Date().toISOString().slice(0,10);
+  const today=getLocalFeeToday();
   const completed=getCompletedFeeItems(student,today);
   const items=[];
   const seen=new Set();
@@ -2131,7 +2150,7 @@ function renderFeeDetails(st){
     return;
   }
 
-  const today=new Date().toISOString().slice(0,10);
+  const today=getLocalFeeToday();
   const completed=getCompletedFeeItems(st,today);
   const items=[];
   const seen=new Set();
