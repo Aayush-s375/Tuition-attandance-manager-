@@ -2168,15 +2168,13 @@ function renderFeeDetails(st){
     return refDate && (refDate.startsWith(String(year)) || item.start?.startsWith(String(year)));
   }).sort((a,b)=>String(a.start||'').localeCompare(String(b.start||'')));
 
-  let totalCredited=0,totalPending=0,rows='';
+  let rows='';
   yearItems.forEach(item=>{
     const rec=item.record;
     const amount=Number(rec?.amount || getKnownFeeAmount(st) || 0);
     if(rec?.status==='credited'){
-      totalCredited+=amount;
       rows+=`<div class="feeDetailRow"><b>${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="font-size:12px;color:#606775;">${formatFeeShortDate(rec.date)} · ${rec.mode||'Mode not set'}</span><button class="miniBtn red" style="float:right;margin-top:-25px;" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})">🗑️</button></div>`;
     }else{
-      totalPending+=amount;
       rows+=`<div class="feeDetailRow"><b>${item.label}</b><br><span class="feePending">Pending</span>${amount ? ` · ₹${amount}` : ''}</div>`;
     }
   });
@@ -2184,7 +2182,7 @@ function renderFeeDetails(st){
   if(!yearItems.length) rows='<div style="padding:10px 0;color:#666;">No fee details in this year yet.</div>';
 
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn" style="margin-left:6px;padding:5px 8px;" onclick="editJoiningDate()">Edit</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeDetailsSectionTitle">Yearly Summary</div><div class="feeSummaryBox"><span class="feeCredited">Total Credited: ₹${totalCredited}</span><br><span class="feePending">Total Pending: ₹${totalPending}</span></div>`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn" style="margin-left:6px;padding:5px 8px;" onclick="editJoiningDate()">Edit</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
