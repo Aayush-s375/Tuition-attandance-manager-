@@ -1576,108 +1576,146 @@ function getLocalFeeToday(){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-function getCompletedFeeItems(student, today){
+function getCreditedFeeRecords(student){
+  return (student.fees||[]).map((rec,index)=>({rec,index})).filter(x=>{
+    const r=x.rec;
+    if(r.status!=='credited') return false;
+    if(r.type==='month') return !!r.monthKey;
+    if(r.type==='period') return !!(r.periodStart && r.periodEnd && feeDateObj(r.periodEnd)>=feeDateObj(r.periodStart));
+    return false;
+  }).sort((a,b)=>Number(a.rec.updatedAt||a.index)-Number(b.rec.updatedAt||b.index));
+}
+
+function getCreditedRange(rec,student){
+  if(!rec) return null;
+  if(rec.type==='month' && rec.monthKey){
+    const y=Number(rec.monthKey.slice(0,4));
+    const m=Number(rec.monthKey.slice(5,7));
+    const endDay=new Date(y,m,0).getDate();
+    let start=`${rec.monthKey}-01`;
+    const end=`${rec.monthKey}-${String(endDay).padStart(2,'0')}`;
+    if(student && student.joiningDate){
+      const join=feeDateObj(student.joiningDate);
+      const monthStart=feeDateObj(start);
+      if(join && join>monthStart && join<=feeDateObj(end)) start=student.joiningDate;
+    }
+    return {start,end};
+  }
+  if(rec.type==='period' && rec.periodStart && rec.periodEnd){
+    return {start:rec.periodStart,end:rec.periodEnd};
+  }
+  return null;
+}
+
+function feeDayAfter(date){
+  return addDaysToDate(date,1);
+}
+
+function getCalendarFeeObligations(student,today){
   const result=[];
   const join=student.joiningDate;
-  if(!join) return result;
   const joinDate=feeDateObj(join), todayDate=feeDateObj(today);
-  if(!joinDate || !todayDate || todayDate < joinDate) return result;
+  if(!joinDate || !todayDate || todayDate<joinDate) return result;
 
-  if(getFeeCycleMode(student)==='month'){
-    let cursor=new Date(joinDate.getFullYear(),joinDate.getMonth(),1);
-    const firstMonthKey=monthKey(joinDate.getFullYear(),joinDate.getMonth()+1);
-    while(cursor <= todayDate){
-      const y=cursor.getFullYear(), m=cursor.getMonth()+1;
-      const key=monthKey(y,m);
-      let periodStart, periodEnd, label;
-
-      if(key===firstMonthKey && joinDate.getDate()!==1){
-        periodStart=join;
-        periodEnd=`${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
-        label=`${formatFeeShortDate(periodStart)} – ${formatFeeShortDate(periodEnd)}`;
-      }else{
-        periodStart=`${key}-01`;
-        const monthEnd=new Date(y,m,0).getDate();
-        const fullMonthEnd=`${key}-${String(monthEnd).padStart(2,'0')}`;
-        periodEnd=fullMonthEnd;
-        label=feeMonthLabel(key);
-      }
-
-      // Every date from joining date to today must be represented. The
-      // current month is shown only up to today's date.
-      if(y===todayDate.getFullYear() && m===todayDate.getMonth()+1){
-        periodEnd=today;
-        label=(key===firstMonthKey && joinDate.getDate()!==1)
-          ? `${formatFeeShortDate(periodStart)} – ${formatFeeShortDate(periodEnd)}`
-          : `${formatFeeShortDate(periodStart)} – ${formatFeeShortDate(periodEnd)}`;
-      }
-
-      const endDate=feeDateObj(periodEnd);
-      if(endDate && endDate>=joinDate && endDate<=todayDate){
-        result.push({kind:'month',key,label,start:periodStart,end:periodEnd,record:getFeeRecordForMonth(student,key)});
-      }
-      cursor.setMonth(cursor.getMonth()+1);
+  let cursor=new Date(joinDate.getFullYear(),joinDate.getMonth(),1);
+  while(cursor<=todayDate){
+    const y=cursor.getFullYear(), m=cursor.getMonth()+1;
+    const monthStart=`${y}-${String(m).padStart(2,'0')}-01`;
+    const monthEnd=`${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
+    const start=joinDate>feeDateObj(monthStart)?join:monthStart;
+    const end=todayDate<feeDateObj(monthEnd)?today:monthEnd;
+    if(feeDateObj(end)>=feeDateObj(start)){
+      result.push({start,end,monthKey:monthKey(y,m)});
     }
-  }else{
-    let startDate=join;
-    const savedDays=student.savedFeeInterval && Number(student.savedFeeInterval.days)>0 ? Number(student.savedFeeInterval.days) : 0;
-    let guard=0;
-    while(guard<240 && feeDateObj(startDate)<=todayDate){
-      let endDate;
-      if(savedDays){
-        endDate=addDaysToDate(startDate,savedDays-1);
-      }else{
-        const sd=feeDateObj(startDate);
-        const next=new Date(sd.getFullYear(),sd.getMonth()+1,sd.getDate());
-        if(next.getDate()!==sd.getDate()) next.setDate(0);
-        endDate=`${next.getFullYear()}-${String(next.getMonth()+1).padStart(2,'0')}-${String(next.getDate()).padStart(2,'0')}`;
-      }
-      if(!endDate) break;
-      if(feeDateObj(endDate)>todayDate) endDate=today;
-      const days=daysBetweenDates(startDate,endDate);
-      result.push({kind:'period',days,label:`${formatFeeShortDate(startDate)} – ${formatFeeShortDate(endDate)}`,start:startDate,end:endDate,record:getFeeRecordForPeriod(student,startDate,endDate)});
-      if(endDate===today) break;
-      startDate=addDaysToDate(endDate,1);
-      guard++;
-    }
+    cursor.setMonth(cursor.getMonth()+1);
   }
   return result;
 }
 
+function pendingLabel(start,end,monthKeyValue){
+  const sd=feeDateObj(start), ed=feeDateObj(end);
+  if(!sd || !ed) return `${formatFeeShortDate(start)} – ${formatFeeShortDate(end)}`;
+  const monthStart=monthKeyValue+'-01';
+  const y=sd.getFullYear(), m=sd.getMonth()+1;
+  const monthEnd=`${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
+  if(start===monthStart && end===monthEnd) return feeMonthLabel(monthKeyValue);
+  return `${formatFeeShortDate(start)} – ${formatFeeShortDate(end)}`;
+}
+
+function getFeeStatusItems(student,today){
+  const obligations=getCalendarFeeObligations(student,today);
+  const credited=getCreditedFeeRecords(student);
+  const items=[];
+
+  // Add every credited record in its original form. A period payment such as
+  // 13 Jun–13 Jul must remain one credited period, not be split by months.
+  credited.forEach(({rec,index})=>{
+    const range=getCreditedRange(rec,student);
+    if(!range) return;
+    const days=daysBetweenDates(range.start,range.end);
+    let label;
+    if(rec.type==='month'){
+      const monthStart=`${rec.monthKey}-01`;
+      label=range.start!==monthStart
+        ? `${formatFeeShortDate(range.start)} – ${formatFeeShortDate(range.end)}`
+        : feeMonthLabel(rec.monthKey);
+    }else{
+      label=`${formatFeeShortDate(range.start)} – ${formatFeeShortDate(range.end)}${days ? ` (${days} days)` : ''}`;
+    }
+    items.push({kind:rec.type==='month'?'month':'period',key:rec.type==='month'?rec.monthKey:`${range.start}:${range.end}`,start:range.start,end:range.end,label,record:rec,recordIndex:index});
+  });
+
+  // For each calendar obligation, subtract all credited ranges. The latest
+  // update wins where credited records overlap; pending is generated only
+  // for dates that remain uncovered.
+  obligations.forEach(ob=>{
+    let segments=[{start:ob.start,end:ob.end}];
+    credited.forEach(({rec})=>{
+      const cr=getCreditedRange(rec,student);
+      if(!cr) return;
+      const cs=feeDateObj(cr.start), ce=feeDateObj(cr.end);
+      const next=[];
+      segments.forEach(seg=>{
+        const ss=feeDateObj(seg.start), se=feeDateObj(seg.end);
+        if(!ss || !se || ce<ss || cs>se){
+          next.push(seg);
+          return;
+        }
+        if(ss<cs){
+          next.push({start:seg.start,end:addDaysToDate(cr.start,-1)});
+        }
+        if(ce<se){
+          next.push({start:addDaysToDate(cr.end,1),end:seg.end});
+        }
+      });
+      segments=next.filter(seg=>feeDateObj(seg.end)>=feeDateObj(seg.start));
+    });
+
+    segments.forEach(seg=>{
+      items.push({
+        kind:'pending',
+        key:`pending:${seg.start}:${seg.end}`,
+        start:seg.start,
+        end:seg.end,
+        monthKey:ob.monthKey,
+        label:pendingLabel(seg.start,seg.end,ob.monthKey),
+        record:null
+      });
+    });
+  });
+
+  return items.sort((a,b)=>{
+    const d=String(a.start||'').localeCompare(String(b.start||''));
+    if(d) return d;
+    if(a.record && !b.record) return -1;
+    if(!a.record && b.record) return 1;
+    return String(a.end||'').localeCompare(String(b.end||''));
+  });
+}
+
 function getCurrentFeeDisplayItems(student){
   const today=getLocalFeeToday();
-  const completed=getCompletedFeeItems(student,today);
-  const items=[];
-  const seen=new Set();
-
-  // Show all completed month/period items so pending periods are visible.
-  completed.forEach(item=>{
-    const key=item.kind==='month' ? `m:${item.key}` : `p:${item.start}:${item.end}`;
-    if(!seen.has(key)){
-      items.push(item);
-      seen.add(key);
-    }
-  });
-
-  // A fee that was just credited can be shown immediately even when its
-  // calendar month/period has not ended yet.
-  (student.fees||[]).forEach(rec=>{
-    if(rec.status!=='credited') return;
-    let item=null;
-    if(rec.type==='month' && rec.monthKey){
-      item={kind:'month',key:rec.monthKey,label:feeMonthLabel(rec.monthKey),start:rec.monthKey+'-01',end:new Date(Number(rec.monthKey.slice(0,4)),Number(rec.monthKey.slice(5,7)),0).toISOString().slice(0,10),record:rec};
-    }else if(rec.type==='period' && rec.periodStart && rec.periodEnd){
-      item={kind:'period',days:daysBetweenDates(rec.periodStart,rec.periodEnd),label:`${formatFeeShortDate(rec.periodStart)} – ${formatFeeShortDate(rec.periodEnd)} (${daysBetweenDates(rec.periodStart,rec.periodEnd)} days)`,start:rec.periodStart,end:rec.periodEnd,record:rec};
-    }
-    if(item){
-      const key=item.kind==='month' ? `m:${item.key}` : `p:${item.start}:${item.end}`;
-      if(!seen.has(key)){
-        items.push(item);
-        seen.add(key);
-      }
-    }
-  });
-
+  const items=getFeeStatusItems(student,today);
   return items.slice(-2).reverse();
 }
 
@@ -2151,36 +2189,7 @@ function renderFeeDetails(st){
   }
 
   const today=getLocalFeeToday();
-  const completed=getCompletedFeeItems(st,today);
-  const items=[];
-  const seen=new Set();
-
-  completed.forEach(item=>{
-    const key=feeItemKey(item);
-    if(!seen.has(key)){
-      items.push(item);
-      seen.add(key);
-    }
-  });
-
-  (st.fees||[]).forEach(rec=>{
-    if(rec.status!=='credited') return;
-    let item=null;
-    if(rec.type==='month' && rec.monthKey){
-      const y=Number(rec.monthKey.slice(0,4)), m=Number(rec.monthKey.slice(5,7));
-      item={kind:'month',key:rec.monthKey,label:feeMonthLabel(rec.monthKey),start:`${rec.monthKey}-01`,end:new Date(y,m,0).toISOString().slice(0,10),record:rec};
-    }else if(rec.type==='period' && rec.periodStart && rec.periodEnd){
-      const days=daysBetweenDates(rec.periodStart,rec.periodEnd);
-      item={kind:'period',days,label:`${formatFeeShortDate(rec.periodStart)} – ${formatFeeShortDate(rec.periodEnd)} (${days} days)`,start:rec.periodStart,end:rec.periodEnd,record:rec};
-    }
-    if(item){
-      const key=feeItemKey(item);
-      if(!seen.has(key)){
-        items.push(item);
-        seen.add(key);
-      }
-    }
-  });
+  const items=getFeeStatusItems(st,today);
 
   const yearItems=items.filter(item=>{
     const refDate=item.end||item.start;
@@ -2262,7 +2271,7 @@ function saveFee(){
   if(updateMode==='month'){
     const key=document.getElementById('feeMonthSelect').value;
     if(!key){ alert('Select Fee Month'); return; }
-    record={type:'month',monthKey:key,status:'credited',amount:String(amount),mode,date};
+    record={type:'month',monthKey:key,status:'credited',amount:String(amount),mode,date,updatedAt:Date.now()};
     const old=st.fees.find(f=>f.type==='month' && f.monthKey===key);
     if(old) Object.assign(old,record); else st.fees.push(record);
     st.feeCycle='month';
@@ -2272,7 +2281,7 @@ function saveFee(){
     if(!start || !end){ alert('Select Fee Period'); return; }
     if(feeDateObj(end)<feeDateObj(start)){ alert('End date must be after start date'); return; }
     const days=daysBetweenDates(start,end);
-    record={type:'period',periodStart:start,periodEnd:end,days,status:'credited',amount:String(amount),mode,date};
+    record={type:'period',periodStart:start,periodEnd:end,days,status:'credited',amount:String(amount),mode,date,updatedAt:Date.now()};
     const old=st.fees.find(f=>f.type==='period' && f.periodStart===start && f.periodEnd===end);
     if(old) Object.assign(old,record); else st.fees.push(record);
     st.feeCycle='period';
