@@ -417,6 +417,15 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 @media(max-width:390px){.attendanceRow{gap:6px}.attendanceAvatar{width:37px;height:37px;border-radius:11px}.attendanceName{font-size:14px}.attendanceChoices{gap:3px}.attendanceChoice{width:29px;height:29px;font-size:11px;border-radius:8px;}}
 #sundayBtn{border-radius:11px!important;}
 #reportArea .student{background:#fff;border:0;border-radius:16px;padding:14px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin:0 0 12px;}
+.reportSlider{position:relative;overflow:hidden;}
+.reportSlide{display:none;}
+.reportSlide.active{display:block;}
+.reportSlideNav{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0 12px;}
+.reportSlideBtn{border:0;border-radius:10px;background:#eef2ff;color:#3947a7;font-weight:800;font-size:20px;width:42px;height:38px;cursor:pointer;}
+.reportSlideNumber{height:38px;min-width:88px;padding:0 10px;border:1px solid #d8dce5;border-radius:10px;background:#fff;color:#3947a7;font-weight:800;text-align:center;}
+.reportSlideNumber:focus{outline:2px solid #b8c0ff;outline-offset:1px;}
+.reportSwipeHint{text-align:center;color:#777;font-size:12px;margin:-3px 0 9px;}
+
 #reportArea .summary{border-radius:10px;}
 .bottomNav{position:fixed;left:0;right:0;bottom:0;height:66px;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid #e7e9ee;display:flex;justify-content:center;z-index:5000;box-shadow:0 -4px 18px rgba(20,30,60,.08);}
 .bottomNavInner{width:100%;max-width:720px;display:grid;grid-template-columns:repeat(5,1fr);}
@@ -1960,16 +1969,32 @@ function populateReportYears(){
   }
 }
 
+let reportSlideIndex = 0;
+
 function renderReports(){
   const reportArea = document.getElementById("reportArea");
+  if(!reportArea) return;
   reportArea.innerHTML="";
 
   populateReportYears();
 
   const selectedMonth = document.getElementById("reportMonth").value;
   const selectedYear = document.getElementById("reportYear").value;
+  const reportStudents = students.map((s,index)=>({s,index}));
 
-  students.forEach((s,index)=>{
+  if(reportStudents.length===0){
+    reportArea.innerHTML=`<div class="modernPanel"><p style="text-align:center;">No students found</p></div>`;
+    return;
+  }
+
+  if(reportSlideIndex < 0) reportSlideIndex=0;
+  if(reportSlideIndex >= reportStudents.length) reportSlideIndex=reportStudents.length-1;
+
+  let slidesHtml = "";
+
+  reportStudents.forEach((item,slideIndex)=>{
+    const s=item.s;
+    const index=item.index;
     if(!s.attendance) s.attendance=[];
     if(!s.fees) s.fees=[];
 
@@ -1993,28 +2018,6 @@ function renderReports(){
     absent = Math.max(0, absent - sundayManage);
 
     let attendanceHtml = "";
-    let feeInfo = "";
-
-    s.fees.forEach(f=>{
-      const parts = f.date.split("-");
-      if(parts[0] === selectedYear && parts[1] === selectedMonth){
-        const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-        const feeMonth = parseInt(parts[1]);
-        const previousMonthName = monthNames[(feeMonth + 10) % 12];
-        const formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-
-        feeInfo =
-        `<span style="color:green;font-weight:bold;">
-        ${previousMonthName} Fee Status : Credited
-        </span><br>
-        ₹${f.amount} via ${f.mode} on ${formattedDate}`;
-      }
-    });
-
-    if(feeInfo === ""){
-      feeInfo = `<span style="color:#721c24;font-weight:bold;">Fee Status : Pending</span>`;
-    }
-
     const sortedAttendance = [...s.attendance];
     sortedAttendance.sort((a,b)=>new Date(a.date)-new Date(b.date));
 
@@ -2030,7 +2033,7 @@ function renderReports(){
         else if(a.status=="Sunday Manage ✅") color="green";
         else color="#ff8800";
 
-        const displayStatus = a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
+        const displayStatus = a.status.startsWith("EH|") ? a.status.split("|").slice(1).join("|") : a.status;
         const safeDate = a.date.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 
         attendanceHtml +=
@@ -2050,21 +2053,11 @@ function renderReports(){
 
     if(attendanceHtml==="") attendanceHtml="<p>No attendance found</p>";
 
-    reportArea.innerHTML += `
-    <div class="student">
-      <div style="margin-bottom:10px;">
-        <h3 onclick="openStudentDetails(${index})" style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;">${s.name}</h3>
-      </div>
-
-      <div style="display:flex;gap:5px;margin-bottom:10px;flex-wrap:nowrap;">
-        <button class="feeBtn" onclick="openFee(${index})" style="padding:6px 5px;min-width:0;flex:1;">Fee</button>
-        <button class="feeBtn" onclick="editStudent(${index})" style="padding:6px 5px;min-width:0;flex:1;">Edit</button>
-        <button class="feeBtn" onclick="downloadPDF(${index})" style="padding:6px 5px;min-width:0;flex:1;">Report</button>
-        <button class="deleteBtn" onclick="deleteStudent(${index})" style="padding:6px 5px;min-width:0;flex:1;">Delete</button>
-      </div>
-
-      <div class="status" onclick="openFeeStatus(${index})" style="cursor:pointer;">
-        ${feeInfo}
+    slidesHtml += `
+    <div class="student reportSlide ${slideIndex===reportSlideIndex?'active':''}" data-report-slide="${slideIndex}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+        <h3 style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
+        <button class="feeBtn" onclick="downloadPDF(${index})" style="padding:7px 10px;min-width:0;white-space:nowrap;">Print Report</button>
       </div>
 
       ${attendanceHtml}
@@ -2075,6 +2068,71 @@ function renderReports(){
       </div>
     </div>`;
   });
+
+  const optionsHtml = reportStudents.map((item,i)=>
+    `<option value="${i}" ${i===reportSlideIndex?'selected':''}>${i+1}</option>`
+  ).join("");
+
+  reportArea.innerHTML = `
+    <div class="reportSlider" id="reportSlider">
+      ${slidesHtml}
+    </div>
+    <div class="reportSlideNav">
+      <button class="reportSlideBtn" onclick="changeReportSlide(-1)" aria-label="Previous student">‹</button>
+      <select id="reportStudentNumber" class="reportSlideNumber" onchange="goToReportSlide(this.value)" aria-label="Student number">
+        ${optionsHtml}
+      </select>
+      <span style="font-weight:700;color:#555;">/ ${reportStudents.length}</span>
+      <button class="reportSlideBtn" onclick="changeReportSlide(1)" aria-label="Next student">›</button>
+    </div>
+    <div class="reportSwipeHint">Swipe left/right to change student</div>`;
+
+  setupReportSwipe();
+}
+
+function changeReportSlide(direction){
+  const total = document.querySelectorAll("#reportSlider .reportSlide").length;
+  if(!total) return;
+  reportSlideIndex = (reportSlideIndex + direction + total) % total;
+  renderReports();
+}
+
+function goToReportSlide(value){
+  const total = document.querySelectorAll("#reportSlider .reportSlide").length;
+  if(!total) return;
+  const index = Number(value);
+  if(!Number.isInteger(index) || index<0 || index>=total) return;
+  reportSlideIndex=index;
+  renderReports();
+}
+
+function setupReportSwipe(){
+  const slider=document.getElementById("reportSlider");
+  if(!slider) return;
+
+  let startX=0;
+  let startY=0;
+  let tracking=false;
+
+  slider.addEventListener("touchstart",function(e){
+    if(!e.touches || !e.touches[0]) return;
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+    tracking=true;
+  },{passive:true});
+
+  slider.addEventListener("touchend",function(e){
+    if(!tracking || !e.changedTouches || !e.changedTouches[0]) return;
+    tracking=false;
+    const endX=e.changedTouches[0].clientX;
+    const endY=e.changedTouches[0].clientY;
+    const dx=endX-startX;
+    const dy=endY-startY;
+
+    if(Math.abs(dx)<60 || Math.abs(dx)<=Math.abs(dy)) return;
+    if(dx<0) changeReportSlide(1);
+    else changeReportSlide(-1);
+  },{passive:true});
 }
 
 function populateFeeMonthSelect(student){
