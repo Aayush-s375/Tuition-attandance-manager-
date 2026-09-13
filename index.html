@@ -1543,6 +1543,26 @@ function addDaysToDate(date,days){
   return d.toISOString().slice(0,10);
 }
 
+function addCalendarMonths(date,months){
+  const d=feeDateObj(date);
+  if(!d) return "";
+  const originalDay=d.getDate();
+  const targetMonth=d.getMonth()+months;
+  const first=new Date(d.getFullYear(),targetMonth,1);
+  const lastDay=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
+  first.setDate(Math.min(originalDay,lastDay));
+  return first.toISOString().slice(0,10);
+}
+
+function getNextFeeInterval(start,end){
+  const s=feeDateObj(start), e=feeDateObj(end);
+  if(!s || !e || e<s) return null;
+  const nextStart=addCalendarMonths(start,1);
+  const nextEnd=addDaysToDate(addCalendarMonths(nextStart,1),-1);
+  if(!nextStart || !nextEnd) return null;
+  return {start:nextStart,end:nextEnd,days:daysBetweenDates(nextStart,nextEnd)};
+}
+
 function monthKey(year,month){
   return String(year)+'-'+String(month).padStart(2,'0');
 }
@@ -2119,6 +2139,7 @@ function useSavedFeeInterval(){
   if(!st || !st.savedFeeInterval) return;
   document.getElementById('feePeriodStart').value=st.savedFeeInterval.start || st.joiningDate || '';
   document.getElementById('feePeriodEnd').value=st.savedFeeInterval.end || '';
+  document.getElementById('feePopup').dataset.usedSavedInterval='true';
   updateFeePeriodDays();
 }
 
@@ -2147,6 +2168,7 @@ function openFee(index){
   document.getElementById('feeAmount').value='';
   document.getElementById('feeDate').value=new Date().toISOString().slice(0,10);
   const saved=st.savedFeeInterval;
+  document.getElementById('feePopup').dataset.usedSavedInterval=saved ? 'true' : 'false';
   document.getElementById('feePeriodStart').value=saved?.start || st.joiningDate;
   document.getElementById('feePeriodEnd').value=saved?.end || addDaysToDate(st.joiningDate,30);
   const saveIntervalBox=document.getElementById('saveFeeIntervalFuture');
@@ -2285,8 +2307,14 @@ function saveFee(){
     const old=st.fees.find(f=>f.type==='period' && f.periodStart===start && f.periodEnd===end);
     if(old) Object.assign(old,record); else st.fees.push(record);
     st.feeCycle='period';
-    if(document.getElementById('saveFeeIntervalFuture').checked){
-      st.savedFeeInterval={start,end,days};
+
+    // A saved interval is a reusable shortcut. After using/saving it,
+    // automatically prepare the next calendar-month interval.
+    const usedSavedInterval=document.getElementById('feePopup').dataset.usedSavedInterval==='true';
+    const saveForFuture=document.getElementById('saveFeeIntervalFuture').checked;
+    if(saveForFuture || usedSavedInterval){
+      const next=getNextFeeInterval(start,end);
+      if(next) st.savedFeeInterval=next;
     }
   }
   saveLocalData(true);
