@@ -1261,6 +1261,18 @@ async function syncWithGoogleDrive() {
     const driveBackup = await readDriveData(driveFile.id);
     const driveUpdatedAt = Number(driveBackup?.updatedAt || 0);
 
+    // A local change may happen while the Drive request is in progress
+    // (for example, deleting a fee record). Never let an older Drive read
+    // overwrite that newer local change.
+    const latestLocalMeta = getSyncMeta();
+    const latestLocalUpdatedAt = Number(latestLocalMeta.updatedAt || 0);
+    if (latestLocalUpdatedAt > localUpdatedAt) {
+      setSyncMeta({...latestLocalMeta, pending:true});
+      setDriveSyncStatus("New changes pending — syncing…", "working");
+      scheduleDriveSync();
+      return;
+    }
+
     // If local changes are newer, upload them. If Drive is newer, download them.
     if (localUpdatedAt > driveUpdatedAt) {
       const backup = {
@@ -1274,8 +1286,19 @@ async function syncWithGoogleDrive() {
       };
 
       await uploadDriveData(backup, driveFile.id);
-      setSyncMeta({updatedAt: localUpdatedAt, pending: false, driveFileId: driveFile.id});
-      setDriveSyncStatus("Synced with Google Drive", "ok");
+
+      // If another local change happened during the upload, keep it pending
+      // instead of marking the newer change as already synced.
+      const afterUploadMeta = getSyncMeta();
+      const afterUploadUpdatedAt = Number(afterUploadMeta.updatedAt || 0);
+      if (afterUploadUpdatedAt > localUpdatedAt) {
+        setSyncMeta({...afterUploadMeta, pending:true, driveFileId:driveFile.id});
+        setDriveSyncStatus("New changes pending — syncing…", "working");
+        scheduleDriveSync();
+      } else {
+        setSyncMeta({updatedAt:localUpdatedAt, pending:false, driveFileId:driveFile.id});
+        setDriveSyncStatus("Synced with Google Drive", "ok");
+      }
     } else if (driveUpdatedAt > localUpdatedAt) {
       if (Array.isArray(driveBackup.students)) {
         students = driveBackup.students;
@@ -1666,30 +1689,19 @@ function subtractFeeRange(baseStart,baseEnd,cutStart,cutEnd){
 }
 
 function getEffectiveCreditedRanges(student){
-  const effective=[];
-  getCreditedFeeRecords(student).forEach(({rec,index})=>{
+  // Every saved credited fee period remains its own record.
+  // Records are never trimmed or replaced here. Overlapping periods are
+  // blocked when saving a new period, so existing saved periods stay intact.
+  return getCreditedFeeRecords(student).map(({rec,index})=>{
     const range=getCreditedRange(rec,student);
-    if(!range) return;
-
-    // The newest saved fee update wins wherever it overlaps an older one.
-    // Remove the new range from all older effective ranges first.
-    let remaining=[];
-    effective.forEach(item=>{
-      remaining.push(...subtractFeeRange(item.start,item.end,range.start,range.end));
-    });
-
-    remaining.push({
+    if(!range) return null;
+    return {
       start:range.start,
       end:range.end,
       record:rec,
       recordIndex:index
-    });
-
-    effective.length=0;
-    effective.push(...remaining);
-  });
-
-  return effective.sort((a,b)=>{
+    };
+  }).filter(Boolean).sort((a,b)=>{
     const d=String(a.start).localeCompare(String(b.start));
     if(d) return d;
     return String(a.end).localeCompare(String(b.end));
@@ -2256,8 +2268,20 @@ function renderFeeDetails(st){
 
   if(!yearItems.length) rows='<div style="padding:10px 0;color:#666;">No fee details in this year yet.</div>';
 
+  // Total collections = all credited payments recorded in the selected year
+  // up to today. Pending amounts are never included.
+  const todayDate=feeDateObj(today);
+  const totalCollections=(st.fees||[]).reduce((sum,rec)=>{
+    if(rec?.status!=='credited' || !rec?.date) return sum;
+    const paymentDate=feeDateObj(rec.date);
+    if(!paymentDate || !todayDate) return sum;
+    if(paymentDate.getFullYear()!==year || paymentDate>todayDate) return sum;
+    const amount=Number(rec.amount);
+    return Number.isFinite(amount) && amount>0 ? sum+amount : sum;
+  },0);
+
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn" style="margin-left:6px;padding:5px 8px;" onclick="editJoiningDate()">Edit</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn" style="margin-left:6px;padding:5px 8px;" onclick="editJoiningDate()">Edit</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:700;color:#202638;">${year} • Total Collections - ₹${totalCollections}</div>`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
@@ -2327,10 +2351,26 @@ function saveFee(){
     const end=document.getElementById('feePeriodEnd').value;
     if(!start || !end){ alert('Select Fee Period'); return; }
     if(feeDateObj(end)<feeDateObj(start)){ alert('End date must be after start date'); return; }
+
+    // Every saved fee update is kept as a separate record.
+    // Do not allow a new credited period to overlap any already-credited period.
+    const newStart=feeDateObj(start), newEnd=feeDateObj(end);
+    const overlapping=(st.fees||[]).find(f=>{
+      if(f.status!=='credited') return false;
+      const range=getCreditedRange(f,st);
+      if(!range) return false;
+      const rs=feeDateObj(range.start), re=feeDateObj(range.end);
+      return rs && re && newStart<=re && newEnd>=rs;
+    });
+    if(overlapping){
+      const range=getCreditedRange(overlapping,st);
+      alert(`This fee period overlaps an already saved period: ${formatFeeShortDate(range.start)} – ${formatFeeShortDate(range.end)}.\n\nPlease select a new period that does not overlap.`);
+      return;
+    }
+
     const days=daysBetweenDates(start,end);
     record={type:'period',periodStart:start,periodEnd:end,days,status:'credited',amount:String(amount),mode,date,updatedAt:Date.now()};
-    const old=st.fees.find(f=>f.type==='period' && f.periodStart===start && f.periodEnd===end);
-    if(old) Object.assign(old,record); else st.fees.push(record);
+    st.fees.push(record);
     st.feeCycle='period';
 
   }
