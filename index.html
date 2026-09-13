@@ -1662,53 +1662,88 @@ function pendingLabel(start,end,monthKeyValue){
   return `${formatFeeShortDate(start)} – ${formatFeeShortDate(end)}`;
 }
 
-function getFeeStatusItems(student,today){
-  const obligations=getCalendarFeeObligations(student,today);
-  const credited=getCreditedFeeRecords(student);
-  const items=[];
+function subtractFeeRange(baseStart,baseEnd,cutStart,cutEnd){
+  const bs=feeDateObj(baseStart), be=feeDateObj(baseEnd);
+  const cs=feeDateObj(cutStart), ce=feeDateObj(cutEnd);
+  if(!bs || !be || !cs || !ce || be<bs) return [];
+  if(ce<bs || cs>be) return [{start:baseStart,end:baseEnd}];
 
-  // Add every credited record in its original form. A period payment such as
-  // 13 Jun–13 Jul must remain one credited period, not be split by months.
-  credited.forEach(({rec,index})=>{
+  const result=[];
+  if(bs<cs){
+    const leftEnd=addDaysToDate(cutStart,-1);
+    if(leftEnd && feeDateObj(leftEnd)>=bs) result.push({start:baseStart,end:leftEnd});
+  }
+  if(ce<be){
+    const rightStart=addDaysToDate(cutEnd,1);
+    if(rightStart && feeDateObj(rightStart)<=be) result.push({start:rightStart,end:baseEnd});
+  }
+  return result;
+}
+
+function getEffectiveCreditedRanges(student){
+  const effective=[];
+  getCreditedFeeRecords(student).forEach(({rec,index})=>{
     const range=getCreditedRange(rec,student);
     if(!range) return;
-    const days=daysBetweenDates(range.start,range.end);
-    let label;
-    if(rec.type==='month'){
-      const monthStart=`${rec.monthKey}-01`;
-      label=range.start!==monthStart
-        ? `${formatFeeShortDate(range.start)} – ${formatFeeShortDate(range.end)}`
-        : feeMonthLabel(rec.monthKey);
-    }else{
-      label=`${formatFeeShortDate(range.start)} – ${formatFeeShortDate(range.end)}${days ? ` (${days} days)` : ''}`;
-    }
-    items.push({kind:rec.type==='month'?'month':'period',key:rec.type==='month'?rec.monthKey:`${range.start}:${range.end}`,start:range.start,end:range.end,label,record:rec,recordIndex:index});
+
+    // The newest saved fee update wins wherever it overlaps an older one.
+    // Remove the new range from all older effective ranges first.
+    let remaining=[];
+    effective.forEach(item=>{
+      remaining.push(...subtractFeeRange(item.start,item.end,range.start,range.end));
+    });
+
+    remaining.push({
+      start:range.start,
+      end:range.end,
+      record:rec,
+      recordIndex:index
+    });
+
+    effective.length=0;
+    effective.push(...remaining);
   });
 
-  // For each calendar obligation, subtract all credited ranges. The latest
-  // update wins where credited records overlap; pending is generated only
-  // for dates that remain uncovered.
+  return effective.sort((a,b)=>{
+    const d=String(a.start).localeCompare(String(b.start));
+    if(d) return d;
+    return String(a.end).localeCompare(String(b.end));
+  });
+}
+
+function getFeeStatusItems(student,today){
+  const obligations=getCalendarFeeObligations(student,today);
+  const effectiveCredited=getEffectiveCreditedRanges(student);
+  const items=[];
+
+  // Show only the effective credited portions. If a newer payment overlaps
+  // an older payment, the newer update wins and the older one is trimmed.
+  effectiveCredited.forEach(item=>{
+    const rec=item.record;
+    const days=daysBetweenDates(item.start,item.end);
+    const label=`${formatFeeShortDate(item.start)} – ${formatFeeShortDate(item.end)}${days ? ` (${days} days)` : ''}`;
+    items.push({
+      kind:rec?.type==='month'?'month':'period',
+      key:rec?.type==='month' ? `${rec.monthKey}:${item.start}:${item.end}` : `${item.start}:${item.end}`,
+      start:item.start,
+      end:item.end,
+      label,
+      record:rec,
+      recordIndex:item.recordIndex
+    });
+  });
+
+  // Generate pending only for dates not covered by any effective credited
+  // range. This guarantees that no date is skipped between joining and today.
   obligations.forEach(ob=>{
     let segments=[{start:ob.start,end:ob.end}];
-    credited.forEach(({rec})=>{
-      const cr=getCreditedRange(rec,student);
-      if(!cr) return;
-      const cs=feeDateObj(cr.start), ce=feeDateObj(cr.end);
+
+    effectiveCredited.forEach(cr=>{
       const next=[];
       segments.forEach(seg=>{
-        const ss=feeDateObj(seg.start), se=feeDateObj(seg.end);
-        if(!ss || !se || ce<ss || cs>se){
-          next.push(seg);
-          return;
-        }
-        if(ss<cs){
-          next.push({start:seg.start,end:addDaysToDate(cr.start,-1)});
-        }
-        if(ce<se){
-          next.push({start:addDaysToDate(cr.end,1),end:seg.end});
-        }
+        next.push(...subtractFeeRange(seg.start,seg.end,cr.start,cr.end));
       });
-      segments=next.filter(seg=>feeDateObj(seg.end)>=feeDateObj(seg.start));
+      segments=next;
     });
 
     segments.forEach(seg=>{
