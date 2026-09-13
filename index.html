@@ -769,16 +769,12 @@ Reset PIN
 
     <div id="feePeriodFields" style="margin-top:12px;text-align:left;display:none;">
       <label style="font-size:13px;font-weight:600;">Fee Period</label>
-      <div id="savedFeeIntervals" style="margin-top:8px;"></div>
       <div style="display:flex;gap:8px;align-items:center;margin-top:9px;">
         <input type="date" id="feePeriodStart">
         <span>to</span>
         <input type="date" id="feePeriodEnd">
       </div>
       <div id="feePeriodDays" style="font-size:12px;color:#606775;margin-top:4px;"></div>
-      <label style="display:flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;">
-        <input type="checkbox" id="saveFeeIntervalFuture" style="width:auto;"> Save this fee interval for future
-      </label>
     </div>
 
     <input type="number" id="feeAmount" placeholder="Enter Fee Amount" min="0" step="0.01">
@@ -1543,44 +1539,6 @@ function addDaysToDate(date,days){
   return d.toISOString().slice(0,10);
 }
 
-function addCalendarMonths(date,months){
-  const d=feeDateObj(date);
-  if(!d) return "";
-  const originalDay=d.getDate();
-  const targetMonth=d.getMonth()+months;
-  const first=new Date(d.getFullYear(),targetMonth,1);
-  const lastDay=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();
-  first.setDate(Math.min(originalDay,lastDay));
-  return first.toISOString().slice(0,10);
-}
-
-function getNextFeeInterval(start,end){
-  const s=feeDateObj(start), e=feeDateObj(end);
-  if(!s || !e || e<s) return null;
-
-  // The saved interval is a DATE PATTERN, not a fixed number of days.
-  // The next interval starts on the day after the previous interval's
-  // START date, shifted exactly one calendar month, and ends on the day
-  // before the following month's START date.
-  // Example:
-  // 16 Jun -> 15 Jul  => 16 Jul -> 15 Aug
-  // 16 Jul -> 15 Aug  => 16 Aug -> 15 Sep
-  // 16 Aug -> 15 Sep  => 16 Sep -> 15 Oct
-  const nextStart=addCalendarMonths(start,1);
-  const nextStartNextMonth=addCalendarMonths(start,2);
-  if(!nextStart || !nextStartNextMonth) return null;
-
-  const nextEnd=addDaysToDate(nextStartNextMonth,-1);
-  const ns=feeDateObj(nextStart), ne=feeDateObj(nextEnd);
-  if(!ns || !ne || ne<ns) return null;
-
-  return {
-    start:nextStart,
-    end:nextEnd,
-    days:daysBetweenDates(nextStart,nextEnd)
-  };
-}
-
 function monthKey(year,month){
   return String(year)+'-'+String(month).padStart(2,'0');
 }
@@ -2143,20 +2101,13 @@ function updateFeePeriodDays(){
   const box=document.getElementById('feePeriodDays');
   const start=document.getElementById('feePeriodStart')?.value;
   const end=document.getElementById('feePeriodEnd')?.value;
-  const saveBox=document.getElementById('saveFeeIntervalFuture');
   if(!box) return;
   if(!start || !end){
     box.textContent='';
-    if(saveBox){ saveBox.disabled=true; saveBox.checked=false; }
     return;
   }
   const days=daysBetweenDates(start,end);
-  const nearMonth=days>=25 && days<=40;
   box.textContent=days>0 ? `${days} day${days===1?'':'s'} fee interval` : 'End date must be after start date';
-  if(saveBox){
-    saveBox.disabled=!nearMonth;
-    if(!nearMonth) saveBox.checked=false;
-  }
 }
 
 function selectFeeUpdateMode(mode){
@@ -2171,39 +2122,6 @@ function selectFeeUpdateMode(mode){
   monthBtn.classList.toggle('active',isMonth);
   periodBtn.classList.toggle('active',!isMonth);
   document.getElementById('feePopup').dataset.updateMode=mode;
-  if(!isMonth) renderSavedFeeIntervals();
-}
-
-function renderSavedFeeIntervals(){
-  const box=document.getElementById('savedFeeIntervals');
-  if(!box) return;
-  const st=students[currentStudent];
-  let saved=st?.savedFeeInterval;
-  if(saved && (!saved.start || !saved.end) && Number(saved.days)>0 && st.joiningDate){
-    saved={...saved,start:st.joiningDate,end:addDaysToDate(st.joiningDate,Number(saved.days)-1)};
-    st.savedFeeInterval=saved;
-  }
-  if(!saved || !saved.start || !saved.end){ box.innerHTML=''; return; }
-  box.innerHTML=`<div class="savedFeeIntervalWrap"><div class="savedFeeIntervalBtn"><button type="button" class="savedFeeIntervalUse" onclick="useSavedFeeInterval()">${formatFeeShortDate(saved.start)} → ${formatFeeShortDate(saved.end)}</button><button type="button" class="savedFeeIntervalDelete" onclick="removeSavedFeeInterval(event)" title="Remove saved interval">✕</button></div></div>`;
-}
-
-function useSavedFeeInterval(){
-  const st=students[currentStudent];
-  if(!st || !st.savedFeeInterval) return;
-  document.getElementById('feePeriodStart').value=st.savedFeeInterval.start || st.joiningDate || '';
-  document.getElementById('feePeriodEnd').value=st.savedFeeInterval.end || '';
-  document.getElementById('feePopup').dataset.usedSavedInterval='true';
-  updateFeePeriodDays();
-}
-
-function removeSavedFeeInterval(event){
-  if(event) event.stopPropagation();
-  const st=students[currentStudent];
-  if(!st || !st.savedFeeInterval) return;
-  if(!confirm('Remove this saved fee interval?')) return;
-  st.savedFeeInterval=null;
-  saveLocalData(true);
-  renderSavedFeeIntervals();
 }
 
 function openFee(index){
@@ -2220,13 +2138,9 @@ function openFee(index){
   document.getElementById('feeMode').value='';
   document.getElementById('feeAmount').value='';
   document.getElementById('feeDate').value=new Date().toISOString().slice(0,10);
-  const saved=st.savedFeeInterval;
-  document.getElementById('feePopup').dataset.usedSavedInterval=saved ? 'true' : 'false';
-  document.getElementById('feePeriodStart').value=saved?.start || st.joiningDate;
-  document.getElementById('feePeriodEnd').value=saved?.end || addDaysToDate(st.joiningDate,30);
-  const saveIntervalBox=document.getElementById('saveFeeIntervalFuture');
-  saveIntervalBox.checked=false;
-  saveIntervalBox.disabled=true;
+  document.getElementById('feePopup').dataset.usedSavedInterval='false';
+  document.getElementById('feePeriodStart').value=st.joiningDate || '';
+  document.getElementById('feePeriodEnd').value=st.joiningDate ? addDaysToDate(st.joiningDate,30) : '';
   document.getElementById('feePeriodStart').onchange=updateFeePeriodDays;
   document.getElementById('feePeriodEnd').onchange=updateFeePeriodDays;
   selectFeeUpdateMode(getFeeCycleMode(st));
@@ -2361,14 +2275,6 @@ function saveFee(){
     if(old) Object.assign(old,record); else st.fees.push(record);
     st.feeCycle='period';
 
-    // A saved interval is a reusable shortcut. After using/saving it,
-    // automatically prepare the next calendar-month interval.
-    const usedSavedInterval=document.getElementById('feePopup').dataset.usedSavedInterval==='true';
-    const saveForFuture=document.getElementById('saveFeeIntervalFuture').checked;
-    if(saveForFuture || usedSavedInterval){
-      const next=getNextFeeInterval(start,end);
-      if(next) st.savedFeeInterval=next;
-    }
   }
   saveLocalData(true);
   closeFeePopup();
