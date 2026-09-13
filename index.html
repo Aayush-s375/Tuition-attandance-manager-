@@ -1557,9 +1557,14 @@ function addCalendarMonths(date,months){
 function getNextFeeInterval(start,end){
   const s=feeDateObj(start), e=feeDateObj(end);
   if(!s || !e || e<s) return null;
+
+  // Saved fee intervals advance by CALENDAR MONTH, not by number of days.
+  // Example: 16 Jun -> 15 Jul becomes 16 Jul -> 15 Aug, then 16 Aug -> 15 Sep.
+  // The day-of-month of each endpoint is preserved as far as that month allows.
   const nextStart=addCalendarMonths(start,1);
-  const nextEnd=addDaysToDate(addCalendarMonths(nextStart,1),-1);
-  if(!nextStart || !nextEnd) return null;
+  const nextEnd=addCalendarMonths(end,1);
+  if(!nextStart || !nextEnd || feeDateObj(nextEnd)<feeDateObj(nextStart)) return null;
+
   return {start:nextStart,end:nextEnd,days:daysBetweenDates(nextStart,nextEnd)};
 }
 
