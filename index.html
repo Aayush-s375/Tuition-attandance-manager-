@@ -1558,15 +1558,19 @@ function getNextFeeInterval(start,end){
   const s=feeDateObj(start), e=feeDateObj(end);
   if(!s || !e || e<s) return null;
 
-  // A saved interval always moves to the NEXT calendar month while
-  // preserving the exact day-of-month pattern of the saved interval.
-  // Example: 16 Jun -> 15 Jul  =>  16 Jul -> 15 Aug
-  //          16 Jul -> 15 Aug  =>  16 Aug -> 15 Sep
-  // We do NOT calculate the next interval from the number of days.
+  // The saved interval is a DATE PATTERN, not a fixed number of days.
+  // The next interval starts on the day after the previous interval's
+  // START date, shifted exactly one calendar month, and ends on the day
+  // before the following month's START date.
+  // Example:
+  // 16 Jun -> 15 Jul  => 16 Jul -> 15 Aug
+  // 16 Jul -> 15 Aug  => 16 Aug -> 15 Sep
+  // 16 Aug -> 15 Sep  => 16 Sep -> 15 Oct
   const nextStart=addCalendarMonths(start,1);
-  const nextEnd=addCalendarMonths(end,1);
-  if(!nextStart || !nextEnd) return null;
+  const nextStartNextMonth=addCalendarMonths(start,2);
+  if(!nextStart || !nextStartNextMonth) return null;
 
+  const nextEnd=addDaysToDate(nextStartNextMonth,-1);
   const ns=feeDateObj(nextStart), ne=feeDateObj(nextEnd);
   if(!ns || !ne || ne<ns) return null;
 
