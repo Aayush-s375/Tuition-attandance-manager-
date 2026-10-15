@@ -446,6 +446,14 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .attendanceReminder{display:none;margin-top:18px;background:#fff7e6;border:1px solid #ffd88a;border-left:5px solid #e99b14;border-radius:15px;padding:13px 15px;color:#754b00;box-shadow:0 3px 12px rgba(20,30,60,.05);font-weight:700;line-height:1.45;}
 .thoughtCard{margin-top:14px;background:linear-gradient(135deg,#fff,#f4f1ff);border:1px solid #e5ddff;border-radius:17px;padding:16px;box-shadow:0 3px 14px rgba(20,30,60,.06);}
 .thoughtCardHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
+.myNotesHomeCard{background:linear-gradient(135deg,#fff,#f0f8ff);border-color:#d8e8f5;}
+.myNoteItem{border:1px solid #e3e7ef;border-radius:12px;padding:12px;margin-top:10px;background:#fff;}
+.myNoteContent{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;font-size:15px;color:#252b38;}
+.myNoteActions{display:flex;gap:8px;margin-top:10px;}
+.myNoteActions button{border:0;border-radius:9px;padding:8px 12px;font-weight:700;cursor:pointer;}
+.myNoteEdit{background:#e9edff;color:#38318a;}.myNoteDelete{background:#fff0f0;color:#b42318;}
+.myNoteEditorTextarea{width:100%;min-height:180px;box-sizing:border-box;resize:vertical;border:1px solid #cfd5e2;border-radius:12px;padding:12px;font:inherit;line-height:1.6;margin:12px 0;}
+
 .thoughtCardHead h3{margin:0;font-size:16px;color:#44358d;}
 .thoughtText{font-size:18px;font-weight:700;line-height:1.65;color:#24213a;overflow-wrap:anywhere;word-break:normal;}
 .thoughtActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
@@ -751,6 +759,10 @@ Reset PIN
               <span class="modernMenuIcon">🌱</span>
               <span class="modernMenuLabel">सभी विचार</span>
             </div>
+            <div class="modernMenuItem" onclick="openMyNotesFromMenu(event)">
+              <span class="modernMenuIcon">📝</span>
+              <span class="modernMenuLabel">My Notes</span>
+            </div>
             <div class="modernMenuItem" onclick="openTrashFromMenu(event)">
               <span class="modernMenuIcon">🗑️</span>
               <span class="modernMenuLabel">Deleted Students</span>
@@ -790,6 +802,10 @@ Reset PIN
         <div class="thoughtCardHead"><h3>🌱 आज का विचार</h3><span aria-hidden="true">✨</span></div>
         <div id="homeThoughtText" class="thoughtText">मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।</div>
       </div>
+      <div class="thoughtCard myNotesHomeCard" id="homeMyNotesCard" style="display:none;">
+        <div class="thoughtCardHead"><h3>📝 My Notes</h3></div>
+        <div id="homeMyNotesContent" class="thoughtText" style="font-size:15px;font-weight:600;white-space:pre-wrap;"></div>
+      </div>
     </section>
 
     <section id="thoughtsSection" class="section">
@@ -816,6 +832,14 @@ Reset PIN
           </div>
         </div>
         <div id="personalThoughtsList" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="myNotesSection" class="section">
+      <div class="pageHead"><div><h2>📝 My Notes</h2><p>अपने काम और याद रखने वाली बातें लिखें</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="modernPanel" style="padding:14px;">
+        <button class="thoughtBtn" type="button" onclick="openMyNoteEditor()">＋ Add Note</button>
+        <div id="myNotesList" style="margin-top:12px;"></div>
       </div>
     </section>
 
@@ -877,6 +901,15 @@ Reset PIN
     <button id="reportsNav" class="navItem" onclick="showSection('reportsSection','reportsNav')"><span>▦</span><span>Reports</span></button>
   </div>
 </nav>
+
+<div class="popup" id="myNoteEditorPopup" style="display:none;align-items:center;justify-content:center;z-index:10020;">
+  <div class="popupContent" style="width:min(560px,92vw);max-height:88vh;overflow:auto;padding:18px;">
+    <button class="popupClose" onclick="closeMyNoteEditor()">✕</button>
+    <h3 id="myNoteEditorTitle">📝 Add Note</h3>
+    <textarea id="myNoteEditorInput" class="myNoteEditorTextarea" placeholder="यहाँ अपना Note लिखें… कोई भी लंबाई लिख सकते हैं।"></textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="thoughtBtn" type="button" onclick="saveMyNote()">Save Note</button><button class="thoughtBtn secondary" type="button" onclick="closeMyNoteEditor()">Cancel</button></div>
+  </div>
+</div>
 
 <div class="popup" id="developerPopup">
   <div class="popupContent developerPopupContent">
@@ -1048,11 +1081,29 @@ function readMyThoughts(){
   }catch(e){return [];}
 }
 function writeMyThoughts(items){localStorage.setItem(getMyThoughtsKey(),JSON.stringify(items));}
+function getMyNotesKey(){return "tuitionMyNotes_v1_"+(currentAccountKey||"local");}
+function readMyNotes(){try{const notes=JSON.parse(localStorage.getItem(getMyNotesKey())||"[]");return Array.isArray(notes)?notes.filter(n=>n&&typeof n.text==="string").map(n=>({id:String(n.id||("note_"+Date.now()+"_"+Math.random().toString(36).slice(2))),text:String(n.text),updatedAt:Number(n.updatedAt||Date.now())})):[];}catch(e){return [];}}
+function writeMyNotes(notes){localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));renderHomeNotes();renderMyNotesList();}
+let editingMyNoteId=null;
+function renderHomeNotes(){const card=document.getElementById("homeMyNotesCard"),content=document.getElementById("homeMyNotesContent");if(!card||!content)return;const notes=readMyNotes().filter(n=>n.text.trim());if(!notes.length){card.style.display="none";content.textContent="";return;}card.style.display="block";content.textContent=notes.map(n=>n.text).join("\n\n");}
+function renderMyNotesList(){
+  const area=document.getElementById("myNotesList");if(!area)return;
+  const notes=readMyNotes().filter(n=>n.text.trim());
+  if(!notes.length){area.innerHTML='<div class="emptyState">अभी कोई Note नहीं है। नया Note जोड़ने के लिए Add Note दबाएँ।</div>';return;}
+  area.innerHTML=notes.map(n=>`<div class="myNoteItem"><div class="myNoteContent">${escapeHtml(n.text)}</div><div class="myNoteActions"><button class="myNoteEdit" type="button" onclick="editMyNote('${n.id}')">Edit</button><button class="myNoteDelete" type="button" onclick="deleteMyNote('${n.id}')">Delete</button></div></div>`).join('');
+}
+function openMyNotesFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)menu.style.display="none";overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("myNotesSection","homeNav");renderMyNotesList();setTimeout(()=>{menuNavigationInProgress=false;},300);}
+function openMyNoteEditor(id){editingMyNoteId=id||null;let note=editingMyNoteId?readMyNotes().find(n=>n.id===editingMyNoteId):null;const modal=document.getElementById("myNoteEditorPopup");const input=document.getElementById("myNoteEditorInput");if(!modal||!input)return;input.value=note?note.text:"";modal.style.display="flex";setTimeout(()=>input.focus(),50);}
+function saveMyNote(){const input=document.getElementById("myNoteEditorInput");const value=String(input?.value||"").trim();if(!value){alert("पहले Note लिखें।");return;}const notes=readMyNotes();if(editingMyNoteId){const i=notes.findIndex(n=>n.id===editingMyNoteId);if(i>=0){notes[i].text=value;notes[i].updatedAt=Date.now();}else notes.unshift({id:editingMyNoteId,text:value,updatedAt:Date.now()});}else notes.unshift({id:"note_"+Date.now()+"_"+Math.random().toString(36).slice(2),text:value,updatedAt:Date.now()});localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));closeMyNoteEditor();renderMyNotesList();renderHomeNotes();}
+function editMyNote(id){openMyNoteEditor(id);}
+function deleteMyNote(id){if(!confirm("इस Note को Delete करना चाहते हैं?"))return;writeMyNotes(readMyNotes().filter(n=>n.id!==id));}
+function closeMyNoteEditor(){const modal=document.getElementById("myNoteEditorPopup");if(modal)modal.style.display="none";editingMyNoteId=null;}
 function getThoughtSource(){return localStorage.getItem(getThoughtSourceKey())==="mine"?"mine":"ready";}
-function getThoughtBackupData(){return {myThoughts:readMyThoughts(),thoughtSource:getThoughtSource(),thoughtOfDay:localStorage.getItem(getThoughtPreferenceKey()),thoughtRotation:localStorage.getItem(getThoughtRotationKey())};}
+function getThoughtBackupData(){return {myThoughts:readMyThoughts(),myNotes:readMyNotes(),thoughtSource:getThoughtSource(),thoughtOfDay:localStorage.getItem(getThoughtPreferenceKey()),thoughtRotation:localStorage.getItem(getThoughtRotationKey())};}
 function applyThoughtBackupData(data){
   if(!data||typeof data!=="object")return;
   if(Array.isArray(data.myThoughts))writeMyThoughts(data.myThoughts);
+  if(Array.isArray(data.myNotes))localStorage.setItem(getMyNotesKey(),JSON.stringify(data.myNotes));
   if(data.thoughtSource==="mine"||data.thoughtSource==="ready")localStorage.setItem(getThoughtSourceKey(),data.thoughtSource);
   if(Object.prototype.hasOwnProperty.call(data,"thoughtRotation")){
     if(data.thoughtRotation)localStorage.setItem(getThoughtRotationKey(),typeof data.thoughtRotation==="string"?data.thoughtRotation:JSON.stringify(data.thoughtRotation));
@@ -1395,6 +1446,7 @@ function renderHomeExtras(){
     else{reminder.style.display="none";reminder.textContent="";}
   }
   const thought=getTodaysThought();const text=document.getElementById("homeThoughtText");if(text)text.textContent=thought.t;
+  renderHomeNotes();
 }
 function openThoughtsLibrary(){
   activeThoughtTab='ready';
@@ -3697,6 +3749,7 @@ window.addEventListener("load", function(){
   setupOverlayBackHandling();
   currentSectionId='homeSection';
   sectionHistoryStack=[];
+  renderHomeNotes();
   // One guard entry lets the first Back press be intercepted while the app is open.
   history.pushState({tuitionAppGuard:true}, "", location.href);
 });
