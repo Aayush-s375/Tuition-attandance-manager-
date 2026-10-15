@@ -464,6 +464,62 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 #thoughtsSection .thoughtItem{display:block;width:100%;box-sizing:border-box;}
 .thoughtItem .thoughtBtn{margin-top:8px;padding:7px 11px;font-size:12px;}
 @media(max-width:390px){.modernStudent{align-items:center;flex-wrap:nowrap;gap:8px}.studentMain{flex:1 1 auto;min-width:0}.studentActions{margin-left:0;flex:none;gap:4px}.studentActions .miniBtn{padding:7px 6px;font-size:11px}.thoughtText{font-size:17px}.appTitle{overflow-wrap:anywhere;}}
+
+/* Compact right-side settings drawer and light-gray surface */
+#menuPopup{
+  width:min(280px,58vw)!important;
+  max-width:58vw!important;
+  min-width:0!important;
+  background:#F3F4F6!important;
+  color:#202638!important;
+  box-shadow:-8px 0 26px rgba(20,30,50,.16)!important;
+  border:1px solid #E1E5EC!important;
+  border-right:0!important;
+  border-radius:18px 0 0 18px!important;
+}
+#menuPopup .modernMenuProfile,
+#menuPopup .modernMenuItem,
+#menuPopup .modernMenuAccount{background:#F3F4F6!important;}
+#menuPopup .modernMenuItem{border-bottom:1px solid #E2E5EB!important;gap:8px!important;padding-left:10px!important;padding-right:9px!important;font-size:14px!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:anywhere!important;}
+#menuPopup .modernMenuProfile{padding-left:10px!important;padding-right:9px!important;}
+#menuPopup .modernMenuIcon{width:25px!important;min-width:25px!important;font-size:19px!important;}
+#menuPopup .modernMenuAccount{font-size:10px!important;padding-left:10px!important;padding-right:9px!important;}
+#menuPopup .modernMenuItem:active{background:#E7EAF0!important;}
+#menuPopup.drawerClosing{animation:drawerOut .18s ease-in forwards!important;pointer-events:none!important;}
+@keyframes drawerOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:.75}}
+
+/* Thought library tabs, editor and personal thoughts */
+.thoughtTabs{display:flex;gap:8px;margin:0 0 12px;padding:4px;background:#E9ECF3;border-radius:13px;}
+.thoughtTab{flex:1;min-width:0;border:0;border-radius:10px;padding:10px 8px;background:transparent;color:#4B5563;font-weight:800;font-size:13px;line-height:1.35;cursor:pointer;overflow-wrap:anywhere;}
+.thoughtTab.active{background:#5143B8;color:#fff;box-shadow:0 2px 7px rgba(35,40,90,.12);}
+.thoughtSourcePanel{background:#F3F4F6;border:1px solid #E2E6EF;border-radius:13px;padding:12px;margin-bottom:12px;}
+.thoughtSourceTitle{font-size:13px;color:#344054;font-weight:700;line-height:1.5;margin-bottom:9px;}
+.thoughtSourceButtons{display:flex;gap:7px;}
+.thoughtSourceButtons .thoughtBtn{flex:1;min-width:0;padding:8px 6px;font-size:12px;line-height:1.3;}
+.thoughtSourceButtons .activeSource{background:#18794E!important;color:#fff!important;}
+.thoughtSourceStatus{font-size:11px;color:#667085;line-height:1.45;margin-top:8px;}
+.newThoughtBtn{width:100%;border:0;border-radius:11px;padding:11px 12px;background:#5143B8;color:#fff;font-weight:800;font-size:14px;margin-bottom:10px;cursor:pointer;}
+.personalThoughtEditor{background:#F8F9FC;border:1px solid #DDE2EC;border-radius:14px;padding:12px;margin-bottom:12px;}
+.personalThoughtEditor label{display:block;font-size:13px;font-weight:800;color:#344054;margin-bottom:8px;}
+.personalThoughtEditor textarea{display:block;width:100%;min-height:105px;box-sizing:border-box;resize:vertical;border:1px solid #CDD4E0;border-radius:10px;background:#fff;color:#202638;padding:10px;font:inherit;font-size:15px;line-height:1.6;outline-color:#5143B8;}
+.personalThoughtSaveStatus{font-size:11px;color:#667085;margin:7px 0 10px;line-height:1.45;}
+.personalThoughtEditorActions{display:flex;gap:7px;flex-wrap:wrap;}
+.personalThoughtEditorActions .thoughtBtn{flex:1;min-width:95px;padding:8px;font-size:12px;}
+.personalThoughtStatus{display:inline-block;margin:0 0 5px;padding:3px 7px;border-radius:7px;background:#FFF3D6;color:#8A5B00;font-size:10px;font-weight:800;}
+.personalThoughtStatus.saved{background:#E6F6EC;color:#137A42;}
+.personalThoughtActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px;}
+.personalThoughtActions button{border:0;border-radius:8px;padding:7px 9px;font-size:11px;font-weight:800;cursor:pointer;}
+.personalThoughtActions .thoughtBtn{font-size:11px;margin-top:0;}
+.personalThoughtDelete{background:#FFF0F0;color:#B42318;}
+#personalThoughtsList .thoughtItem{padding:13px 0;}
+#personalThoughtsList .thoughtItemText{white-space:pre-wrap;}
+@media(max-width:390px){
+  #menuPopup{width:min(260px,58vw)!important;max-width:58vw!important;}
+  .thoughtTab{font-size:12px;padding:9px 5px;}
+  .thoughtSourceButtons{flex-direction:column;}
+  .personalThoughtActions button{padding:7px 8px;}
+}
+
 </style>  
 </head>  
   <body>
@@ -696,7 +752,7 @@ Reset PIN
             </div>
             <div class="modernMenuItem" onclick="openTrashFromMenu(event)">
               <span class="modernMenuIcon">🗑️</span>
-              <span class="modernMenuLabel">Trash / Deleted Students</span>
+              <span class="modernMenuLabel">Deleted Students</span>
             </div>
             <div class="modernMenuAccount">
               <span id="googleEmailDisplay"></span>
@@ -736,15 +792,41 @@ Reset PIN
     </section>
 
     <section id="thoughtsSection" class="section">
-      <div class="pageHead"><div><h2>हिंदी विचार</h2><p>शिक्षा, मेहनत, अनुशासन और जीवन</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
-      <div class="modernPanel">
-        <input id="thoughtSearchInput" class="thoughtSearch" type="search" placeholder="विचार खोजें..." oninput="renderThoughtsLibrary()" autocomplete="off">
-        <div id="thoughtsLibraryArea"></div>
+      <div class="pageHead"><div><h2>हिंदी विचार</h2><p>तैयार विचार चुनें या अपने विचार लिखें</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="thoughtTabs" role="tablist" aria-label="विचारों के प्रकार">
+        <button id="thoughtTabReady" class="thoughtTab active" role="tab" aria-selected="true" onclick="switchThoughtTab('ready')">250 तैयार विचार</button>
+        <button id="thoughtTabMine" class="thoughtTab" role="tab" aria-selected="false" onclick="switchThoughtTab('mine')">मेरे विचार</button>
+      </div>
+      <div id="readyThoughtsPanel" class="modernPanel">
+        <input id="thoughtSearchInput" class="thoughtSearch" type="search" placeholder="250 विचारों में खोजें..." oninput="renderThoughtsLibrary()" autocomplete="off">
+        <div id="thoughtsLibraryArea" aria-live="polite"></div>
+      </div>
+      <div id="myThoughtsPanel" class="modernPanel" style="display:none;">
+        <div class="thoughtSourcePanel">
+          <div class="thoughtSourceTitle">ऐप खोलने पर सामान्य विचार किस सूची से चुना जाए?</div>
+          <div class="thoughtSourceButtons">
+            <button id="thoughtSourceReady" class="thoughtBtn" type="button" onclick="setThoughtSource('ready')">250 तैयार विचार</button>
+            <button id="thoughtSourceMine" class="thoughtBtn secondary" type="button" onclick="setThoughtSource('mine')">मेरे विचार</button>
+          </div>
+          <div id="thoughtSourceStatus" class="thoughtSourceStatus">ऐप खुलने पर चुनी गई सूची से विचार बदलेगा। आज के लिए सेट किया गया विचार नहीं बदलेगा।</div>
+        </div>
+        <button class="newThoughtBtn" type="button" onclick="createMyThought()">＋ नया विचार लिखें</button>
+        <div id="personalThoughtEditor" class="personalThoughtEditor" style="display:none;">
+          <label for="personalThoughtInput">अपना विचार लिखें</label>
+          <textarea id="personalThoughtInput" maxlength="1200" placeholder="अपना विचार यहाँ लिखें… टाइप करते ही ड्राफ्ट सेव होने लगेगा।" oninput="handlePersonalThoughtInput(this.value)" onblur="flushThoughtSync()"></textarea>
+          <div id="personalThoughtSaveStatus" class="personalThoughtSaveStatus">लिखते ही ड्राफ्ट अपने आप सेव होगा।</div>
+          <div class="personalThoughtEditorActions">
+            <button class="thoughtBtn" type="button" onclick="finalizeEditingMyThought()">विचार सेव करें</button>
+            <button class="thoughtBtn secondary" type="button" onclick="setEditingMyThoughtToday()">आज के लिए सेट करें</button>
+            <button class="thoughtBtn secondary" type="button" onclick="closeMyThoughtEditor()">बंद करें</button>
+          </div>
+        </div>
+        <div id="personalThoughtsList" aria-live="polite"></div>
       </div>
     </section>
 
     <section id="trashSection" class="section">
-      <div class="pageHead"><div><h2>Trash / Deleted Students</h2><p>30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Deleted Students</h2><p>30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div id="trashStudentsArea" class="modernPanel"></div>
     </section>
 
@@ -947,20 +1029,56 @@ function readTrash(){
   return keep;
 }
 function writeTrash(items){localStorage.setItem(getTrashKey(),JSON.stringify(items));}
-function openTrashFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)menu.style.display="none";overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("trashSection","homeNav");renderTrashStudents();setTimeout(()=>{menuNavigationInProgress=false;},300);}
+function openTrashFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)closeMenuDrawer();overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("trashSection","homeNav");renderTrashStudents();setTimeout(()=>{menuNavigationInProgress=false;},300);}
 function renderTrashStudents(){
   const area=document.getElementById("trashStudentsArea");if(!area)return;const items=readTrash();
   if(!items.length){area.innerHTML='<div class="emptyState"><div style="font-size:34px">🗑️</div><b>Trash खाली है</b><div style="margin-top:6px">डिलीट किए गए विद्यार्थी यहाँ 30 दिनों तक रहेंगे।</div></div>';return;}
   area.innerHTML=items.map((item,i)=>{const days=Math.max(0,30-Math.floor((Date.now()-Number(item.deletedAt))/(24*60*60*1000)));return '<div class="trashStudent"><div class="trashStudentInfo"><div class="trashStudentName">'+escapeHtml(item.student?.name||'Unnamed Student')+'</div><div class="trashStudentMeta">वापस हटने में '+days+' दिन बाकी<br>Attendance: '+(item.student?.attendance?.length||0)+' रिकॉर्ड · Fees: '+(item.student?.fees?.length||0)+' रिकॉर्ड</div></div><div class="trashActions"><button class="trashRecover" onclick="recoverDeletedStudent('+i+')">Recover</button><button class="trashPermanent" onclick="permanentlyDeleteStudent('+i+')">Delete Permanently</button></div></div>';}).join('');
 }
 function recoverDeletedStudent(index){const items=readTrash();const item=items[index];if(!item)return;if(students.some(s=>String(s.id||'')===String(item.student?.id||'')&&s.id)){alert('यह विद्यार्थी पहले से मौजूद है।');return;}students.push(item.student);items.splice(index,1);writeTrash(items);saveLocalData(true);render();renderTrashStudents();alert('विद्यार्थी और उसका पूरा रिकॉर्ड वापस आ गया है।');}
-function permanentlyDeleteStudent(index){const items=readTrash();if(!items[index])return;if(!confirm('इस विद्यार्थी और उसके सभी Attendance/Fees रिकॉर्ड को हमेशा के लिए मिटाएँ? यह वापस नहीं आएगा।'))return;items.splice(index,1);writeTrash(items);renderTrashStudents();}
+function permanentlyDeleteStudent(index){const items=readTrash();if(!items[index])return;if(!confirm('इस विद्यार्थी और उसके सभी Attendance/Fees रिकॉर्ड को हमेशा के लिए मिटाएँ? यह वापस नहीं आएगा।'))return;items.splice(index,1);writeTrash(items);saveLocalData(true);renderTrashStudents();}
 
 function getThoughtPreferenceKey(){
   return "tuitionThoughtOfDay_v1_" + (currentAccountKey || "local");
 }
 function localDateKey(date=new Date()){
   return date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0");
+}
+function getMyThoughtsKey(){return "tuitionMyThoughts_v1_"+(currentAccountKey||"local");}
+function getThoughtSourceKey(){return "tuitionThoughtSource_v1_"+(currentAccountKey||"local");}
+function getThoughtRotationKey(){return "tuitionThoughtRotation_v1_"+(currentAccountKey||"local");}
+function readMyThoughts(){
+  try{
+    const items=JSON.parse(localStorage.getItem(getMyThoughtsKey())||"[]");
+    return Array.isArray(items)?items.filter(x=>x&&typeof x.t==="string").map(x=>({id:String(x.id||("my_"+Date.now()+"_"+Math.floor(Math.random()*10000))),t:String(x.t||""),c:"मेरे विचार",status:x.status==="saved"?"saved":"draft",createdAt:Number(x.createdAt||Date.now()),updatedAt:Number(x.updatedAt||x.createdAt||Date.now())})):[];
+  }catch(e){return [];}
+}
+function writeMyThoughts(items){localStorage.setItem(getMyThoughtsKey(),JSON.stringify(items));}
+function getThoughtSource(){return localStorage.getItem(getThoughtSourceKey())==="mine"?"mine":"ready";}
+function getThoughtBackupData(){return {myThoughts:readMyThoughts(),thoughtSource:getThoughtSource(),thoughtOfDay:localStorage.getItem(getThoughtPreferenceKey()),thoughtRotation:localStorage.getItem(getThoughtRotationKey())};}
+function applyThoughtBackupData(data){
+  if(!data||typeof data!=="object")return;
+  if(Array.isArray(data.myThoughts))writeMyThoughts(data.myThoughts);
+  if(data.thoughtSource==="mine"||data.thoughtSource==="ready")localStorage.setItem(getThoughtSourceKey(),data.thoughtSource);
+  if(Object.prototype.hasOwnProperty.call(data,"thoughtRotation")){
+    if(data.thoughtRotation)localStorage.setItem(getThoughtRotationKey(),typeof data.thoughtRotation==="string"?data.thoughtRotation:JSON.stringify(data.thoughtRotation));
+    else localStorage.removeItem(getThoughtRotationKey());
+  }
+  if(Object.prototype.hasOwnProperty.call(data,"thoughtOfDay")){
+    if(data.thoughtOfDay)localStorage.setItem(getThoughtPreferenceKey(),typeof data.thoughtOfDay==="string"?data.thoughtOfDay:JSON.stringify(data.thoughtOfDay));
+    else localStorage.removeItem(getThoughtPreferenceKey());
+  }
+  normalThoughtCache=null;
+}
+function queueThoughtSync(){
+  clearTimeout(thoughtSyncTimer);
+  thoughtSyncTimer=setTimeout(markThoughtChangeForSync,1300);
+}
+function flushThoughtSync(){clearTimeout(thoughtSyncTimer);markThoughtChangeForSync();}
+function markThoughtChangeForSync(){
+  if(currentAccountKey){
+    const meta=getSyncMeta();meta.updatedAt=Date.now();meta.pending=true;setSyncMeta(meta);scheduleDriveSync();
+  }
 }
 const HINDI_THOUGHTS = [
 {c:"शिक्षा",t:"शिक्षा का असली उद्देश्य केवल अंक पाना नहीं, समझ विकसित करना है।"},
@@ -1214,60 +1332,196 @@ const HINDI_THOUGHTS = [
 {c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है — 8।"},
 {c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है — 9।"},
 {c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं — 10।"}];
-const NORMAL_THOUGHT_INDEX = Math.floor(Math.random() * HINDI_THOUGHTS.length);
+let activeThoughtTab='ready';
+let activePersonalThoughtId=null;
+let thoughtSyncTimer=null;
+let normalThoughtCache=null;
 function getNormalThought(){
-  return HINDI_THOUGHTS[NORMAL_THOUGHT_INDEX];
+  if(normalThoughtCache)return normalThoughtCache;
+  const source=getThoughtSource();
+  let previous=null;try{previous=JSON.parse(localStorage.getItem(getThoughtRotationKey())||"null");}catch(e){}
+  const personal=source==='mine'?readMyThoughts().filter(x=>x.status==='saved'&&x.t.trim()):[];
+  if(source==='mine'&&personal.length){
+    let options=personal.filter(x=>!(previous&&previous.source==='mine'&&previous.id===x.id));
+    if(!options.length)options=personal;
+    const chosen=options[Math.floor(Math.random()*options.length)];
+    normalThoughtCache={c:'मेरे विचार',t:chosen.t};
+    localStorage.setItem(getThoughtRotationKey(),JSON.stringify({source:'mine',id:chosen.id}));
+  }else{
+    let options=HINDI_THOUGHTS.map((thought,index)=>({thought,index})).filter(x=>!(previous&&previous.source==='ready'&&Number(previous.index)===x.index));
+    if(!options.length)options=HINDI_THOUGHTS.map((thought,index)=>({thought,index}));
+    const chosen=options[Math.floor(Math.random()*options.length)];
+    normalThoughtCache=chosen?chosen.thought:{c:'विचार',t:'हर दिन कुछ नया सीखने का अवसर है।'};
+    if(chosen)localStorage.setItem(getThoughtRotationKey(),JSON.stringify({source:'ready',index:chosen.index}));
+  }
+  return normalThoughtCache;
 }
 function getTodaysThought(){
   const key=getThoughtPreferenceKey();
-  try{const saved=JSON.parse(localStorage.getItem(key)||"null");if(saved&&saved.date===localDateKey()&&Number.isInteger(saved.index)&&HINDI_THOUGHTS[saved.index])return HINDI_THOUGHTS[saved.index];}catch(e){}
+  try{
+    const saved=JSON.parse(localStorage.getItem(key)||"null");
+    if(saved&&saved.date===localDateKey()){
+      if(saved.source==='personal'&&saved.id){const own=readMyThoughts().find(x=>x.id===saved.id&&x.t.trim());if(own)return {c:'मेरे विचार',t:own.t};}
+      const index=Number.isInteger(saved.index)?saved.index:Number(saved.index);
+      if((saved.source==='ready'||saved.source===undefined)&&Number.isInteger(index)&&HINDI_THOUGHTS[index])return HINDI_THOUGHTS[index];
+    }
+  }catch(e){}
   return getNormalThought();
 }
 function setTodayThought(index){
   if(!Number.isInteger(index)||!HINDI_THOUGHTS[index])return;
-  localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),index:index}));
-  renderHomeExtras();
-  renderThoughtsLibrary();
+  localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),source:'ready',index:index}));
+  markThoughtChangeForSync();renderHomeExtras();renderThoughtsLibrary();
   alert("यह विचार आज के लिए Home Page पर सेट हो गया है।");
 }
-function resetTodayThought(){localStorage.removeItem(getThoughtPreferenceKey());renderHomeExtras();}
+function setPersonalThoughtForToday(id){
+  const item=readMyThoughts().find(x=>x.id===String(id));
+  if(!item||!item.t.trim()){alert('पहले विचार लिखें।');return;}
+  localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),source:'personal',id:item.id}));
+  markThoughtChangeForSync();renderHomeExtras();renderThoughtsLibrary();if(document.getElementById('personalThoughtsList'))renderMyThoughtsList();
+  alert('आपका विचार आज के लिए Home Page पर सेट हो गया है।');
+}
+function resetTodayThought(){localStorage.removeItem(getThoughtPreferenceKey());normalThoughtCache=null;markThoughtChangeForSync();renderHomeExtras();}
 function renderHomeExtras(){
   const reminder=document.getElementById("attendanceReminder");
   if(reminder){
-    const active=students.filter(s=>s.active!==false);
-    const today=localDateKey();
+    const active=students.filter(s=>s.active!==false);const today=localDateKey();
     const pending=active.filter(s=>!Array.isArray(s.attendance)||!s.attendance.some(a=>a.date===today));
     if(active.length&&pending.length){reminder.style.display="block";reminder.textContent=pending.length===1?"📌 1 विद्यार्थी की आज की Attendance बाकी है।":"📌 "+pending.length+" विद्यार्थियों की आज की Attendance बाकी है।";}
     else{reminder.style.display="none";reminder.textContent="";}
   }
-  const thought=getTodaysThought();
-  const text=document.getElementById("homeThoughtText");if(text)text.textContent=thought.t;
+  const thought=getTodaysThought();const text=document.getElementById("homeThoughtText");if(text)text.textContent=thought.t;
 }
 function openThoughtsLibrary(){
-  const search=document.getElementById("thoughtSearchInput");
-  if(search) search.value="";
-  const area=document.getElementById("thoughtsLibraryArea");if(area){area.style.display="block";area.style.visibility="visible";area.innerHTML="विचार लोड हो रहे हैं…";}
+  activeThoughtTab='ready';
+  const search=document.getElementById("thoughtSearchInput");if(search)search.value="";
   showSection("thoughtsSection","homeNav");
+  switchThoughtTab('ready');
   renderThoughtsLibrary();
+  requestAnimationFrame(()=>renderThoughtsLibrary());
+  setTimeout(()=>{if(document.getElementById('thoughtsSection')?.classList.contains('active'))renderThoughtsLibrary();},120);
 }
 function openThoughtsLibraryFromMenu(event){
-  if(event) event.stopPropagation();
-  menuNavigationInProgress=true;
-  const menu=document.getElementById("menuPopup");
-  if(menu) menu.style.display="none";
+  if(event)event.stopPropagation();menuNavigationInProgress=true;
+  const menu=document.getElementById("menuPopup");if(menu)menu.style.display="none";
   overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");
-  openThoughtsLibrary();
-  setTimeout(()=>{menuNavigationInProgress=false;},300);
+  openThoughtsLibrary();setTimeout(()=>{menuNavigationInProgress=false;},300);
+}
+function switchThoughtTab(tab){
+  activeThoughtTab=tab==='mine'?'mine':'ready';
+  const ready=document.getElementById('readyThoughtsPanel'),mine=document.getElementById('myThoughtsPanel');
+  if(ready)ready.style.display=activeThoughtTab==='ready'?'block':'none';
+  if(mine)mine.style.display=activeThoughtTab==='mine'?'block':'none';
+  const readyBtn=document.getElementById('thoughtTabReady'),mineBtn=document.getElementById('thoughtTabMine');
+  if(readyBtn){readyBtn.classList.toggle('active',activeThoughtTab==='ready');readyBtn.setAttribute('aria-selected',String(activeThoughtTab==='ready'));}
+  if(mineBtn){mineBtn.classList.toggle('active',activeThoughtTab==='mine');mineBtn.setAttribute('aria-selected',String(activeThoughtTab==='mine'));}
+  if(activeThoughtTab==='ready')renderThoughtsLibrary();else renderMyThoughtsList();
+}
+function setThoughtSource(source){
+  const chosen=source==='mine'?'mine':'ready';localStorage.setItem(getThoughtSourceKey(),chosen);normalThoughtCache=null;
+  markThoughtChangeForSync();renderThoughtSourceSettings();renderHomeExtras();
+}
+function renderThoughtSourceSettings(){
+  const source=getThoughtSource();
+  const r=document.getElementById('thoughtSourceReady'),m=document.getElementById('thoughtSourceMine');
+  if(r){r.classList.toggle('activeSource',source==='ready');r.classList.toggle('secondary',source!=='ready');}
+  if(m){m.classList.toggle('activeSource',source==='mine');m.classList.toggle('secondary',source!=='mine');}
+  const status=document.getElementById('thoughtSourceStatus');
+  if(status){
+    const hasPersonal=readMyThoughts().some(x=>x.status==='saved'&&x.t.trim());
+    status.textContent=source==='mine'&&!hasPersonal?'मेरे विचार चुने गए हैं, लेकिन अभी कोई सेव किया हुआ विचार नहीं है। तब तक 250 तैयार विचारों में से चुना जाएगा।':'ऐप खोलने पर चुनी गई सूची से सामान्य विचार बदलेगा। आज के लिए सेट किया गया विचार आज नहीं बदलेगा।';
+  }
 }
 function renderThoughtsLibrary(){
   const area=document.getElementById("thoughtsLibraryArea");if(!area)return;
   area.style.display="block";area.style.visibility="visible";area.style.width="100%";
-  const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLocaleLowerCase("hi");
-  const thoughts=Array.isArray(HINDI_THOUGHTS)?HINDI_THOUGHTS:[];
-  const items=thoughts.map((thought,index)=>({...thought,index})).filter(x=>String(x.t||"").toLocaleLowerCase("hi").includes(query)||String(x.c||"").toLocaleLowerCase("hi").includes(query));
-  if(!items.length){area.innerHTML='<div class="emptyState">'+(thoughts.length?'कोई विचार नहीं मिला।':'विचार लोड नहीं हो पाए। कृपया पेज रीफ्रेश करें।')+'</div>';return;}
-  let selectedIndex=null;try{const saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");if(saved&&saved.date===localDateKey()&&Number.isInteger(saved.index))selectedIndex=saved.index;}catch(e){}
-  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.c||'विचार')+'</div><div class="thoughtItemText">'+escapeHtml(x.t||'')+'</div></div></div><button type="button" class="thoughtBtn '+(selectedIndex===x.index?'secondary':'')+'" onclick="setTodayThought('+x.index+')">'+(selectedIndex===x.index?'आज के लिए चुना गया ✓':'आज के लिए सेट करें')+'</button></div>').join('');
+  try{
+    const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLocaleLowerCase("hi");
+    const thoughts=Array.isArray(HINDI_THOUGHTS)?HINDI_THOUGHTS:[];
+    const items=thoughts.map((thought,index)=>({thought,index})).filter(x=>String(x.thought.t||"").toLocaleLowerCase("hi").includes(query)||String(x.thought.c||"").toLocaleLowerCase("hi").includes(query));
+    if(!items.length){area.innerHTML='<div class="emptyState">'+(thoughts.length?'कोई विचार नहीं मिला।':'विचार सूची लोड नहीं हो सकी। पेज रीफ्रेश करें।')+'</div>';return;}
+    let selected=null;try{selected=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");}catch(e){}
+    const selectedIndex=selected&&selected.date===localDateKey()&&selected.source!=='personal'&&Number.isInteger(Number(selected.index))?Number(selected.index):null;
+    area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.thought.c||'विचार')+'</div><div class="thoughtItemText">'+escapeHtml(x.thought.t||'')+'</div></div></div><button type="button" class="thoughtBtn '+(selectedIndex===x.index?'secondary':'')+'" onclick="setTodayThought('+x.index+')">'+(selectedIndex===x.index?'आज के लिए चुना गया ✓':'आज के लिए सेट करें')+'</button></div>').join('');
+  }catch(error){console.error('Thought list render failed:',error);area.innerHTML='<div class="emptyState">विचार दिखाने में समस्या हुई। पेज रीफ्रेश करके फिर कोशिश करें।</div>';}
+}
+function createMyThought(){
+  activePersonalThoughtId=null;
+  const editor=document.getElementById('personalThoughtEditor'),input=document.getElementById('personalThoughtInput');
+  if(editor)editor.style.display='block';if(input){input.value='';input.focus();}
+  const status=document.getElementById('personalThoughtSaveStatus');if(status)status.textContent='लिखते ही यह विचार ड्राफ्ट में अपने आप सेव होगा।';
+  renderThoughtSourceSettings();
+}
+function handlePersonalThoughtInput(value){
+  const now=Date.now();let items=readMyThoughts();
+  if(!activePersonalThoughtId&&String(value||'').trim()){
+    activePersonalThoughtId='my_'+now+'_'+Math.floor(Math.random()*100000);
+    items.unshift({id:activePersonalThoughtId,t:String(value),c:'मेरे विचार',status:'draft',createdAt:now,updatedAt:now});
+  }else if(activePersonalThoughtId){
+    const ix=items.findIndex(x=>x.id===activePersonalThoughtId);
+    if(ix>=0){items[ix].t=String(value||'');items[ix].updatedAt=now;}
+  }
+  writeMyThoughts(items);if(activePersonalThoughtId)queueThoughtSync();
+  const status=document.getElementById('personalThoughtSaveStatus');if(status)status.textContent=activePersonalThoughtId?'ड्राफ्ट अपने आप सेव हो रहा है। आप बाद में इसे संपादित कर सकते हैं।':'लिखते ही यह विचार ड्राफ्ट में सेव होगा।';
+  if(activePersonalThoughtId)renderMyThoughtsList();
+}
+function editMyThought(id){
+  const item=readMyThoughts().find(x=>x.id===String(id));if(!item)return;
+  activePersonalThoughtId=item.id;
+  const editor=document.getElementById('personalThoughtEditor'),input=document.getElementById('personalThoughtInput');
+  if(editor)editor.style.display='block';if(input){input.value=item.t;input.focus();input.setSelectionRange(input.value.length,input.value.length);}
+  const status=document.getElementById('personalThoughtSaveStatus');if(status)status.textContent=item.status==='draft'?'यह ड्राफ्ट है। बदलाव अपने आप सेव होंगे।':'सेव किया हुआ विचार संपादित कर रहे हैं। बदलाव अपने आप सेव होंगे।';
+  if(activeThoughtTab!=='mine')switchThoughtTab('mine');
+  renderMyThoughtsList();
+}
+function finalizeEditingMyThought(){
+  const input=document.getElementById('personalThoughtInput');const value=input?String(input.value||'').trim():'';
+  if(!value){alert('पहले अपना विचार लिखें।');return;}
+  handlePersonalThoughtInput(input.value);
+  const items=readMyThoughts();const item=items.find(x=>x.id===activePersonalThoughtId);if(!item)return;
+  item.status='saved';item.updatedAt=Date.now();writeMyThoughts(items);flushThoughtSync();
+  const id=item.id;activePersonalThoughtId=id;
+  const status=document.getElementById('personalThoughtSaveStatus');if(status)status.textContent='विचार सेव हो गया। अब इसे किसी भी दिन के लिए चुन सकते हैं।';
+  renderMyThoughtsList();renderThoughtSourceSettings();
+  alert('आपका विचार सेव हो गया है।');
+}
+function closeMyThoughtEditor(){
+  const editor=document.getElementById('personalThoughtEditor');if(editor)editor.style.display='none';
+  activePersonalThoughtId=null;
+  renderMyThoughtsList();
+}
+function setEditingMyThoughtToday(){
+  const input=document.getElementById('personalThoughtInput');
+  if(input&&String(input.value||'').trim())handlePersonalThoughtInput(input.value);
+  if(!activePersonalThoughtId){alert('पहले अपना विचार लिखें।');return;}
+  flushThoughtSync();setPersonalThoughtForToday(activePersonalThoughtId);
+}
+function setMyThoughtToday(id){setPersonalThoughtForToday(id);renderMyThoughtsList();}
+function finalizeMyThoughtById(id){
+  const items=readMyThoughts();const item=items.find(x=>x.id===String(id));if(!item)return;
+  if(!item.t.trim()){alert('यह ड्राफ्ट खाली है। पहले इसे संपादित करें।');return;}
+  item.status='saved';item.updatedAt=Date.now();writeMyThoughts(items);flushThoughtSync();renderMyThoughtsList();renderThoughtSourceSettings();
+}
+function deleteMyThought(id){
+  const items=readMyThoughts();const item=items.find(x=>x.id===String(id));if(!item)return;
+  if(!confirm('इस विचार को हमेशा के लिए हटाना चाहते हैं?'))return;
+  writeMyThoughts(items.filter(x=>x.id!==String(id)));
+  try{const saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||'null');if(saved&&saved.date===localDateKey()&&saved.source==='personal'&&saved.id===String(id))localStorage.removeItem(getThoughtPreferenceKey());}catch(e){}
+  if(activePersonalThoughtId===String(id))closeMyThoughtEditor();
+  normalThoughtCache=null;flushThoughtSync();renderMyThoughtsList();renderThoughtSourceSettings();renderHomeExtras();
+}
+function renderMyThoughtsList(){
+  const area=document.getElementById('personalThoughtsList');if(!area)return;
+  const items=readMyThoughts().sort((a,b)=>Number(b.updatedAt||0)-Number(a.updatedAt||0));
+  if(!items.length){area.innerHTML='<div class="emptyState"><div style="font-size:30px">✍️</div><b>अभी आपके विचार नहीं हैं</b><div style="margin-top:6px">“नया विचार लिखें” दबाएँ। आप लिखते जाएँगे और ड्राफ्ट अपने आप सेव होता जाएगा।</div></div>';renderThoughtSourceSettings();return;}
+  let selected=null;try{selected=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||'null');}catch(e){}
+  area.innerHTML=items.map((item,index)=>{
+    const isSelected=selected&&selected.date===localDateKey()&&selected.source==='personal'&&selected.id===item.id;
+    const status=item.status==='saved'?'<span class="personalThoughtStatus saved">सेव किया गया</span>':'<span class="personalThoughtStatus">ड्राफ्ट</span>';
+    const statusButton=item.status==='draft'?'<button type="button" class="thoughtBtn secondary" onclick="finalizeMyThoughtById(\''+escapeHtml(item.id)+'\')">विचार सेव करें</button>':'';
+    return '<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(index+1)+'.</span><div class="thoughtItemBody">'+status+'<div class="thoughtItemText">'+escapeHtml(item.t||'')+'</div></div></div><div class="personalThoughtActions">'+(isSelected?'<button type="button" class="thoughtBtn secondary" disabled>आज के लिए चुना गया ✓</button>':'<button type="button" class="thoughtBtn" onclick="setMyThoughtToday(\''+escapeHtml(item.id)+'\')">आज के लिए सेट करें</button>')+'<button type="button" class="thoughtBtn secondary" onclick="editMyThought(\''+escapeHtml(item.id)+'\')">संपादित करें</button>'+statusButton+'<button type="button" class="personalThoughtDelete" onclick="deleteMyThought(\''+escapeHtml(item.id)+'\')">हटाएँ</button></div></div>';
+  }).join('');
+  renderThoughtSourceSettings();
 }
 
 function getOwnerName() {
@@ -1637,7 +1891,8 @@ async function syncWithGoogleDrive() {
         ownerName: getDriveBackupOwnerName(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students,
-        deletedStudents: readTrash()
+        deletedStudents: readTrash(),
+        ...getThoughtBackupData()
       };
 
       const created = await uploadDriveData(backup);
@@ -1672,7 +1927,8 @@ async function syncWithGoogleDrive() {
         ownerName: getDriveBackupOwnerName(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students,
-        deletedStudents: readTrash()
+        deletedStudents: readTrash(),
+        ...getThoughtBackupData()
       };
 
       await uploadDriveData(backup, driveFile.id);
@@ -1693,6 +1949,7 @@ async function syncWithGoogleDrive() {
       if (Array.isArray(driveBackup.students)) {
         students = driveBackup.students;
         if(Array.isArray(driveBackup.deletedStudents))writeTrash(driveBackup.deletedStudents);
+        applyThoughtBackupData(driveBackup);
         students.forEach(s => {
           if (!s.fees) s.fees = [];
           if (!s.attendance) s.attendance = [];
@@ -3394,7 +3651,7 @@ function handleOutsideTap(event){
   const menu = document.getElementById("menuPopup");
   const menuButton = event.target.closest && event.target.closest('button[onclick="toggleMenu()"]');
   if(menu && isOverlayVisible("menuPopup") && !menu.contains(event.target) && !menuButton){
-    menu.style.display = "none";
+    closeMenuDrawer();
   }
 }
 
@@ -3450,10 +3707,16 @@ window.addEventListener("load", function(){
   history.pushState({tuitionAppGuard:true}, "", location.href);
 });
 
+let menuCloseTimer=null;
+function closeMenuDrawer(){
+  const menu=document.getElementById("menuPopup");if(!menu||menu.style.display!=="block")return;
+  clearTimeout(menuCloseTimer);menu.classList.add("drawerClosing");
+  menuCloseTimer=setTimeout(()=>{menu.style.display="none";menu.classList.remove("drawerClosing");menuCloseTimer=null;},190);
+}
 function toggleMenu(){
-  const menu=document.getElementById("menuPopup");
-  if(!menu)return;
-  if(menu.style.display==="block"){menu.style.display="none";}else{menu.style.display="block";menu.scrollTop=0;}
+  const menu=document.getElementById("menuPopup");if(!menu)return;
+  if(menu.style.display==="block"){closeMenuDrawer();}
+  else{clearTimeout(menuCloseTimer);menuCloseTimer=null;menu.classList.remove("drawerClosing");menu.style.display="block";menu.scrollTop=0;}
 }
 
 function changePin(){
@@ -3566,6 +3829,8 @@ async function restoreFromGoogleDrive(){
     if(!confirmRestore) return;
 
     students = backup.students;
+    if(Array.isArray(backup.deletedStudents))writeTrash(backup.deletedStudents);
+    applyThoughtBackupData(backup);
     students.forEach(s => {
       if(!s.fees) s.fees=[];
       if(!s.attendance) s.attendance=[];
@@ -3600,7 +3865,8 @@ function backupData(){
     students: students,
     deletedStudents: readTrash(),
     ownerName: getOwnerName(),
-    appPin: localStorage.getItem(getPinKey())
+    appPin: localStorage.getItem(getPinKey()),
+    ...getThoughtBackupData()
   };
 
   const data = JSON.stringify(backup,null,2);
@@ -3646,6 +3912,7 @@ function restoreBackup(event){
 
       students = backup.students;
       if(Array.isArray(backup.deletedStudents))writeTrash(backup.deletedStudents);
+      applyThoughtBackupData(backup);
       students.forEach(s => {
         if(!s.fees) s.fees=[];
         if(!s.attendance) s.attendance=[];
