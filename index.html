@@ -1084,22 +1084,23 @@ function readMyThoughts(){
 }
 function writeMyThoughts(items){localStorage.setItem(getMyThoughtsKey(),JSON.stringify(items));}
 function getMyNotesKey(){return "tuitionMyNotes_v1_"+(currentAccountKey||"local");}
-function readMyNotes(){try{const notes=JSON.parse(localStorage.getItem(getMyNotesKey())||"[]");return Array.isArray(notes)?notes.filter(n=>n&&typeof n.text==="string").map(n=>({id:String(n.id||("note_"+Date.now()+"_"+Math.random().toString(36).slice(2))),text:String(n.text),updatedAt:Number(n.updatedAt||Date.now())})):[];}catch(e){return [];}}
+function readMyNotes(){try{const notes=JSON.parse(localStorage.getItem(getMyNotesKey())||"[]");return Array.isArray(notes)?notes.filter(n=>n&&typeof n.text==="string").map(n=>({id:String(n.id||("note_"+Date.now()+"_"+Math.random().toString(36).slice(2))),text:String(n.text),updatedAt:Number(n.updatedAt||Date.now()),showHome:n.showHome!==false})):[];}catch(e){return [];}}
 function writeMyNotes(notes){localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));renderHomeNotes();renderMyNotesList();}
 let editingMyNoteId=null;
 let myNoteOriginalText="";
 let myNoteBackPending=false;
-function renderHomeNotes(){const card=document.getElementById("homeMyNotesCard"),content=document.getElementById("homeMyNotesContent");if(!card||!content)return;const notes=readMyNotes().filter(n=>n.text.trim());if(!notes.length){card.style.display="none";content.textContent="";return;}card.style.display="block";content.textContent=notes.map(n=>n.text).join("\n\n");}
+function renderHomeNotes(){const card=document.getElementById("homeMyNotesCard"),content=document.getElementById("homeMyNotesContent");if(!card||!content)return;const notes=readMyNotes().filter(n=>n.text.trim()&&n.showHome!==false);if(!notes.length){card.style.display="none";content.textContent="";return;}card.style.display="block";content.textContent=notes.map(n=>n.text).join("\n\n");}
 function renderMyNotesList(){
   const area=document.getElementById("myNotesList");if(!area)return;
   const notes=readMyNotes().filter(n=>n.text.trim());
   if(!notes.length){area.innerHTML='<div class="emptyState">अभी कोई Note नहीं है। नया Note जोड़ने के लिए Add Note दबाएँ।</div>';return;}
-  area.innerHTML=notes.map(n=>`<div class="myNoteItem"><div class="myNoteContent">${escapeHtml(n.text)}</div><div class="myNoteActions"><button class="myNoteEdit" type="button" onclick="editMyNote('${n.id}')">Edit</button><button class="myNoteDelete" type="button" onclick="deleteMyNote('${n.id}')">Delete</button></div></div>`).join('');
+  area.innerHTML=notes.map(n=>`<div class="myNoteItem"><div class="myNoteContent">${escapeHtml(n.text)}</div><div class="myNoteActions"><button class="myNoteEdit" type="button" onclick="editMyNote('${n.id}')">Edit</button><button class="myNoteEdit" type="button" onclick="toggleMyNoteHome('${n.id}')">${n.showHome===false?"Show":"Hide"}</button><button class="myNoteDelete" type="button" onclick="deleteMyNote('${n.id}')">Delete</button></div></div>`).join('');
 }
 function openMyNotesFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)menu.style.display="none";overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("myNotesSection","homeNav");renderMyNotesList();setTimeout(()=>{menuNavigationInProgress=false;},300);}
 function openMyNoteEditor(id){editingMyNoteId=id||null;let note=editingMyNoteId?readMyNotes().find(n=>n.id===editingMyNoteId):null;const modal=document.getElementById("myNoteEditorPopup");const input=document.getElementById("myNoteEditorInput");if(!modal||!input)return;input.value=note?note.text:"";myNoteOriginalText=input.value;modal.style.display="flex";history.pushState({myNoteEditor:true}, "", location.href);setTimeout(()=>input.focus(),50);}
 function saveMyNote(){const input=document.getElementById("myNoteEditorInput");const value=String(input?.value||"").trim();if(!value){alert("पहले Note लिखें।");return;}const notes=readMyNotes();if(editingMyNoteId){const i=notes.findIndex(n=>n.id===editingMyNoteId);if(i>=0){notes[i].text=value;notes[i].updatedAt=Date.now();}else notes.unshift({id:editingMyNoteId,text:value,updatedAt:Date.now()});}else notes.unshift({id:"note_"+Date.now()+"_"+Math.random().toString(36).slice(2),text:value,updatedAt:Date.now()});localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));closeMyNoteEditor();renderMyNotesList();renderHomeNotes();}
 function editMyNote(id){openMyNoteEditor(id);}
+function toggleMyNoteHome(id){const notes=readMyNotes();const note=notes.find(n=>n.id===id);if(!note)return;note.showHome=note.showHome===false;localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));renderMyNotesList();renderHomeNotes();}
 function deleteMyNote(id){if(!confirm("इस Note को Delete करना चाहते हैं?"))return;writeMyNotes(readMyNotes().filter(n=>n.id!==id));}
 function closeMyNoteEditor(){const modal=document.getElementById("myNoteEditorPopup");if(modal)modal.style.display="none";editingMyNoteId=null;myNoteOriginalText="";myNoteBackPending=false;}
 function cancelMyNote(){const input=document.getElementById("myNoteEditorInput");if(input&&String(input.value||"")!==myNoteOriginalText){if(!confirm("आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।"))return;}closeMyNoteEditor();}
