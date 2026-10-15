@@ -457,7 +457,10 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .thoughtItemBody{flex:1;min-width:0;}
 .thoughtItem:last-child{border-bottom:0;}
 .thoughtCategory{font-size:11px;color:#6254b5;font-weight:800;margin-bottom:4px;}
-.thoughtItemText{font-size:14px;line-height:1.6;overflow-wrap:anywhere;}
+.thoughtItemText{font-size:14px;line-height:1.6;overflow-wrap:anywhere;word-break:normal;}
+#thoughtsLibraryArea{display:block;width:100%;min-width:0;}
+#thoughtsSection .modernPanel{overflow:visible;}
+#thoughtsSection .thoughtItem{display:block;width:100%;box-sizing:border-box;}
 .thoughtItem .thoughtBtn{margin-top:8px;padding:7px 11px;font-size:12px;}
 @media(max-width:390px){.modernStudent{align-items:center;flex-wrap:nowrap;gap:8px}.studentMain{flex:1 1 auto;min-width:0}.studentActions{margin-left:0;flex:none;gap:4px}.studentActions .miniBtn{padding:7px 6px;font-size:11px}.thoughtText{font-size:17px}.appTitle{overflow-wrap:anywhere;}}
 </style>  
@@ -686,7 +689,7 @@ Reset PIN
               <span class="modernMenuIcon">🔄</span>
               <span class="modernMenuLabel">Change Account</span>
             </div>
-            <div class="modernMenuItem" onclick="openThoughtsLibrary();toggleMenu();">
+            <div class="modernMenuItem" onclick="openThoughtsLibraryFromMenu(event)">
               <span class="modernMenuIcon">🌱</span>
               <span class="modernMenuLabel">सभी विचार</span>
             </div>
@@ -724,9 +727,6 @@ Reset PIN
       <div class="thoughtCard" id="homeThoughtCard">
         <div class="thoughtCardHead"><h3>🌱 आज का विचार</h3><span aria-hidden="true">✨</span></div>
         <div id="homeThoughtText" class="thoughtText">मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।</div>
-        <div class="thoughtActions">
-          <button class="thoughtBtn" onclick="openThoughtsLibrary()">विचार देखें</button>
-        </div>
       </div>
     </section>
 
@@ -1055,10 +1055,140 @@ const HINDI_THOUGHTS = [
 {c:"जीवन",t:"सही सवाल कई बार जल्दबाजी के जवाब से ज्यादा मूल्यवान होता है।"},
 {c:"जीवन",t:"जीवन को बेहतर बनाने के लिए हर चीज बदलना जरूरी नहीं; एक आदत से शुरू करें।"},
 {c:"जीवन",t:"अपनी जिम्मेदारी निभाते हुए दूसरों के लिए भी जगह बनाएँ।"}
-];
+,
+{c:"शिक्षा",t:"शिक्षा का लाभ तभी है जब वह सोचने और समझने की क्षमता बढ़ाए।"},
+{c:"शिक्षा",t:"एक शिक्षक का अच्छा उदाहरण कई उपदेशों से अधिक प्रभाव डालता है।"},
+{c:"शिक्षा",t:"सीखने के लिए सवालों को दबाने के बजाय उन्हें स्पष्ट करना चाहिए।"},
+{c:"शिक्षा",t:"ज्ञान को जीवन से जोड़ने पर पढ़ाई अर्थपूर्ण बनती है।"},
+{c:"शिक्षा",t:"कक्षा में सम्मान का वातावरण सीखने को आसान बनाता है।"},
+{c:"शिक्षा",t:"विद्यार्थी की प्रगति को उसके पिछले प्रयास से भी मापें।"},
+{c:"शिक्षा",t:"किताब पढ़ना शुरुआत है, उस पर विचार करना सीखने का हिस्सा है।"},
+{c:"शिक्षा",t:"अच्छा शिक्षक विद्यार्थी को अपने पैरों पर खड़ा होना सिखाता है।"},
+{c:"शिक्षा",t:"सीखने में गलती होना रुकावट नहीं, प्रक्रिया का हिस्सा है।"},
+{c:"शिक्षा",t:"ज्ञान के साथ विनम्रता हो तो सीखना लगातार जारी रहता है।"},
+{c:"विद्यार्थी",t:"आज की तैयारी भविष्य के अवसरों के लिए रास्ता बनाती है।"},
+{c:"विद्यार्थी",t:"अपने लक्ष्य को छोटे कामों में बाँटकर आगे बढ़ें।"},
+{c:"विद्यार्थी",t:"किसी विषय से डरने के बजाय उसे रोज थोड़ा समय दें।"},
+{c:"विद्यार्थी",t:"समझकर पढ़ा गया एक पन्ना, बिना समझे पढ़े कई पन्नों से बेहतर है।"},
+{c:"विद्यार्थी",t:"अपनी पढ़ाई का हिसाब रखें, केवल पढ़ने के समय का नहीं।"},
+{c:"विद्यार्थी",t:"नियमित पुनरावृत्ति सीखी हुई बातों को मजबूत करती है।"},
+{c:"विद्यार्थी",t:"मदद माँगना कमजोरी नहीं, समस्या हल करने की समझ है।"},
+{c:"विद्यार्थी",t:"अपने लक्ष्य के लिए आज एक छोटा कदम जरूर उठाएँ।"},
+{c:"विद्यार्थी",t:"परीक्षा की तैयारी में अभ्यास और समीक्षा दोनों जरूरी हैं।"},
+{c:"विद्यार्थी",t:"दूसरों की गति देखकर अपनी मेहनत का मूल्य कम न आँकें।"},
+{c:"मेहनत",t:"लगातार किया गया सही प्रयास धीरे-धीरे कौशल बन जाता है।"},
+{c:"मेहनत",t:"शुरू करने का सही समय अक्सर अभी होता है।"},
+{c:"मेहनत",t:"प्रगति का रास्ता छोटे कामों को पूरा करने से बनता है।"},
+{c:"मेहनत",t:"काम को आसान बनाने का तरीका खोजें, उससे भागने का नहीं।"},
+{c:"मेहनत",t:"कठिन लक्ष्य के लिए धैर्य और नियमित अभ्यास दोनों चाहिए।"},
+{c:"मेहनत",t:"हर प्रयास से कुछ सीखें, ताकि अगला प्रयास बेहतर हो।"},
+{c:"मेहनत",t:"काम की गुणवत्ता पर ध्यान दें, केवल उसकी मात्रा पर नहीं।"},
+{c:"मेहनत",t:"सफलता की तैयारी अक्सर उन दिनों होती है जब कोई देख नहीं रहा होता।"},
+{c:"मेहनत",t:"आरंभ में धीमे चलना ठीक है, रुक जाना जरूरी नहीं।"},
+{c:"मेहनत",t:"परिणाम की प्रतीक्षा करते हुए अपने काम की ईमानदारी बनाए रखें।"},
+{c:"अनुशासन",t:"समय पर किया गया छोटा काम मन का बोझ कम करता है।"},
+{c:"अनुशासन",t:"दिन को बेहतर बनाने के लिए तीन जरूरी काम तय करें।"},
+{c:"अनुशासन",t:"नियमितता लक्ष्य को कल्पना से व्यवहार में लाती है।"},
+{c:"अनुशासन",t:"जो जरूरी है उसे पहले रखें, जो आसान है उसे नहीं।"},
+{c:"अनुशासन",t:"अपनी आदतों को बदलने के लिए वातावरण को भी अनुकूल बनाएँ।"},
+{c:"अनुशासन",t:"ध्यान की रक्षा करना अपने समय की रक्षा करना है।"},
+{c:"अनुशासन",t:"छोटी जिम्मेदारियाँ निभाने से बड़ी जिम्मेदारियों की तैयारी होती है।"},
+{c:"अनुशासन",t:"काम शुरू करने से पहले जरूरी चीजें तैयार रखें।"},
+{c:"अनुशासन",t:"हर दिन का अंत थोड़ी समीक्षा के साथ करें।"},
+{c:"अनुशासन",t:"नियम बनाना आसान है, उन्हें निभाने के लिए अभ्यास चाहिए।"},
+{c:"आत्मविकास",t:"अपनी सोच को जाँचने की आदत विकास को गति देती है।"},
+{c:"आत्मविकास",t:"सही प्रतिक्रिया देने से पहले परिस्थिति को समझें।"},
+{c:"आत्मविकास",t:"अपनी कमियों को पहचानना स्वयं को कम समझना नहीं है।"},
+{c:"आत्मविकास",t:"धैर्य के साथ लगातार सीखना आत्मविश्वास बढ़ाता है।"},
+{c:"आत्मविकास",t:"हर अनुभव से सीख निकालने वाला व्यक्ति आगे बढ़ता रहता है।"},
+{c:"आत्मविकास",t:"अपने निर्णयों की जिम्मेदारी लेना स्वतंत्रता का हिस्सा है।"},
+{c:"आत्मविकास",t:"अपनी बात बदलना गलत नहीं, बेहतर समझ मिलने पर यह समझदारी है।"},
+{c:"आत्मविकास",t:"सुनने की क्षमता बढ़े तो समझ भी गहरी होती है।"},
+{c:"आत्मविकास",t:"अपने वादों को यथार्थवादी रखें और उन्हें निभाएँ।"},
+{c:"आत्मविकास",t:"हर दिन थोड़ा बेहतर चुनाव करना संभव है।"},
+{c:"जीवन",t:"व्यस्त रहना और सार्थक काम करना एक ही बात नहीं है।"},
+{c:"जीवन",t:"किसी निष्कर्ष पर पहुँचने से पहले तथ्य समझें।"},
+{c:"जीवन",t:"अच्छा व्यवहार छोटी परिस्थितियों में भी दिखाई देता है।"},
+{c:"जीवन",t:"दूसरों की बात सुनना उनके विचार से सहमत होना जरूरी नहीं बनाता।"},
+{c:"जीवन",t:"समस्या पर स्पष्टता मिलने से अगला कदम आसान हो जाता है।"},
+{c:"जीवन",t:"अपने समय और ऊर्जा का उपयोग सोच-समझकर करें।"},
+{c:"जीवन",t:"गलतियों को छिपाने से बेहतर है उनसे सीखकर सुधार करना।"},
+{c:"जीवन",t:"सुविधा के साथ जिम्मेदारी को भी महत्व दें।"},
+{c:"जीवन",t:"छोटी अच्छी आदतें रोजमर्रा के जीवन को सरल बनाती हैं।"},
+{c:"जीवन",t:"सम्मानजनक बातचीत असहमति में भी संभव है।"},
+{c:"शिक्षा",t:"अच्छी शिक्षा जिज्ञासा को जीवित रखती है।"},
+{c:"शिक्षा",t:"पढ़े हुए विषय को अपने शब्दों में समझाना ज्ञान की जाँच है।"},
+{c:"शिक्षा",t:"हर विद्यार्थी को अभ्यास और प्रतिक्रिया का अवसर चाहिए।"},
+{c:"शिक्षा",t:"शिक्षक का धैर्य सीखने के लिए सुरक्षित माहौल बनाता है।"},
+{c:"शिक्षा",t:"शिक्षा व्यक्ति को बेहतर निर्णय लेने में सहायता करती है।"},
+{c:"शिक्षा",t:"ज्ञान का सम्मान उसे व्यवहार में उतारने से होता है।"},
+{c:"शिक्षा",t:"पढ़ाई में समझ विकसित करना केवल पाठ पूरा करने से अधिक जरूरी है।"},
+{c:"शिक्षा",t:"प्रश्न पूछने की स्वतंत्रता सीखने को मजबूत करती है।"},
+{c:"शिक्षा",t:"सीखने का अवसर हर दिन मौजूद रहता है।"},
+{c:"शिक्षा",t:"शिक्षा का असर व्यवहार और निर्णयों में दिखना चाहिए।"},
+{c:"विद्यार्थी",t:"आज का एक ईमानदार अभ्यास कल का आत्मविश्वास बन सकता है।"},
+{c:"विद्यार्थी",t:"लक्ष्य लिखने से उसे रोज याद रखना आसान होता है।"},
+{c:"विद्यार्थी",t:"पढ़ाई के बीच छोटे विराम ध्यान बनाए रखने में मदद करते हैं।"},
+{c:"विद्यार्थी",t:"कठिन सवाल पर समय दें, फिर हल की समीक्षा करें।"},
+{c:"विद्यार्थी",t:"गलत उत्तरों की सूची बनाना सुधार का अच्छा तरीका है।"},
+{c:"विद्यार्थी",t:"अपने कमजोर विषय को रोज थोड़ा समय दें।"},
+{c:"विद्यार्थी",t:"सीखी हुई बात किसी को समझाना याददाश्त मजबूत करता है।"},
+{c:"विद्यार्थी",t:"छोटी उपलब्धियों को पहचानें और अभ्यास जारी रखें।"},
+{c:"विद्यार्थी",t:"पढ़ाई में सवाल हल करना भी उतना ही जरूरी है जितना पढ़ना।"},
+{c:"विद्यार्थी",t:"परीक्षा के बाद गलतियों की समीक्षा अगली तैयारी बेहतर करती है。"},
+{c:"मेहनत",t:"बिना समीक्षा के दोहराव से बेहतर है सोच-समझकर अभ्यास करना।"},
+{c:"मेहनत",t:"एक दिन की मेहनत नहीं, लंबे समय की निरंतरता असर दिखाती है।"},
+{c:"मेहनत",t:"प्रयास को बेहतर बनाने के लिए तरीका बदलना भी जरूरी है।"},
+{c:"मेहनत",t:"हर दिन का छोटा सुधार भविष्य में बड़ा लाभ दे सकता है।"},
+{c:"मेहनत",t:"कठिन काम को हिस्सों में बाँटने से शुरुआत आसान होती है।"},
+{c:"मेहनत",t:"मेहनत का सम्मान करें, चाहे परिणाम अभी न दिखे।"},
+{c:"मेहनत",t:"ध्यान से किया गया काम समय की बचत करता है।"},
+{c:"मेहनत",t:"थोड़ा आगे बढ़ना भी ठहराव से बेहतर है।"},
+{c:"मेहनत",t:"असफलता के बाद योजना सुधारें और फिर प्रयास करें।"},
+{c:"मेहनत",t:"काम पूरा करने के बाद अपनी सीख दर्ज करें।"},
+{c:"अनुशासन",t:"अपने काम की शुरुआत के लिए निश्चित समय तय करें।"},
+{c:"अनुशासन",t:"सूची बनाना तभी उपयोगी है जब काम भी पूरा हो।"},
+{c:"अनुशासन",t:"जरूरी काम के समय अनावश्यक सूचनाएँ बंद रखें।"},
+{c:"अनुशासन",t:"दिनचर्या में आराम के लिए भी जगह रखें।"},
+{c:"अनुशासन",t:"आदत को आसान बनाने के लिए पहला कदम छोटा रखें।"},
+{c:"अनुशासन",t:"नियमितता बार-बार निभाने से बनती है।"},
+{c:"अनुशासन",t:"समय का अनुमान लगाकर काम शुरू करें।"},
+{c:"अनुशासन",t:"काम के बीच ध्यान भटके तो शांति से वापस लौटें।"},
+{c:"अनुशासन",t:"अपनी प्राथमिकताओं को रोज स्पष्ट करें।"},
+{c:"अनुशासन",t:"जो आदत काम नहीं कर रही, उसे सुधारने का साहस रखें।"},
+{c:"आत्मविकास",t:"अपनी राय को प्रमाण और तर्क से परखें।"},
+{c:"आत्मविकास",t:"सीखने के लिए अपनी अज्ञानता स्वीकार करना जरूरी है।"},
+{c:"आत्मविकास",t:"सुधार के लिए ईमानदार प्रतिक्रिया को ध्यान से सुनें।"},
+{c:"आत्मविकास",t:"भावना को पहचानकर निर्णय में विवेक की जगह रखें।"},
+{c:"आत्मविकास",t:"अपनी क्षमता को अभ्यास से विकसित किया जा सकता है।"},
+{c:"आत्मविकास",t:"दूसरों की सफलता से सीखने की दृष्टि रखें।"},
+{c:"आत्मविकास",t:"कठिन बातचीत में भी सम्मान बनाए रखें।"},
+{c:"आत्मविकास",t:"अपनी गलती सुधारना बहाना बनाने से बेहतर है।"},
+{c:"आत्मविकास",t:"नए कौशल के लिए धैर्य और नियमितता रखें।"},
+{c:"आत्मविकास",t:"जो नहीं जानते, उसे सीखने की योजना बनाएं।"},
+{c:"जीवन",t:"समय पर कही गई सच्ची बात भ्रम दूर कर सकती है।"},
+{c:"जीवन",t:"दूसरे की परिस्थिति समझने की कोशिश करें।"},
+{c:"जीवन",t:"साफ इरादा और जिम्मेदार व्यवहार भरोसा बनाते हैं।"},
+{c:"जीवन",t:"हर समस्या का हल तुरंत नहीं मिलता; पहले उसे समझें।"},
+{c:"जीवन",t:"अपने आसपास के लोगों के समय का भी सम्मान करें।"},
+{c:"जीवन",t:"कम बोलकर ध्यान से सुनना कई बार अधिक उपयोगी है।"},
+{c:"जीवन",t:"सही जानकारी के बिना जल्दबाजी में निर्णय न लें।"},
+{c:"जीवन",t:"सहयोग माँगना और सहयोग देना दोनों महत्वपूर्ण हैं।"},
+{c:"जीवन",t:"अपनी जिम्मेदारी से भागने पर समस्या बढ़ती है।"},
+{c:"जीवन",t:"जीवन में स्पष्टता छोटे निर्णयों से भी आती है."},
+{c:"शिक्षा",t:"सीखने का प्रमाण है कि आप बात को समझाकर बता सकें — 1।"},
+{c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है — 2।"},
+{c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है — 3।"},
+{c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं — 4।"},
+{c:"आत्मविकास",t:"खुद को बेहतर समझना बदलाव को संभव बनाता है — 5।"},
+{c:"जीवन",t:"विचारपूर्वक किया गया छोटा काम भी मूल्यवान है — 6।"},
+{c:"शिक्षा",t:"सीखने का प्रमाण है कि आप बात को समझाकर बता सकें — 7।"},
+{c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है — 8।"},
+{c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है — 9।"},
+{c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं — 10।"}];
+const NORMAL_THOUGHT_INDEX = Math.floor(Math.random() * HINDI_THOUGHTS.length);
 function getNormalThought(){
-  const day=Math.floor(new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()).getTime()/86400000);
-  return HINDI_THOUGHTS[((day%HINDI_THOUGHTS.length)+HINDI_THOUGHTS.length)%HINDI_THOUGHTS.length];
+  return HINDI_THOUGHTS[NORMAL_THOUGHT_INDEX];
 }
 function getTodaysThought(){
   const key=getThoughtPreferenceKey();
@@ -1069,6 +1199,7 @@ function setTodayThought(index){
   if(!Number.isInteger(index)||!HINDI_THOUGHTS[index])return;
   localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),index:index}));
   renderHomeExtras();
+  renderThoughtsLibrary();
   alert("यह विचार आज के लिए Home Page पर सेट हो गया है।");
 }
 function resetTodayThought(){localStorage.removeItem(getThoughtPreferenceKey());renderHomeExtras();}
@@ -1084,13 +1215,30 @@ function renderHomeExtras(){
   const thought=getTodaysThought();
   const text=document.getElementById("homeThoughtText");if(text)text.textContent=thought.t;
 }
-function openThoughtsLibrary(){showSection("thoughtsSection","homeNav");renderThoughtsLibrary();}
+function openThoughtsLibrary(){
+  const search=document.getElementById("thoughtSearchInput");
+  if(search) search.value="";
+  showSection("thoughtsSection","homeNav");
+  renderThoughtsLibrary();
+}
+function openThoughtsLibraryFromMenu(event){
+  if(event) event.stopPropagation();
+  menuNavigationInProgress=true;
+  const menu=document.getElementById("menuPopup");
+  if(menu) menu.style.display="none";
+  overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");
+  openThoughtsLibrary();
+  setTimeout(()=>{menuNavigationInProgress=false;},300);
+}
 function renderThoughtsLibrary(){
   const area=document.getElementById("thoughtsLibraryArea");if(!area)return;
   const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLowerCase();
   const items=HINDI_THOUGHTS.map((thought,index)=>({...thought,index})).filter(x=>(x.t+" "+x.c).toLowerCase().includes(query));
-  if(!items.length){area.innerHTML='<div class="emptyState">कोई विचार नहीं मिला।</div>';return;}
-  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.c)+'</div><div class="thoughtItemText">'+escapeHtml(x.t)+'</div></div></div><button class="thoughtBtn" onclick="setTodayThought('+x.index+')">आज के लिए सेट करें</button></div>').join('');
+  if(!items.length){area.style.display="block";area.innerHTML='<div class="emptyState">कोई विचार नहीं मिला।</div>';return;}
+  let selectedIndex=null;
+  try{const saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");if(saved&&saved.date===localDateKey()&&Number.isInteger(saved.index))selectedIndex=saved.index;}catch(e){}
+  area.style.display="block";
+  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.c)+'</div><div class="thoughtItemText">'+escapeHtml(x.t)+'</div></div></div><button class="thoughtBtn '+(selectedIndex===x.index?'secondary':'')+'" onclick="setTodayThought('+x.index+')">'+(selectedIndex===x.index?'आज के लिए चुना गया ✓':'आज के लिए सेट करें')+'</button></div>').join('');
 }
 
 function getOwnerName() {
@@ -3131,6 +3279,7 @@ let overlayHistoryStack = [];
 let handlingBackOverlayClose = false;
 let pendingDeveloperPopup = false;
 let overlayObserverReady = false;
+let menuNavigationInProgress = false;
 
 function isOverlayVisible(id){
   const el = document.getElementById(id);
@@ -3163,7 +3312,7 @@ function setupOverlayBackHandling(){
         overlayHistoryStack.push(id);
       }else if(!visible && wasTracked){
         overlayHistoryStack = overlayHistoryStack.filter(x => x !== id);
-        if(!handlingBackOverlayClose){
+        if(!handlingBackOverlayClose && !(id === "menuPopup" && menuNavigationInProgress)){
           // The user closed the popup normally. Remove its history layer too,
           // so the next Back press behaves normally.
           history.back();
