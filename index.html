@@ -328,7 +328,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .headerIconBtn{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .headerAdd{font-size:27px;font-weight:400;}
 #menuPopup{right:0!important;top:0!important;bottom:0!important;width:min(340px,88vw)!important;max-width:88vw!important;min-width:0!important;height:100dvh!important;max-height:100dvh!important;border-radius:18px 0 0 18px!important;overflow-y:auto!important;overflow-x:hidden!important;box-sizing:border-box!important;transform:translateX(0);animation:drawerIn .22s ease-out; padding-top:env(safe-area-inset-top,0px)!important;padding-bottom:env(safe-area-inset-bottom,0px)!important;}@keyframes drawerIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
-#menuPopup>div{padding:13px 15px!important;}#thoughtsLibraryArea{display:block!important;visibility:visible!important;min-height:20px;}#thoughtsSection .modernPanel{display:block!important;}#trashStudentsArea{overflow-wrap:anywhere;} .trashStudent{padding:14px 0;border-bottom:1px solid #ececf4;display:flex;align-items:flex-start;gap:10px;justify-content:space-between}.trashStudent:last-child{border-bottom:0}.trashStudentInfo{min-width:0;flex:1}.trashStudentName{font-weight:800;overflow-wrap:anywhere}.trashStudentMeta{font-size:12px;color:#687080;margin-top:5px;line-height:1.5}.trashActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.trashActions button{border:0;border-radius:9px;padding:8px 9px;font-weight:700;cursor:pointer}.trashRecover{background:#e9f8ef;color:#137a42}.trashPermanent{background:#fff0f0;color:#b42318}
+#menuPopup>div{padding:13px 15px!important;}#thoughtsLibraryArea{visibility:visible!important;min-height:20px;}#trashStudentsArea{overflow-wrap:anywhere;} .trashStudent{padding:14px 0;border-bottom:1px solid #ececf4;display:flex;align-items:flex-start;gap:10px;justify-content:space-between}.trashStudent:last-child{border-bottom:0}.trashStudentInfo{min-width:0;flex:1}.trashStudentName{font-weight:800;overflow-wrap:anywhere}.trashStudentMeta{font-size:12px;color:#687080;margin-top:5px;line-height:1.5}.trashActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.trashActions button{border:0;border-radius:9px;padding:8px 9px;font-weight:700;cursor:pointer}.trashRecover{background:#e9f8ef;color:#137a42}.trashPermanent{background:#fff0f0;color:#b42318}
 #menuPopup>div{padding:13px 15px!important;}
 .menuLockRow{display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;}
 .menuLockSwitch{flex:0 0 46px;}
@@ -479,12 +479,12 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 }
 #menuPopup .modernMenuProfile,
 #menuPopup .modernMenuItem,
-#menuPopup .modernMenuAccount{background:#F3F4F6!important;}
+#menuPopup .modernMenuAccount{background:#F0F1F7!important;}
 #menuPopup .modernMenuItem{border-bottom:1px solid #E2E5EB!important;gap:8px!important;padding-left:10px!important;padding-right:9px!important;font-size:14px!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:anywhere!important;}
 #menuPopup .modernMenuProfile{padding-left:10px!important;padding-right:9px!important;}
 #menuPopup .modernMenuIcon{width:25px!important;min-width:25px!important;font-size:19px!important;}
 #menuPopup .modernMenuAccount{font-size:10px!important;padding-left:10px!important;padding-right:9px!important;}
-#menuPopup .modernMenuItem:active{background:#E7EAF0!important;}
+#menuPopup .modernMenuItem:active{background:#E3E5F0!important;}
 #menuPopup.drawerClosing{animation:drawerOut .18s ease-in forwards!important;pointer-events:none!important;}
 @keyframes drawerOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:.75}}
 
@@ -497,7 +497,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .thoughtSourceButtons{display:flex;gap:7px;}
 .thoughtSourceButtons .thoughtBtn{flex:1;min-width:0;padding:8px 6px;font-size:12px;line-height:1.3;}
 .thoughtSourceButtons .activeSource{background:#18794E!important;color:#fff!important;}
-.thoughtSourceStatus{font-size:11px;color:#667085;line-height:1.45;margin-top:8px;}
+.thoughtSourceCompact{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px;padding:7px 9px;background:#EEF0F6;border:1px solid #E0E4EE;border-radius:11px;font-size:12px;color:#596174}.thoughtSourceCompact span{font-weight:800;margin-right:2px}.thoughtSourceChip{border:1px solid #D7DCE8;border-radius:8px;padding:6px 9px;background:#fff;color:#5143A8;font-size:12px;font-weight:800;cursor:pointer}.thoughtSourceChip.activeSource{background:#5143B8;border-color:#5143B8;color:#fff}.thoughtSourceStatus{font-size:11px;color:#667085;line-height:1.45;margin-top:8px;}
 .newThoughtBtn{width:100%;border:0;border-radius:11px;padding:11px 12px;background:#5143B8;color:#fff;font-weight:800;font-size:14px;margin-bottom:10px;cursor:pointer;}
 .personalThoughtEditor{background:#F8F9FC;border:1px solid #DDE2EC;border-radius:14px;padding:12px;margin-bottom:12px;}
 .personalThoughtEditor label{display:block;font-size:13px;font-weight:800;color:#344054;margin-bottom:8px;}
@@ -793,6 +793,7 @@ Reset PIN
 
     <section id="thoughtsSection" class="section">
       <div class="pageHead"><div><h2>हिंदी विचार</h2><p>तैयार विचार चुनें या अपने विचार लिखें</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="thoughtSourceCompact" aria-label="सामान्य विचार का स्रोत"><span>Loop:</span><button id="thoughtSourceReady" class="thoughtSourceChip" type="button" onclick="setThoughtSource('ready')">250 तैयार</button><button id="thoughtSourceMine" class="thoughtSourceChip" type="button" onclick="setThoughtSource('mine')">मेरे विचार</button></div>
       <div class="thoughtTabs" role="tablist" aria-label="विचारों के प्रकार">
         <button id="thoughtTabReady" class="thoughtTab active" role="tab" aria-selected="true" onclick="switchThoughtTab('ready')">250 तैयार विचार</button>
         <button id="thoughtTabMine" class="thoughtTab" role="tab" aria-selected="false" onclick="switchThoughtTab('mine')">मेरे विचार</button>
@@ -802,14 +803,6 @@ Reset PIN
         <div id="thoughtsLibraryArea" aria-live="polite"></div>
       </div>
       <div id="myThoughtsPanel" class="modernPanel" style="display:none;">
-        <div class="thoughtSourcePanel">
-          <div class="thoughtSourceTitle">ऐप खोलने पर सामान्य विचार किस सूची से चुना जाए?</div>
-          <div class="thoughtSourceButtons">
-            <button id="thoughtSourceReady" class="thoughtBtn" type="button" onclick="setThoughtSource('ready')">250 तैयार विचार</button>
-            <button id="thoughtSourceMine" class="thoughtBtn secondary" type="button" onclick="setThoughtSource('mine')">मेरे विचार</button>
-          </div>
-          <div id="thoughtSourceStatus" class="thoughtSourceStatus">ऐप खुलने पर चुनी गई सूची से विचार बदलेगा। आज के लिए सेट किया गया विचार नहीं बदलेगा।</div>
-        </div>
         <button class="newThoughtBtn" type="button" onclick="createMyThought()">＋ नया विचार लिखें</button>
         <div id="personalThoughtEditor" class="personalThoughtEditor" style="display:none;">
           <label for="personalThoughtInput">अपना विचार लिखें</label>
@@ -1370,16 +1363,26 @@ function getTodaysThought(){
 }
 function setTodayThought(index){
   if(!Number.isInteger(index)||!HINDI_THOUGHTS[index])return;
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");}catch(e){}
+  if(saved&&saved.date===localDateKey()&&saved.source==='ready'&&Number(saved.index)===index){
+    resetTodayThought();renderThoughtsLibrary();if(activeThoughtTab==='mine')renderMyThoughtsList();
+    alert("आज के लिए चुना गया विचार हट गया है। सामान्य Loop फिर से चालू है।");return;
+  }
   localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),source:'ready',index:index}));
   markThoughtChangeForSync();renderHomeExtras();renderThoughtsLibrary();
-  alert("यह विचार आज के लिए Home Page पर सेट हो गया है।");
+  alert("यह विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।");
 }
 function setPersonalThoughtForToday(id){
   const item=readMyThoughts().find(x=>x.id===String(id));
   if(!item||!item.t.trim()){alert('पहले विचार लिखें।');return;}
+  let saved=null;try{saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");}catch(e){}
+  if(saved&&saved.date===localDateKey()&&saved.source==='personal'&&saved.id===item.id){
+    resetTodayThought();renderThoughtsLibrary();renderMyThoughtsList();
+    alert("आज के लिए चुना गया विचार हट गया है। सामान्य Loop फिर से चालू है।");return;
+  }
   localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),source:'personal',id:item.id}));
-  markThoughtChangeForSync();renderHomeExtras();renderThoughtsLibrary();if(document.getElementById('personalThoughtsList'))renderMyThoughtsList();
-  alert('आपका विचार आज के लिए Home Page पर सेट हो गया है।');
+  markThoughtChangeForSync();renderHomeExtras();renderThoughtsLibrary();renderMyThoughtsList();
+  alert('आपका विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।');
 }
 function resetTodayThought(){localStorage.removeItem(getThoughtPreferenceKey());normalThoughtCache=null;markThoughtChangeForSync();renderHomeExtras();}
 function renderHomeExtras(){
@@ -1415,6 +1418,7 @@ function switchThoughtTab(tab){
   const readyBtn=document.getElementById('thoughtTabReady'),mineBtn=document.getElementById('thoughtTabMine');
   if(readyBtn){readyBtn.classList.toggle('active',activeThoughtTab==='ready');readyBtn.setAttribute('aria-selected',String(activeThoughtTab==='ready'));}
   if(mineBtn){mineBtn.classList.toggle('active',activeThoughtTab==='mine');mineBtn.setAttribute('aria-selected',String(activeThoughtTab==='mine'));}
+  renderThoughtSourceSettings();
   if(activeThoughtTab==='ready')renderThoughtsLibrary();else renderMyThoughtsList();
 }
 function setThoughtSource(source){
@@ -1424,13 +1428,8 @@ function setThoughtSource(source){
 function renderThoughtSourceSettings(){
   const source=getThoughtSource();
   const r=document.getElementById('thoughtSourceReady'),m=document.getElementById('thoughtSourceMine');
-  if(r){r.classList.toggle('activeSource',source==='ready');r.classList.toggle('secondary',source!=='ready');}
-  if(m){m.classList.toggle('activeSource',source==='mine');m.classList.toggle('secondary',source!=='mine');}
-  const status=document.getElementById('thoughtSourceStatus');
-  if(status){
-    const hasPersonal=readMyThoughts().some(x=>x.status==='saved'&&x.t.trim());
-    status.textContent=source==='mine'&&!hasPersonal?'मेरे विचार चुने गए हैं, लेकिन अभी कोई सेव किया हुआ विचार नहीं है। तब तक 250 तैयार विचारों में से चुना जाएगा।':'ऐप खोलने पर चुनी गई सूची से सामान्य विचार बदलेगा। आज के लिए सेट किया गया विचार आज नहीं बदलेगा।';
-  }
+  if(r){r.classList.toggle('activeSource',source==='ready');r.setAttribute('aria-pressed',String(source==='ready'));}
+  if(m){m.classList.toggle('activeSource',source==='mine');m.setAttribute('aria-pressed',String(source==='mine'));}
 }
 function renderThoughtsLibrary(){
   const area=document.getElementById("thoughtsLibraryArea");if(!area)return;
@@ -1519,7 +1518,7 @@ function renderMyThoughtsList(){
     const isSelected=selected&&selected.date===localDateKey()&&selected.source==='personal'&&selected.id===item.id;
     const status=item.status==='saved'?'<span class="personalThoughtStatus saved">सेव किया गया</span>':'<span class="personalThoughtStatus">ड्राफ्ट</span>';
     const statusButton=item.status==='draft'?'<button type="button" class="thoughtBtn secondary" onclick="finalizeMyThoughtById(\''+escapeHtml(item.id)+'\')">विचार सेव करें</button>':'';
-    return '<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(index+1)+'.</span><div class="thoughtItemBody">'+status+'<div class="thoughtItemText">'+escapeHtml(item.t||'')+'</div></div></div><div class="personalThoughtActions">'+(isSelected?'<button type="button" class="thoughtBtn secondary" disabled>आज के लिए चुना गया ✓</button>':'<button type="button" class="thoughtBtn" onclick="setMyThoughtToday(\''+escapeHtml(item.id)+'\')">आज के लिए सेट करें</button>')+'<button type="button" class="thoughtBtn secondary" onclick="editMyThought(\''+escapeHtml(item.id)+'\')">संपादित करें</button>'+statusButton+'<button type="button" class="personalThoughtDelete" onclick="deleteMyThought(\''+escapeHtml(item.id)+'\')">हटाएँ</button></div></div>';
+    return '<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(index+1)+'.</span><div class="thoughtItemBody">'+status+'<div class="thoughtItemText">'+escapeHtml(item.t||'')+'</div></div></div><div class="personalThoughtActions">'+(isSelected?'<button type="button" class="thoughtBtn secondary" onclick="setMyThoughtToday(\''+escapeHtml(item.id)+'\')">Loop फिर चालू करें ↻</button>':'<button type="button" class="thoughtBtn" onclick="setMyThoughtToday(\''+escapeHtml(item.id)+'\')">आज के लिए सेट करें</button>')+'<button type="button" class="thoughtBtn secondary" onclick="editMyThought(\''+escapeHtml(item.id)+'\')">संपादित करें</button>'+statusButton+'<button type="button" class="personalThoughtDelete" onclick="deleteMyThought(\''+escapeHtml(item.id)+'\')">हटाएँ</button></div></div>';
   }).join('');
   renderThoughtSourceSettings();
 }
