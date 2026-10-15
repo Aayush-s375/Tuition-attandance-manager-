@@ -477,9 +477,10 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
   border-right:0!important;
   border-radius:18px 0 0 18px!important;
 }
-#menuPopup .modernMenuProfile,
-#menuPopup .modernMenuItem,
-#menuPopup .modernMenuAccount{background:#F0F1F7!important;}
+#menuPopup, #menuPopup>div, #menuPopup .modernMenuProfile,
+#menuPopup .modernMenuItem, #menuPopup .modernMenuAccount{background:#F0F1F7!important;}
+#menuPopup .modernMenuItem{color:#202638!important;}
+#menuPopup .modernMenuItem *, #menuPopup .modernMenuProfile *{color:inherit;}
 #menuPopup .modernMenuItem{border-bottom:1px solid #E2E5EB!important;gap:8px!important;padding-left:10px!important;padding-right:9px!important;font-size:14px!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:anywhere!important;}
 #menuPopup .modernMenuProfile{padding-left:10px!important;padding-right:9px!important;}
 #menuPopup .modernMenuIcon{width:25px!important;min-width:25px!important;font-size:19px!important;}
@@ -1315,16 +1316,16 @@ const HINDI_THOUGHTS = [
 {c:"जीवन",t:"सहयोग माँगना और सहयोग देना दोनों महत्वपूर्ण हैं।"},
 {c:"जीवन",t:"अपनी जिम्मेदारी से भागने पर समस्या बढ़ती है।"},
 {c:"जीवन",t:"जीवन में स्पष्टता छोटे निर्णयों से भी आती है."},
-{c:"शिक्षा",t:"सीखने का प्रमाण है कि आप बात को समझाकर बता सकें — 1।"},
-{c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है — 2।"},
-{c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है — 3।"},
-{c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं — 4।"},
-{c:"आत्मविकास",t:"खुद को बेहतर समझना बदलाव को संभव बनाता है — 5।"},
-{c:"जीवन",t:"विचारपूर्वक किया गया छोटा काम भी मूल्यवान है — 6।"},
-{c:"शिक्षा",t:"सीखने का प्रमाण है कि आप बात को समझाकर बता सकें — 7।"},
-{c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है — 8।"},
-{c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है — 9।"},
-{c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं — 10।"}];
+{c:"शिक्षा",t:"सीखने का प्रमाण है कि आप बात को समझाकर बता सकें।"},
+{c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है।"},
+{c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है।"},
+{c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं।"},
+{c:"आत्मविकास",t:"खुद को बेहतर समझना बदलाव को संभव बनाता है।"},
+{c:"जीवन",t:"विचारपूर्वक किया गया छोटा काम भी मूल्यवान है।"},
+{c:"शिक्षा",t:"सीखने का प्रमाण है कि आप बात को समझाकर बता सकें।"},
+{c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है।"},
+{c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है।"},
+{c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं।"}];
 let activeThoughtTab='ready';
 let activePersonalThoughtId=null;
 let thoughtSyncTimer=null;
@@ -1419,7 +1420,10 @@ function switchThoughtTab(tab){
   if(readyBtn){readyBtn.classList.toggle('active',activeThoughtTab==='ready');readyBtn.setAttribute('aria-selected',String(activeThoughtTab==='ready'));}
   if(mineBtn){mineBtn.classList.toggle('active',activeThoughtTab==='mine');mineBtn.setAttribute('aria-selected',String(activeThoughtTab==='mine'));}
   renderThoughtSourceSettings();
+  // Render only the newly visible panel; avoid rebuilding the hidden 250-item list.
   if(activeThoughtTab==='ready')renderThoughtsLibrary();else renderMyThoughtsList();
+  const panel=document.getElementById(activeThoughtTab==='ready'?'readyThoughtsPanel':'myThoughtsPanel');
+  if(panel) panel.style.visibility='visible';
 }
 function setThoughtSource(source){
   const chosen=source==='mine'?'mine':'ready';localStorage.setItem(getThoughtSourceKey(),chosen);normalThoughtCache=null;
@@ -3665,7 +3669,8 @@ window.addEventListener("popstate", function(event){
   }
   if(closeTopOverlayFromBack()) return;
 
-  // Main app navigation: restore the previous section first.
+  // One Back from any main card returns directly Home. Skip the remaining
+  // stale card-history entries so a later Back on Home exits the app.
   if(pendingHomeNavigation){
     pendingHomeNavigation=false;
     sectionHistoryStack=[];
@@ -3674,26 +3679,16 @@ window.addEventListener("popstate", function(event){
     handlingSectionPop=false;
     return;
   }
-
-  if(event.state && event.state.tuitionSection){
-    // The browser moved to the previous section entry. Remove the current
-    // section from our logical stack and display the section in the state.
-    if(sectionHistoryStack.length) sectionHistoryStack.pop();
-    const target=event.state.tuitionSection;
-    handlingSectionPop=true;
-    showSection(target, sectionNavId(target), true);
-    handlingSectionPop=false;
-    return;
-  }
-
-  // Reached the app's root/guard entry. If we are not on Home yet, the
-  // Back press becomes the step that takes us Home. On Home, do nothing
-  // here so the browser/WebView can handle the next Back normally.
   if(currentSectionId!=='homeSection'){
+    const extraSteps=Math.max(0,sectionHistoryStack.length-1);
     sectionHistoryStack=[];
     handlingSectionPop=true;
     showSection('homeSection','homeNav',true);
     handlingSectionPop=false;
+    if(extraSteps>0){
+      pendingHomeNavigation=true;
+      history.go(-extraSteps);
+    }
   }
   return;
 });
