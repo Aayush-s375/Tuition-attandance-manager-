@@ -487,6 +487,9 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 }
 #menuPopup, #menuPopup>div, #menuPopup .modernMenuProfile,
 #menuPopup .modernMenuItem, #menuPopup .modernMenuAccount{background:#F0F1F7!important;}
+#menuPopup *{background-color:transparent!important;}
+#menuPopup{background:#F0F1F7!important;}
+#menuPopup .modernMenuItem:active{background:#E3E5F0!important;}
 #menuPopup .modernMenuItem{color:#202638!important;}
 #menuPopup .modernMenuItem *, #menuPopup .modernMenuProfile *{color:inherit;}
 #menuPopup .modernMenuItem{border-bottom:1px solid #E2E5EB!important;gap:8px!important;padding-left:10px!important;padding-right:9px!important;font-size:14px!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:anywhere!important;}
@@ -904,10 +907,9 @@ Reset PIN
 
 <div class="popup" id="myNoteEditorPopup" style="display:none;align-items:center;justify-content:center;z-index:10020;">
   <div class="popupContent" style="width:min(560px,92vw);max-height:88vh;overflow:auto;padding:18px;">
-    <button class="popupClose" onclick="closeMyNoteEditor()">✕</button>
     <h3 id="myNoteEditorTitle">📝 Add Note</h3>
     <textarea id="myNoteEditorInput" class="myNoteEditorTextarea" placeholder="यहाँ अपना Note लिखें… कोई भी लंबाई लिख सकते हैं।"></textarea>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="thoughtBtn" type="button" onclick="saveMyNote()">Save Note</button><button class="thoughtBtn secondary" type="button" onclick="closeMyNoteEditor()">Cancel</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="thoughtBtn" type="button" onclick="saveMyNote()">Save Note</button><button class="thoughtBtn secondary" type="button" onclick="cancelMyNote()">Cancel</button></div>
   </div>
 </div>
 
@@ -1085,6 +1087,8 @@ function getMyNotesKey(){return "tuitionMyNotes_v1_"+(currentAccountKey||"local"
 function readMyNotes(){try{const notes=JSON.parse(localStorage.getItem(getMyNotesKey())||"[]");return Array.isArray(notes)?notes.filter(n=>n&&typeof n.text==="string").map(n=>({id:String(n.id||("note_"+Date.now()+"_"+Math.random().toString(36).slice(2))),text:String(n.text),updatedAt:Number(n.updatedAt||Date.now())})):[];}catch(e){return [];}}
 function writeMyNotes(notes){localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));renderHomeNotes();renderMyNotesList();}
 let editingMyNoteId=null;
+let myNoteOriginalText="";
+let myNoteBackPending=false;
 function renderHomeNotes(){const card=document.getElementById("homeMyNotesCard"),content=document.getElementById("homeMyNotesContent");if(!card||!content)return;const notes=readMyNotes().filter(n=>n.text.trim());if(!notes.length){card.style.display="none";content.textContent="";return;}card.style.display="block";content.textContent=notes.map(n=>n.text).join("\n\n");}
 function renderMyNotesList(){
   const area=document.getElementById("myNotesList");if(!area)return;
@@ -1093,11 +1097,23 @@ function renderMyNotesList(){
   area.innerHTML=notes.map(n=>`<div class="myNoteItem"><div class="myNoteContent">${escapeHtml(n.text)}</div><div class="myNoteActions"><button class="myNoteEdit" type="button" onclick="editMyNote('${n.id}')">Edit</button><button class="myNoteDelete" type="button" onclick="deleteMyNote('${n.id}')">Delete</button></div></div>`).join('');
 }
 function openMyNotesFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)menu.style.display="none";overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("myNotesSection","homeNav");renderMyNotesList();setTimeout(()=>{menuNavigationInProgress=false;},300);}
-function openMyNoteEditor(id){editingMyNoteId=id||null;let note=editingMyNoteId?readMyNotes().find(n=>n.id===editingMyNoteId):null;const modal=document.getElementById("myNoteEditorPopup");const input=document.getElementById("myNoteEditorInput");if(!modal||!input)return;input.value=note?note.text:"";modal.style.display="flex";setTimeout(()=>input.focus(),50);}
+function openMyNoteEditor(id){editingMyNoteId=id||null;let note=editingMyNoteId?readMyNotes().find(n=>n.id===editingMyNoteId):null;const modal=document.getElementById("myNoteEditorPopup");const input=document.getElementById("myNoteEditorInput");if(!modal||!input)return;input.value=note?note.text:"";myNoteOriginalText=input.value;modal.style.display="flex";history.pushState({myNoteEditor:true}, "", location.href);setTimeout(()=>input.focus(),50);}
 function saveMyNote(){const input=document.getElementById("myNoteEditorInput");const value=String(input?.value||"").trim();if(!value){alert("पहले Note लिखें।");return;}const notes=readMyNotes();if(editingMyNoteId){const i=notes.findIndex(n=>n.id===editingMyNoteId);if(i>=0){notes[i].text=value;notes[i].updatedAt=Date.now();}else notes.unshift({id:editingMyNoteId,text:value,updatedAt:Date.now()});}else notes.unshift({id:"note_"+Date.now()+"_"+Math.random().toString(36).slice(2),text:value,updatedAt:Date.now()});localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));closeMyNoteEditor();renderMyNotesList();renderHomeNotes();}
 function editMyNote(id){openMyNoteEditor(id);}
 function deleteMyNote(id){if(!confirm("इस Note को Delete करना चाहते हैं?"))return;writeMyNotes(readMyNotes().filter(n=>n.id!==id));}
-function closeMyNoteEditor(){const modal=document.getElementById("myNoteEditorPopup");if(modal)modal.style.display="none";editingMyNoteId=null;}
+function closeMyNoteEditor(){const modal=document.getElementById("myNoteEditorPopup");if(modal)modal.style.display="none";editingMyNoteId=null;myNoteOriginalText="";myNoteBackPending=false;}
+function cancelMyNote(){const input=document.getElementById("myNoteEditorInput");if(input&&String(input.value||"")!==myNoteOriginalText){if(!confirm("आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।"))return;}closeMyNoteEditor();}
+window.addEventListener("popstate",function(e){
+ const modal=document.getElementById("myNoteEditorPopup"),input=document.getElementById("myNoteEditorInput");
+ if(!modal||modal.style.display==="none")return;
+ // A browser Back while the keyboard is open normally dismisses the keyboard first;
+ // if it reaches this handler, protect unsaved text with an explicit choice.
+ if(input&&String(input.value||"")!==myNoteOriginalText){
+   const save=confirm("Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।");
+   if(save){saveMyNote();}else{closeMyNoteEditor();}
+ }else{closeMyNoteEditor();}
+ history.pushState({myNoteEditor:true}, "", location.href);
+});
 function getThoughtSource(){return localStorage.getItem(getThoughtSourceKey())==="mine"?"mine":"ready";}
 function getThoughtBackupData(){return {myThoughts:readMyThoughts(),myNotes:readMyNotes(),thoughtSource:getThoughtSource(),thoughtOfDay:localStorage.getItem(getThoughtPreferenceKey()),thoughtRotation:localStorage.getItem(getThoughtRotationKey())};}
 function applyThoughtBackupData(data){
@@ -1473,7 +1489,8 @@ function switchThoughtTab(tab){
   if(mineBtn){mineBtn.classList.toggle('active',activeThoughtTab==='mine');mineBtn.setAttribute('aria-selected',String(activeThoughtTab==='mine'));}
   renderThoughtSourceSettings();
   // Render only the newly visible panel; avoid rebuilding the hidden 250-item list.
-  if(activeThoughtTab==='ready')renderThoughtsLibrary();else renderMyThoughtsList();
+  if(activeThoughtTab==='mine')renderMyThoughtsList();
+  else if(!document.getElementById('thoughtsLibraryArea')?.dataset.rendered)renderThoughtsLibrary();
   const panel=document.getElementById(activeThoughtTab==='ready'?'readyThoughtsPanel':'myThoughtsPanel');
   if(panel) panel.style.visibility='visible';
 }
@@ -1489,7 +1506,7 @@ function renderThoughtSourceSettings(){
 }
 function renderThoughtsLibrary(){
   const area=document.getElementById("thoughtsLibraryArea");if(!area)return;
-  area.style.display="block";area.style.visibility="visible";area.style.width="100%";
+  area.style.display="block";area.style.visibility="visible";area.style.width="100%";area.dataset.rendered="true";
   try{
     const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLocaleLowerCase("hi");
     const thoughts=Array.isArray(HINDI_THOUGHTS)?HINDI_THOUGHTS:[];
@@ -3706,7 +3723,9 @@ function handleOutsideTap(event){
   const menu = document.getElementById("menuPopup");
   const menuButton = event.target.closest && event.target.closest('button[onclick="toggleMenu()"]');
   if(menu && isOverlayVisible("menuPopup") && !menu.contains(event.target) && !menuButton){
+    menuNavigationInProgress=true;
     closeMenuDrawer();
+    setTimeout(()=>{menuNavigationInProgress=false;},260);
   }
 }
 
