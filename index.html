@@ -327,7 +327,8 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .headerActions{display:flex;align-items:center;gap:5px;flex:none;}
 .headerIconBtn{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .headerAdd{font-size:27px;font-weight:400;}
-#menuPopup{right:0!important;top:48px!important;min-width:215px!important;border-radius:14px!important;overflow:hidden;}
+#menuPopup{right:0!important;top:0!important;bottom:0!important;width:min(340px,88vw)!important;max-width:88vw!important;min-width:0!important;height:100dvh!important;max-height:100dvh!important;border-radius:18px 0 0 18px!important;overflow-y:auto!important;overflow-x:hidden!important;box-sizing:border-box!important;transform:translateX(0);animation:drawerIn .22s ease-out; padding-top:env(safe-area-inset-top,0px)!important;padding-bottom:env(safe-area-inset-bottom,0px)!important;}@keyframes drawerIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+#menuPopup>div{padding:13px 15px!important;}#thoughtsLibraryArea{display:block!important;visibility:visible!important;min-height:20px;}#thoughtsSection .modernPanel{display:block!important;}#trashStudentsArea{overflow-wrap:anywhere;} .trashStudent{padding:14px 0;border-bottom:1px solid #ececf4;display:flex;align-items:flex-start;gap:10px;justify-content:space-between}.trashStudent:last-child{border-bottom:0}.trashStudentInfo{min-width:0;flex:1}.trashStudentName{font-weight:800;overflow-wrap:anywhere}.trashStudentMeta{font-size:12px;color:#687080;margin-top:5px;line-height:1.5}.trashActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.trashActions button{border:0;border-radius:9px;padding:8px 9px;font-weight:700;cursor:pointer}.trashRecover{background:#e9f8ef;color:#137a42}.trashPermanent{background:#fff0f0;color:#b42318}
 #menuPopup>div{padding:13px 15px!important;}
 .menuLockRow{display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid #eee;font-size:14px;font-weight:700;}
 .menuLockSwitch{flex:0 0 46px;}
@@ -653,7 +654,7 @@ Reset PIN
         <button class="headerIconBtn headerAdd" onclick="addStudent()" title="Add Student">+</button>
         <div style="position:relative;">
           <button class="headerIconBtn" onclick="toggleMenu()" title="Menu">☰</button>
-          <div id="menuPopup" class="modernMenuPopup" style="display:none;position:absolute;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:999;">
+          <div id="menuPopup" class="modernMenuPopup" style="display:none;position:fixed;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:9999;">
             <div class="modernMenuProfile">
               <div class="modernMenuProfileName">
                 <span class="modernMenuIcon">👤</span>
@@ -692,6 +693,10 @@ Reset PIN
             <div class="modernMenuItem" onclick="openThoughtsLibraryFromMenu(event)">
               <span class="modernMenuIcon">🌱</span>
               <span class="modernMenuLabel">सभी विचार</span>
+            </div>
+            <div class="modernMenuItem" onclick="openTrashFromMenu(event)">
+              <span class="modernMenuIcon">🗑️</span>
+              <span class="modernMenuLabel">Trash / Deleted Students</span>
             </div>
             <div class="modernMenuAccount">
               <span id="googleEmailDisplay"></span>
@@ -736,6 +741,11 @@ Reset PIN
         <input id="thoughtSearchInput" class="thoughtSearch" type="search" placeholder="विचार खोजें..." oninput="renderThoughtsLibrary()" autocomplete="off">
         <div id="thoughtsLibraryArea"></div>
       </div>
+    </section>
+
+    <section id="trashSection" class="section">
+      <div class="pageHead"><div><h2>Trash / Deleted Students</h2><p>30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div id="trashStudentsArea" class="modernPanel"></div>
     </section>
 
     <section id="studentsSection" class="section">
@@ -927,6 +937,24 @@ function getSyncKey() {
 function getOwnerNameKey() {
   return currentAccountKey ? OWNER_NAME_KEY_PREFIX + currentAccountKey : "tuitionOwnerName_v1";
 }
+
+function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;", "'":"&#39;"}[ch];});}
+function getTrashKey(){return "tuitionDeletedStudents_v1_"+(currentAccountKey||"local");}
+function readTrash(){
+  let items=[];try{items=JSON.parse(localStorage.getItem(getTrashKey())||"[]");}catch(e){items=[];}
+  const now=Date.now();const keep=items.filter(x=>x&&x.deletedAt&&now-Number(x.deletedAt)<30*24*60*60*1000);
+  if(keep.length!==items.length)localStorage.setItem(getTrashKey(),JSON.stringify(keep));
+  return keep;
+}
+function writeTrash(items){localStorage.setItem(getTrashKey(),JSON.stringify(items));}
+function openTrashFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)menu.style.display="none";overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("trashSection","homeNav");renderTrashStudents();setTimeout(()=>{menuNavigationInProgress=false;},300);}
+function renderTrashStudents(){
+  const area=document.getElementById("trashStudentsArea");if(!area)return;const items=readTrash();
+  if(!items.length){area.innerHTML='<div class="emptyState"><div style="font-size:34px">🗑️</div><b>Trash खाली है</b><div style="margin-top:6px">डिलीट किए गए विद्यार्थी यहाँ 30 दिनों तक रहेंगे।</div></div>';return;}
+  area.innerHTML=items.map((item,i)=>{const days=Math.max(0,30-Math.floor((Date.now()-Number(item.deletedAt))/(24*60*60*1000)));return '<div class="trashStudent"><div class="trashStudentInfo"><div class="trashStudentName">'+escapeHtml(item.student?.name||'Unnamed Student')+'</div><div class="trashStudentMeta">वापस हटने में '+days+' दिन बाकी<br>Attendance: '+(item.student?.attendance?.length||0)+' रिकॉर्ड · Fees: '+(item.student?.fees?.length||0)+' रिकॉर्ड</div></div><div class="trashActions"><button class="trashRecover" onclick="recoverDeletedStudent('+i+')">Recover</button><button class="trashPermanent" onclick="permanentlyDeleteStudent('+i+')">Delete Permanently</button></div></div>';}).join('');
+}
+function recoverDeletedStudent(index){const items=readTrash();const item=items[index];if(!item)return;if(students.some(s=>String(s.id||'')===String(item.student?.id||'')&&s.id)){alert('यह विद्यार्थी पहले से मौजूद है।');return;}students.push(item.student);items.splice(index,1);writeTrash(items);saveLocalData(true);render();renderTrashStudents();alert('विद्यार्थी और उसका पूरा रिकॉर्ड वापस आ गया है।');}
+function permanentlyDeleteStudent(index){const items=readTrash();if(!items[index])return;if(!confirm('इस विद्यार्थी और उसके सभी Attendance/Fees रिकॉर्ड को हमेशा के लिए मिटाएँ? यह वापस नहीं आएगा।'))return;items.splice(index,1);writeTrash(items);renderTrashStudents();}
 
 function getThoughtPreferenceKey(){
   return "tuitionThoughtOfDay_v1_" + (currentAccountKey || "local");
@@ -1218,6 +1246,7 @@ function renderHomeExtras(){
 function openThoughtsLibrary(){
   const search=document.getElementById("thoughtSearchInput");
   if(search) search.value="";
+  const area=document.getElementById("thoughtsLibraryArea");if(area){area.style.display="block";area.style.visibility="visible";area.innerHTML="विचार लोड हो रहे हैं…";}
   showSection("thoughtsSection","homeNav");
   renderThoughtsLibrary();
 }
@@ -1232,13 +1261,13 @@ function openThoughtsLibraryFromMenu(event){
 }
 function renderThoughtsLibrary(){
   const area=document.getElementById("thoughtsLibraryArea");if(!area)return;
-  const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLowerCase();
-  const items=HINDI_THOUGHTS.map((thought,index)=>({...thought,index})).filter(x=>(x.t+" "+x.c).toLowerCase().includes(query));
-  if(!items.length){area.style.display="block";area.innerHTML='<div class="emptyState">कोई विचार नहीं मिला।</div>';return;}
-  let selectedIndex=null;
-  try{const saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");if(saved&&saved.date===localDateKey()&&Number.isInteger(saved.index))selectedIndex=saved.index;}catch(e){}
-  area.style.display="block";
-  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.c)+'</div><div class="thoughtItemText">'+escapeHtml(x.t)+'</div></div></div><button class="thoughtBtn '+(selectedIndex===x.index?'secondary':'')+'" onclick="setTodayThought('+x.index+')">'+(selectedIndex===x.index?'आज के लिए चुना गया ✓':'आज के लिए सेट करें')+'</button></div>').join('');
+  area.style.display="block";area.style.visibility="visible";area.style.width="100%";
+  const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLocaleLowerCase("hi");
+  const thoughts=Array.isArray(HINDI_THOUGHTS)?HINDI_THOUGHTS:[];
+  const items=thoughts.map((thought,index)=>({...thought,index})).filter(x=>String(x.t||"").toLocaleLowerCase("hi").includes(query)||String(x.c||"").toLocaleLowerCase("hi").includes(query));
+  if(!items.length){area.innerHTML='<div class="emptyState">'+(thoughts.length?'कोई विचार नहीं मिला।':'विचार लोड नहीं हो पाए। कृपया पेज रीफ्रेश करें।')+'</div>';return;}
+  let selectedIndex=null;try{const saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");if(saved&&saved.date===localDateKey()&&Number.isInteger(saved.index))selectedIndex=saved.index;}catch(e){}
+  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.c||'विचार')+'</div><div class="thoughtItemText">'+escapeHtml(x.t||'')+'</div></div></div><button type="button" class="thoughtBtn '+(selectedIndex===x.index?'secondary':'')+'" onclick="setTodayThought('+x.index+')">'+(selectedIndex===x.index?'आज के लिए चुना गया ✓':'आज के लिए सेट करें')+'</button></div>').join('');
 }
 
 function getOwnerName() {
@@ -1607,7 +1636,8 @@ async function syncWithGoogleDrive() {
         updatedAt: localUpdatedAt || Date.now(),
         ownerName: getDriveBackupOwnerName(),
         appPin: localStorage.getItem(getPinKey()) || null,
-        students: students
+        students: students,
+        deletedStudents: readTrash()
       };
 
       const created = await uploadDriveData(backup);
@@ -1641,7 +1671,8 @@ async function syncWithGoogleDrive() {
         updatedAt: localUpdatedAt,
         ownerName: getDriveBackupOwnerName(),
         appPin: localStorage.getItem(getPinKey()) || null,
-        students: students
+        students: students,
+        deletedStudents: readTrash()
       };
 
       await uploadDriveData(backup, driveFile.id);
@@ -1661,6 +1692,7 @@ async function syncWithGoogleDrive() {
     } else if (driveUpdatedAt > localUpdatedAt) {
       if (Array.isArray(driveBackup.students)) {
         students = driveBackup.students;
+        if(Array.isArray(driveBackup.deletedStudents))writeTrash(driveBackup.deletedStudents);
         students.forEach(s => {
           if (!s.fees) s.fees = [];
           if (!s.attendance) s.attendance = [];
@@ -1822,7 +1854,8 @@ function sectionNavId(sectionId){
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
     reportsSection:'reportsNav',
-    thoughtsSection:'homeNav'
+    thoughtsSection:'homeNav',
+    trashSection:'homeNav'
   };
   return map[sectionId] || 'homeNav';
 }
@@ -1849,6 +1882,7 @@ function showSection(sectionId, navId, fromHistory){
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='reportsSection') renderReports();
   if(sectionId==='thoughtsSection') renderThoughtsLibrary();
+  if(sectionId==='trashSection') renderTrashStudents();
   renderHomeExtras();
 }
 
@@ -3418,7 +3452,8 @@ window.addEventListener("load", function(){
 
 function toggleMenu(){
   const menu=document.getElementById("menuPopup");
-  menu.style.display = menu.style.display=="block" ? "none" : "block";
+  if(!menu)return;
+  if(menu.style.display==="block"){menu.style.display="none";}else{menu.style.display="block";menu.scrollTop=0;}
 }
 
 function changePin(){
@@ -3563,6 +3598,7 @@ function backupData(){
 
   const backup = {
     students: students,
+    deletedStudents: readTrash(),
     ownerName: getOwnerName(),
     appPin: localStorage.getItem(getPinKey())
   };
@@ -3609,6 +3645,7 @@ function restoreBackup(event){
       }
 
       students = backup.students;
+      if(Array.isArray(backup.deletedStudents))writeTrash(backup.deletedStudents);
       students.forEach(s => {
         if(!s.fees) s.fees=[];
         if(!s.attendance) s.attendance=[];
@@ -3646,10 +3683,10 @@ function restoreBackup(event){
 }
 
 function deleteStudent(index){
-  if(confirm("Delete Student?")){
-    students.splice(index,1);
-    saveLocalData(true);
-    render();
+  const student=students[index];if(!student)return;
+  if(confirm("इस विद्यार्थी को Trash में भेजें? वह 30 दिनों तक पूरा रिकॉर्ड सहित वापस लाया जा सकता है।")){
+    const trash=readTrash();trash.unshift({student:JSON.parse(JSON.stringify(student)),deletedAt:Date.now()});writeTrash(trash);
+    students.splice(index,1);saveLocalData(true);render();
   }
 }
 
