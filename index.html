@@ -443,7 +443,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 @media(max-width:390px){.featureGrid{gap:9px}.featureCard{padding:15px 13px;min-height:118px}.featureCard h3{font-size:15px}.featureIcon{font-size:27px}.studentActions .miniBtn{padding:7px 6px}.appTitle{font-size:21px}}
 
 
-.attendanceReminder{display:none;margin-top:18px;background:#fff7e6;border:1px solid #ffd88a;border-left:5px solid #e99b14;border-radius:15px;padding:13px 15px;color:#754b00;box-shadow:0 3px 12px rgba(20,30,60,.05);font-weight:700;line-height:1.45;}
+.attendanceReminder{display:none;flex-direction:column;gap:9px;margin-top:18px;background:transparent;border:0;padding:0;box-shadow:none;} .attendanceReminderItem{background:#fff7e6;border:1px solid #ffd88a;border-left:5px solid #e99b14;border-radius:15px;padding:13px 15px;color:#754b00;box-shadow:0 3px 12px rgba(20,30,60,.05);font-weight:700;line-height:1.45;}
 .thoughtCard{margin-top:14px;background:linear-gradient(135deg,#fff,#f4f1ff);border:1px solid #e5ddff;border-radius:17px;padding:16px;box-shadow:0 3px 14px rgba(20,30,60,.06);}
 .thoughtCardHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
 .myNotesHomeCard{background:linear-gradient(135deg,#fff,#f0f8ff);border-color:#d8e8f5;}
@@ -1458,9 +1458,38 @@ function renderHomeExtras(){
   const reminder=document.getElementById("attendanceReminder");
   if(reminder){
     const active=students.filter(s=>s.active!==false);const today=localDateKey();
-    const pending=active.filter(s=>!Array.isArray(s.attendance)||!s.attendance.some(a=>a.date===today));
-    if(active.length&&pending.length){reminder.style.display="block";reminder.textContent=pending.length===1?"📌 1 विद्यार्थी की आज की Attendance बाकी है।":"📌 "+pending.length+" विद्यार्थियों की आज की Attendance बाकी है।";}
-    else{reminder.style.display="none";reminder.textContent="";}
+    const todayPending=active.filter(s=>!Array.isArray(s.attendance)||!s.attendance.some(a=>a.date===today));
+    const boxes=[];
+    // Today's count stays anonymous, as requested.
+    if(active.length&&todayPending.length){
+      const todayText=todayPending.length===1?"1 विद्यार्थी की आज की Attendance बाकी है।":todayPending.length+" विद्यार्थियों की आज की Attendance बाकी है।";
+      boxes.push('<div class="attendanceReminderItem">📌 '+todayText+'</div>');
+    }
+    // Show missed past dates by student, without changing today's reminder.
+    const todayDate=new Date(today+'T12:00:00');
+    const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const formatMissedDate=(key)=>{const parts=key.split('-').map(Number);return parts[2]+' '+monthNames[parts[1]-1];};
+    active.forEach(st=>{
+      const startKey=st.joiningDate&&/^\d{4}-\d{2}-\d{2}$/.test(st.joiningDate)?st.joiningDate:today;
+      const cursor=new Date(startKey+'T12:00:00');
+      const missed=[];
+      while(cursor<todayDate){
+        const key=localDateKey(cursor);
+        // Sundays are not treated as missed attendance days.
+        if(cursor.getDay()!==0&&!(Array.isArray(st.attendance)&&st.attendance.some(a=>a&&a.date===key))){missed.push(key);}
+        cursor.setDate(cursor.getDate()+1);
+      }
+      if(missed.length){
+        const dates=missed.map(formatMissedDate);
+        let dateText='';
+        if(dates.length===1) dateText=dates[0];
+        else if(dates.length===2) dateText=dates[0]+' और '+dates[1];
+        else dateText=dates.slice(0,-1).join(', ')+' और '+dates[dates.length-1];
+        boxes.push('<div class="attendanceReminderItem">📌 '+escapeHtml(String(st.name||'विद्यार्थी'))+' का '+escapeHtml(dateText)+' का Attendance बाकी है।</div>');
+      }
+    });
+    reminder.innerHTML=boxes.join('');
+    reminder.style.display=boxes.length?'flex':'none';
   }
   const thought=getTodaysThought();const text=document.getElementById("homeThoughtText");if(text)text.textContent=thought.t;
   renderHomeNotes();
