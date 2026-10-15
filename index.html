@@ -322,9 +322,9 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .appShell{max-width:720px;margin:0 auto;padding:14px 14px 24px;}
 .appHeader{background:linear-gradient(135deg,#263b8f,#5b4bd8);color:#fff;border-radius:20px;padding:18px 18px 20px;box-shadow:0 8px 24px rgba(39,55,145,.22);position:relative;overflow:visible;}
 .appHeaderTop{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.appTitle{font-size:23px;font-weight:800;line-height:1.1;overflow-wrap:anywhere;white-space:normal;min-width:0;}
+.appTitle{font-size:23px;font-weight:800;line-height:1.1;overflow-wrap:anywhere;word-break:normal;white-space:normal;min-width:0;}
 .appSubtitle{font-size:13px;opacity:.82;margin-top:5px;}
-.headerActions{display:flex;align-items:center;gap:5px;}
+.headerActions{display:flex;align-items:center;gap:5px;flex:none;}
 .headerIconBtn{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .headerAdd{font-size:27px;font-weight:400;}
 #menuPopup{right:0!important;top:48px!important;min-width:215px!important;border-radius:14px!important;overflow:hidden;}
@@ -356,7 +356,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .pageHead p{margin:4px 0 0;color:#6b7280;font-size:13px;}
 .backHomeBtn{border:0;background:#fff;border-radius:11px;padding:9px 12px;font-weight:700;color:#3947a7;box-shadow:0 2px 8px rgba(0,0,0,.07);}
 .modernPanel{background:#fff;border-radius:18px;padding:15px;box-shadow:0 3px 14px rgba(20,30,60,.07);margin-bottom:13px;}
-.modernStudent{display:flex;align-items:center;gap:12px;padding:13px 2px;border-bottom:1px solid #eef0f4;}
+.modernStudent{display:flex;align-items:center;flex-wrap:nowrap;gap:10px;padding:13px 2px;border-bottom:1px solid #eef0f4;min-width:0;}
 .modernStudent:last-child{border-bottom:0;}
 
 .feeModeSwitch{display:flex;gap:8px;margin-top:14px;}
@@ -377,15 +377,15 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .feeCredited{color:#198754;font-weight:700;}
 .feePending{color:#b02a37;font-weight:700;}
 .feeStatusBlock{margin-top:5px;line-height:1.35;}
-.feeStatusLine{display:block;font-size:11.5px;font-weight:700;}
-.feeStatusMeta{display:block;font-size:11px;color:#606775;font-weight:600;margin-top:1px;}
+.feeStatusLine{display:block;font-size:10.5px;font-weight:700;white-space:normal;overflow-wrap:anywhere;line-height:1.25;}
+.feeStatusMeta{display:block;font-size:10px;color:#606775;font-weight:600;margin-top:1px;white-space:normal;overflow-wrap:anywhere;}
 .feeSummaryBox{margin-top:14px;padding:11px;background:#f6f7fb;border-radius:11px;font-weight:700;line-height:1.8;}
 .avatar{width:43px;height:43px;border-radius:14px;background:#eef2ff;color:#4b4fc4;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex:none;overflow:hidden;cursor:pointer;}
 .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-.studentMain{min-width:0;flex:1;}
-.studentMain b{display:block;font-size:16px;white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.35;}
+.studentMain{min-width:0;flex:1 1 auto;overflow-wrap:anywhere;}
+.studentMain b{display:block;font-size:16px;white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.25;}
 .studentMeta{font-size:12px;color:#7b8190;margin-top:3px;}
-.studentActions{display:flex;gap:5px;}
+.studentActions{display:flex;gap:5px;flex:none;white-space:nowrap;}
 .miniBtn{border:0;border-radius:9px;padding:8px 9px;background:#eef2ff;color:#3947a7;font-weight:700;font-size:12px;}
 .miniBtn.red{background:#fff0f0;color:#d33;}
 .previousStudentsBtn{width:100%;border:0;border-radius:12px;padding:11px 14px;background:#eef2ff;color:#3947a7;font-weight:800;font-size:14px;cursor:pointer;margin-top:8px;}
@@ -446,17 +446,20 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .thoughtCard{margin-top:14px;background:linear-gradient(135deg,#fff,#f4f1ff);border:1px solid #e5ddff;border-radius:17px;padding:16px;box-shadow:0 3px 14px rgba(20,30,60,.06);}
 .thoughtCardHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
 .thoughtCardHead h3{margin:0;font-size:16px;color:#44358d;}
-.thoughtText{font-size:16px;font-weight:700;line-height:1.7;color:#24213a;overflow-wrap:anywhere;}
+.thoughtText{font-size:18px;font-weight:700;line-height:1.65;color:#24213a;overflow-wrap:anywhere;word-break:normal;}
 .thoughtActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
 .thoughtBtn{border:0;border-radius:10px;padding:9px 12px;background:#5143b8;color:white;font-weight:700;cursor:pointer;}
 .thoughtBtn.secondary{background:#eeeaff;color:#44358d;}
 .thoughtSearch{width:100%;box-sizing:border-box;margin:0 0 12px!important;}
 .thoughtItem{padding:13px 0;border-bottom:1px solid #ececf4;}
+.thoughtItemTop{display:flex;align-items:flex-start;gap:9px;min-width:0;}
+.thoughtNumber{flex:none;min-width:24px;font-size:14px;font-weight:800;color:#5143b8;padding-top:1px;}
+.thoughtItemBody{flex:1;min-width:0;}
 .thoughtItem:last-child{border-bottom:0;}
 .thoughtCategory{font-size:11px;color:#6254b5;font-weight:800;margin-bottom:4px;}
 .thoughtItemText{font-size:14px;line-height:1.6;overflow-wrap:anywhere;}
 .thoughtItem .thoughtBtn{margin-top:8px;padding:7px 11px;font-size:12px;}
-@media(max-width:390px){.modernStudent{align-items:flex-start;flex-wrap:wrap}.studentMain{flex:1 1 calc(100% - 65px)}.studentActions{margin-left:55px}.thoughtText{font-size:15px}.appTitle{overflow-wrap:anywhere;}}
+@media(max-width:390px){.modernStudent{align-items:center;flex-wrap:nowrap;gap:8px}.studentMain{flex:1 1 auto;min-width:0}.studentActions{margin-left:0;flex:none;gap:4px}.studentActions .miniBtn{padding:7px 6px;font-size:11px}.thoughtText{font-size:17px}.appTitle{overflow-wrap:anywhere;}}
 </style>  
 </head>  
   <body>
@@ -683,6 +686,10 @@ Reset PIN
               <span class="modernMenuIcon">🔄</span>
               <span class="modernMenuLabel">Change Account</span>
             </div>
+            <div class="modernMenuItem" onclick="openThoughtsLibrary();toggleMenu();">
+              <span class="modernMenuIcon">🌱</span>
+              <span class="modernMenuLabel">सभी विचार</span>
+            </div>
             <div class="modernMenuAccount">
               <span id="googleEmailDisplay"></span>
               <span id="driveSyncStatus">Drive sync: checking…</span>
@@ -718,8 +725,7 @@ Reset PIN
         <div class="thoughtCardHead"><h3>🌱 आज का विचार</h3><span aria-hidden="true">✨</span></div>
         <div id="homeThoughtText" class="thoughtText">मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।</div>
         <div class="thoughtActions">
-          <button class="thoughtBtn" onclick="openThoughtsLibrary()">सभी विचार</button>
-          <button class="thoughtBtn secondary" onclick="resetTodayThought()">आज का सामान्य विचार</button>
+          <button class="thoughtBtn" onclick="openThoughtsLibrary()">विचार देखें</button>
         </div>
       </div>
     </section>
@@ -1084,7 +1090,7 @@ function renderThoughtsLibrary(){
   const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLowerCase();
   const items=HINDI_THOUGHTS.map((thought,index)=>({...thought,index})).filter(x=>(x.t+" "+x.c).toLowerCase().includes(query));
   if(!items.length){area.innerHTML='<div class="emptyState">कोई विचार नहीं मिला।</div>';return;}
-  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtCategory">'+escapeHtml(x.c)+'</div><div class="thoughtItemText">'+escapeHtml(x.t)+'</div><button class="thoughtBtn" onclick="setTodayThought('+x.index+')">आज का विचार बनाएँ</button></div>').join('');
+  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.c)+'</div><div class="thoughtItemText">'+escapeHtml(x.t)+'</div></div></div><button class="thoughtBtn" onclick="setTodayThought('+x.index+')">आज के लिए सेट करें</button></div>').join('');
 }
 
 function getOwnerName() {
@@ -1114,7 +1120,7 @@ function updateOwnerNameDisplay() {
   const welcomeName = document.getElementById("welcomeName");
 
   if (nameDisplay) nameDisplay.textContent = name || "Set Your Name";
-  if (welcomeName) welcomeName.textContent = name || "Welcome";
+  if (welcomeName) { welcomeName.textContent = name || "Welcome"; welcomeName.style.overflowWrap = "anywhere"; welcomeName.style.wordBreak = "normal"; }
 }
 
 function editOwnerName() {
