@@ -307,7 +307,7 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
 .modernMenuPopup .modernMenuItem:active{background:#f2f4ff;}
 .modernMenuProfile{min-height:58px;box-sizing:border-box;padding:10px 12px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;background:#fff;}
 .modernMenuProfileName{min-width:0;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:#202638;}
-.modernMenuProfileName #ownerNameDisplay{min-width:0;max-width:185px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.modernMenuProfileName #ownerNameDisplay{min-width:0;max-width:185px;overflow-wrap:anywhere;white-space:normal;}
 .ownerEditBtn{width:34px;height:34px;flex:0 0 34px;border:0;border-radius:9px;background:#eef2ff;color:#3947a7;font-size:21px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .ownerEditBtn:active{background:#dde3ff;}
 .modernMenuIcon{width:30px;min-width:30px;text-align:center;font-size:22px;line-height:1;}
@@ -322,7 +322,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .appShell{max-width:720px;margin:0 auto;padding:14px 14px 24px;}
 .appHeader{background:linear-gradient(135deg,#263b8f,#5b4bd8);color:#fff;border-radius:20px;padding:18px 18px 20px;box-shadow:0 8px 24px rgba(39,55,145,.22);position:relative;overflow:visible;}
 .appHeaderTop{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.appTitle{font-size:23px;font-weight:800;line-height:1.1;}
+.appTitle{font-size:23px;font-weight:800;line-height:1.1;overflow-wrap:anywhere;white-space:normal;min-width:0;}
 .appSubtitle{font-size:13px;opacity:.82;margin-top:5px;}
 .headerActions{display:flex;align-items:center;gap:5px;}
 .headerIconBtn{width:40px;height:40px;border:0;border-radius:12px;background:rgba(255,255,255,.15);color:#fff;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
@@ -383,7 +383,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .avatar{width:43px;height:43px;border-radius:14px;background:#eef2ff;color:#4b4fc4;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex:none;overflow:hidden;cursor:pointer;}
 .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
 .studentMain{min-width:0;flex:1;}
-.studentMain b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.studentMain b{display:block;font-size:16px;white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.35;}
 .studentMeta{font-size:12px;color:#7b8190;margin-top:3px;}
 .studentActions{display:flex;gap:5px;}
 .miniBtn{border:0;border-radius:9px;padding:8px 9px;background:#eef2ff;color:#3947a7;font-weight:700;font-size:12px;}
@@ -411,7 +411,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .attendanceRow:last-child{border-bottom:0;}
 .attendanceAvatar{width:40px;height:40px;border-radius:13px;background:#eef2ff;color:#4b4fc4;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex:none;overflow:hidden;}
 .attendanceAvatar img{width:100%;height:100%;object-fit:cover;display:block;}
-.attendanceName{font-size:15px;font-weight:700;min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.attendanceName{font-size:15px;font-weight:700;min-width:0;flex:1;white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.25;}
 .attendanceChoices{display:flex;align-items:center;gap:5px;flex:none;}
 .attendanceChoice{width:31px;height:31px;padding:0;border:1px solid #d8dce5;border-radius:9px;background:#f8f9fc;color:#4b5563;font-weight:800;font-size:12px;cursor:pointer;}
 .attendanceChoice.selected{color:#fff;transform:scale(1.04);box-shadow:0 0 0 2px rgba(0,0,0,.10);}
@@ -441,6 +441,22 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .navItem.active{color:#3947a7;}
 @media(max-width:390px){.featureGrid{gap:9px}.featureCard{padding:15px 13px;min-height:118px}.featureCard h3{font-size:15px}.featureIcon{font-size:27px}.studentActions .miniBtn{padding:7px 6px}.appTitle{font-size:21px}}
 
+
+.attendanceReminder{display:none;margin-top:18px;background:#fff7e6;border:1px solid #ffd88a;border-left:5px solid #e99b14;border-radius:15px;padding:13px 15px;color:#754b00;box-shadow:0 3px 12px rgba(20,30,60,.05);font-weight:700;line-height:1.45;}
+.thoughtCard{margin-top:14px;background:linear-gradient(135deg,#fff,#f4f1ff);border:1px solid #e5ddff;border-radius:17px;padding:16px;box-shadow:0 3px 14px rgba(20,30,60,.06);}
+.thoughtCardHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;}
+.thoughtCardHead h3{margin:0;font-size:16px;color:#44358d;}
+.thoughtText{font-size:16px;font-weight:700;line-height:1.7;color:#24213a;overflow-wrap:anywhere;}
+.thoughtActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.thoughtBtn{border:0;border-radius:10px;padding:9px 12px;background:#5143b8;color:white;font-weight:700;cursor:pointer;}
+.thoughtBtn.secondary{background:#eeeaff;color:#44358d;}
+.thoughtSearch{width:100%;box-sizing:border-box;margin:0 0 12px!important;}
+.thoughtItem{padding:13px 0;border-bottom:1px solid #ececf4;}
+.thoughtItem:last-child{border-bottom:0;}
+.thoughtCategory{font-size:11px;color:#6254b5;font-weight:800;margin-bottom:4px;}
+.thoughtItemText{font-size:14px;line-height:1.6;overflow-wrap:anywhere;}
+.thoughtItem .thoughtBtn{margin-top:8px;padding:7px 11px;font-size:12px;}
+@media(max-width:390px){.modernStudent{align-items:flex-start;flex-wrap:wrap}.studentMain{flex:1 1 calc(100% - 65px)}.studentActions{margin-left:55px}.thoughtText{font-size:15px}.appTitle{overflow-wrap:anywhere;}}
 </style>  
 </head>  
   <body>
@@ -697,6 +713,22 @@ Reset PIN
           <span class="featureIcon">📊</span><h3>Reports</h3><p>View monthly reports</p>
         </button>
       </div>
+      <div id="attendanceReminder" class="attendanceReminder" role="status"></div>
+      <div class="thoughtCard" id="homeThoughtCard">
+        <div class="thoughtCardHead"><h3>🌱 आज का विचार</h3><span aria-hidden="true">✨</span></div>
+        <div id="homeThoughtText" class="thoughtText">मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।</div>
+        <div class="thoughtActions">
+          <button class="thoughtBtn" onclick="openThoughtsLibrary()">सभी विचार</button>
+          <button class="thoughtBtn secondary" onclick="resetTodayThought()">आज का सामान्य विचार</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="thoughtsSection" class="section">
+      <div class="pageHead"><div><h2>हिंदी विचार</h2><p>शिक्षा, मेहनत, अनुशासन और जीवन</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="modernPanel">
+        <input id="thoughtSearchInput" class="thoughtSearch" type="search" placeholder="विचार खोजें..." oninput="renderThoughtsLibrary()" autocomplete="off">
+        <div id="thoughtsLibraryArea"></div>
       </div>
     </section>
 
@@ -890,6 +922,171 @@ function getOwnerNameKey() {
   return currentAccountKey ? OWNER_NAME_KEY_PREFIX + currentAccountKey : "tuitionOwnerName_v1";
 }
 
+function getThoughtPreferenceKey(){
+  return "tuitionThoughtOfDay_v1_" + (currentAccountKey || "local");
+}
+function localDateKey(date=new Date()){
+  return date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0")+"-"+String(date.getDate()).padStart(2,"0");
+}
+const HINDI_THOUGHTS = [
+{c:"शिक्षा",t:"शिक्षा का असली उद्देश्य केवल अंक पाना नहीं, समझ विकसित करना है।"},
+{c:"शिक्षा",t:"एक अच्छा शिक्षक उत्तर देने से अधिक, सही प्रश्न पूछना सिखाता है।"},
+{c:"शिक्षा",t:"सीखना तब शुरू होता है जब हम अपनी गलती स्वीकार करते हैं।"},
+{c:"शिक्षा",t:"ज्ञान वही उपयोगी है जो व्यवहार में दिखाई दे।"},
+{c:"शिक्षा",t:"हर विद्यार्थी की गति अलग हो सकती है, पर सीखने का अवसर सबको मिलना चाहिए।"},
+{c:"शिक्षा",t:"पढ़ाई बोझ नहीं, अपनी संभावनाओं को पहचानने का साधन है।"},
+{c:"शिक्षा",t:"शिक्षक का धैर्य विद्यार्थी के आत्मविश्वास को मजबूत करता है।"},
+{c:"शिक्षा",t:"रटने से उत्तर मिल सकता है, समझने से दृष्टि मिलती है।"},
+{c:"शिक्षा",t:"कक्षा में छोटी जिज्ञासा भी बड़े ज्ञान का दरवाजा खोल सकती है।"},
+{c:"शिक्षा",t:"अच्छी शिक्षा व्यक्ति को स्वतंत्र सोचने की क्षमता देती है।"},
+{c:"शिक्षा",t:"विद्यार्थी को केवल सही उत्तर नहीं, सही तरीका भी सिखाएँ।"},
+{c:"शिक्षा",t:"सीखने की आदत जीवन भर काम आती है।"},
+{c:"शिक्षा",t:"पुस्तक रास्ता दिखाती है, अभ्यास उस रास्ते पर चलना सिखाता है।"},
+{c:"शिक्षा",t:"शिक्षा का मूल्य परीक्षा के बाद भी बना रहना चाहिए।"},
+{c:"शिक्षा",t:"जो आज ध्यान से सीखता है, वह कल आत्मविश्वास से निर्णय लेता है।"},
+{c:"शिक्षा",t:"शिक्षक का काम केवल पाठ पूरा करना नहीं, समझ पूरी करना है।"},
+{c:"शिक्षा",t:"जिज्ञासा को दबाएँ नहीं; उसे सही दिशा दें।"},
+{c:"शिक्षा",t:"ज्ञान बाँटने से घटता नहीं, समाज में बढ़ता है।"},
+{c:"शिक्षा",t:"सवाल पूछना कमजोरी नहीं, सीखने की शुरुआत है।"},
+{c:"शिक्षा",t:"अच्छा विद्यार्थी वह नहीं जो कभी गलती न करे, बल्कि वह जो गलती से सीखे।"},
+{c:"विद्यार्थी",t:"आपका भविष्य आज की छोटी-छोटी आदतों से बन रहा है।"},
+{c:"विद्यार्थी",t:"तुलना दूसरों से नहीं, अपने कल के प्रयास से करें।"},
+{c:"विद्यार्थी",t:"अंक आपकी एक उपलब्धि बताते हैं, आपकी पूरी क्षमता नहीं।"},
+{c:"विद्यार्थी",t:"लक्ष्य स्पष्ट हो तो समय का उपयोग भी बेहतर होता है।"},
+{c:"विद्यार्थी",t:"हर दिन थोड़ा सीखना, कभी-कभी बहुत पढ़ने से अधिक टिकाऊ है।"},
+{c:"विद्यार्थी",t:"अपनी जिज्ञासा को जीवित रखें और अपने प्रयास को नियमित रखें।"},
+{c:"विद्यार्थी",t:"असफल प्रयास भी बताते हैं कि अगली बार क्या बदलना है।"},
+{c:"विद्यार्थी",t:"अपने सपनों को योजना और अभ्यास का सहारा दें।"},
+{c:"विद्यार्थी",t:"पढ़ाई में निरंतरता, आखिरी समय की घबराहट से बेहतर है।"},
+{c:"विद्यार्थी",t:"अपनी क्षमता पर भरोसा रखें, लेकिन तैयारी को उसका प्रमाण बनाएँ।"},
+{c:"विद्यार्थी",t:"आज का अभ्यास कल की कठिनाई को थोड़ा आसान बना सकता है।"},
+{c:"विद्यार्थी",t:"मोबाइल को साधन बनाएँ, अपने समय का मालिक नहीं।"},
+{c:"विद्यार्थी",t:"कठिन अध्याय से भागने के बजाय उसे छोटे हिस्सों में बाँटें।"},
+{c:"विद्यार्थी",t:"अपने लक्ष्य के लिए रोज एक काम पूरा करना भी प्रगति है।"},
+{c:"विद्यार्थी",t:"सही दिशा में किया गया छोटा प्रयास भी मायने रखता है।"},
+{c:"विद्यार्थी",t:"परीक्षा की तैयारी में नींद, स्वास्थ्य और नियमितता भी जरूरी हैं।"},
+{c:"विद्यार्थी",t:"अपनी जिज्ञासा को दूसरों की राय से छोटा न होने दें।"},
+{c:"विद्यार्थी",t:"समय पर शुरुआत करने से सीखने के लिए जगह बनती है।"},
+{c:"विद्यार्थी",t:"हर दिन खुद से पूछें—आज मैंने क्या नया समझा?"},
+{c:"विद्यार्थी",t:"भविष्य की चिंता से बेहतर है वर्तमान की तैयारी।"},
+{c:"मेहनत",t:"मेहनत का अर्थ केवल अधिक काम नहीं, सही काम लगातार करना है।"},
+{c:"मेहनत",t:"छोटे प्रयास जब नियमित होते हैं, तो बड़ा बदलाव लाते हैं।"},
+{c:"मेहनत",t:"प्रतिभा शुरुआत में मदद करती है, अभ्यास उसे निखारता है।"},
+{c:"मेहनत",t:"आराम जरूरी है, लेकिन लगातार टालना प्रगति रोक देता है।"},
+{c:"मेहनत",t:"आज की ईमानदार मेहनत कल पछतावे को कम करती है।"},
+{c:"मेहनत",t:"सफलता अक्सर उन कामों के पीछे होती है जिन्हें हम रोज दोहराते हैं।"},
+{c:"मेहनत",t:"कठिनाई यह बताती है कि कौशल को कहाँ मजबूत करना है।"},
+{c:"मेहनत",t:"धीमी प्रगति भी प्रगति है, यदि दिशा सही हो।"},
+{c:"मेहनत",t:"शुरुआत छोटी रखें, लेकिन उसे नियमित बनाएँ।"},
+{c:"मेहनत",t:"केवल इच्छा से नहीं, अभ्यास से क्षमता बढ़ती है।"},
+{c:"मेहनत",t:"हर दिन का एक केंद्रित घंटा भी बहुत कुछ बदल सकता है।"},
+{c:"मेहनत",t:"मुश्किल काम को टालने से वह छोटा नहीं होता; शुरू करने से रास्ता खुलता है।"},
+{c:"मेहनत",t:"परिणाम हमेशा तुरंत नहीं आते, पर अभ्यास अपना असर छोड़ता है।"},
+{c:"मेहनत",t:"अपने प्रयास को मापें, केवल दूसरों की सफलता को नहीं।"},
+{c:"मेहनत",t:"लगातार कोशिश का अर्थ वही गलती दोहराना नहीं, उससे सीखना है।"},
+{c:"मेहनत",t:"अनुशासित मेहनत लक्ष्य को रोजमर्रा की आदत बना देती है।"},
+{c:"मेहनत",t:"जो काम महत्वपूर्ण है, उसे केवल मन होने पर न करें।"},
+{c:"मेहनत",t:"थोड़ा-थोड़ा सुधार लंबे समय में बड़ा अंतर बनाता है।"},
+{c:"मेहनत",t:"थकान में विराम लें, लेकिन अपने उद्देश्य को न भूलें।"},
+{c:"मेहनत",t:"आज का सबसे जरूरी काम पहले पूरा करने की कोशिश करें।"},
+{c:"अनुशासन",t:"अनुशासन वह निर्णय है जो हम अपने लक्ष्य के पक्ष में रोज लेते हैं।"},
+{c:"अनुशासन",t:"समय की इज्जत करने वाला व्यक्ति अपने अवसरों की भी इज्जत करता है।"},
+{c:"अनुशासन",t:"नियमितता प्रेरणा पर निर्भर रहने की जरूरत कम करती है।"},
+{c:"अनुशासन",t:"जो काम तय किया है, उसे पूरा करने की आदत भरोसा बनाती है।"},
+{c:"अनुशासन",t:"अपनी दिनचर्या को इतना सरल रखें कि उसे निभाया जा सके।"},
+{c:"अनुशासन",t:"ध्यान भटकना सामान्य है; ध्यान वापस लाना अभ्यास है।"},
+{c:"अनुशासन",t:"अनुशासन खुद को सजा देना नहीं, खुद की मदद करना है।"},
+{c:"अनुशासन",t:"काम के समय काम और विश्राम के समय विश्राम करें।"},
+{c:"अनुशासन",t:"दिन की योजना बनाना समय को दिशा देना है।"},
+{c:"अनुशासन",t:"छोटी अच्छी आदतें बड़े संकल्पों को टिकाऊ बनाती हैं।"},
+{c:"अनुशासन",t:"वादा कम करें, निभाने की कोशिश पूरी करें।"},
+{c:"अनुशासन",t:"अपने आसपास का व्यवस्थित वातावरण ध्यान लगाने में मदद करता है।"},
+{c:"अनुशासन",t:"जरूरी काम को सुविधा के भरोसे न छोड़ें।"},
+{c:"अनुशासन",t:"सीमाएँ तय करना अपने समय और ऊर्जा की रक्षा करना है।"},
+{c:"अनुशासन",t:"हर दिन की शुरुआत एक स्पष्ट प्राथमिकता से करें।"},
+{c:"अनुशासन",t:"टालने की आदत को तोड़ने के लिए बस पहला छोटा कदम उठाएँ।"},
+{c:"अनुशासन",t:"आदतें धीरे बनती हैं; धैर्य से उन्हें मजबूत करें।"},
+{c:"अनुशासन",t:"अपने फैसलों को अपने मूल्यों के अनुरूप रखने का अभ्यास करें।"},
+{c:"अनुशासन",t:"नियमित समीक्षा से पता चलता है कि कौन-सी आदत काम कर रही है।"},
+{c:"अनुशासन",t:"अनुशासन आजादी छीनता नहीं, सही चुनाव की क्षमता बढ़ाता है।"},
+{c:"आत्मविकास",t:"अपनी गलती मान लेना सुधार की दिशा में पहला कदम है।"},
+{c:"आत्मविकास",t:"खुद को समझना, खुद को बदलने की शुरुआत है।"},
+{c:"आत्मविकास",t:"हर आलोचना सही नहीं होती, लेकिन हर प्रतिक्रिया पर विचार किया जा सकता है।"},
+{c:"आत्मविकास",t:"दूसरों को सुनना सीखना भी बुद्धिमत्ता का हिस्सा है।"},
+{c:"आत्मविकास",t:"अपने विचारों को परखें; केवल परिचित होने से वे सही नहीं हो जाते।"},
+{c:"आत्मविकास",t:"आत्मविश्वास तैयारी और अनुभव से मजबूत होता है।"},
+{c:"आत्मविकास",t:"सुधार की शुरुआत दोष ढूँढ़ने से नहीं, जिम्मेदारी लेने से होती है।"},
+{c:"आत्मविकास",t:"हर दिन कुछ नया सीखने के लिए मन खुला रखें।"},
+{c:"आत्मविकास",t:"अपनी सीमाओं को पहचानें और उन्हें धीरे-धीरे आगे बढ़ाएँ।"},
+{c:"आत्मविकास",t:"शांत होकर सोचना, जल्दबाजी में प्रतिक्रिया देने से बेहतर है।"},
+{c:"आत्मविकास",t:"अपनी ऊर्जा उन कामों पर लगाएँ जिन पर आपका प्रभाव है।"},
+{c:"आत्मविकास",t:"गलत साबित होना सीखने का अवसर हो सकता है।"},
+{c:"आत्मविकास",t:"खुद से ईमानदार रहना विकास के लिए जरूरी है।"},
+{c:"आत्मविकास",t:"बेहतर बनने के लिए पहले अपनी वर्तमान स्थिति को साफ-साफ देखें।"},
+{c:"आत्मविकास",t:"किसी की मदद करना अपने कौशल और संवेदना दोनों को बढ़ाता है।"},
+{c:"आत्मविकास",t:"अच्छी आदतें बनाने के लिए इच्छाशक्ति के साथ व्यवस्था भी बनाएं।"},
+{c:"आत्मविकास",t:"अपने निर्णयों के परिणाम से सीखें, केवल खुद को दोष न दें।"},
+{c:"आत्मविकास",t:"नई चीज सीखते समय शुरुआती गलतियों को जगह दें।"},
+{c:"आत्मविकास",t:"अपने वचन और व्यवहार में मेल रखने की कोशिश करें।"},
+{c:"आत्मविकास",t:"धैर्य का अर्थ निष्क्रिय रहना नहीं, सही प्रयास जारी रखना है।"},
+{c:"जीवन",t:"जीवन में दिशा का महत्व गति से कम नहीं है।"},
+{c:"जीवन",t:"हर दिन नया अवसर नहीं लगता, लेकिन हर दिन एक छोटा चुनाव जरूर देता है।"},
+{c:"जीवन",t:"दूसरों के प्रति सम्मान और अपने प्रति ईमानदारी साथ चल सकते हैं।"},
+{c:"जीवन",t:"जो बदल सकते हैं उस पर काम करें, जो नहीं बदल सकते उसे समझें।"},
+{c:"जीवन",t:"सच्ची प्रगति में ज्ञान, जिम्मेदारी और संवेदना तीनों शामिल हैं।"},
+{c:"जीवन",t:"सुविधा और सही होने में अंतर हो सकता है; सोचकर चुनाव करें।"},
+{c:"जीवन",t:"कठिन समय में छोटे सही कदम भी महत्वपूर्ण होते हैं।"},
+{c:"जीवन",t:"दूसरों की सफलता से प्रेरणा लें, अपनी कीमत का फैसला नहीं।"},
+{c:"जीवन",t:"धन और उपलब्धि उपयोगी हैं, पर उनका उपयोग भी उतना ही महत्वपूर्ण है।"},
+{c:"जीवन",t:"सम्मान माँगने से अधिक, अपने व्यवहार में सम्मान दिखाएँ।"},
+{c:"जीवन",t:"सुनना, समझना और फिर बोलना रिश्तों को बेहतर बनाता है।"},
+{c:"जीवन",t:"समस्या को साफ समझ लेना समाधान की आधी तैयारी है।"},
+{c:"जीवन",t:"सही निर्णय हमेशा आसान नहीं, लेकिन सोच-विचार से बेहतर बनते हैं।"},
+{c:"जीवन",t:"कृतज्ञता का अर्थ समस्याओं को नकारना नहीं, अच्छी चीजों को भी देखना है।"},
+{c:"जीवन",t:"अपने काम का असर दूसरों पर भी पड़ता है; जिम्मेदारी से काम करें।"},
+{c:"जीवन",t:"समय सीमित है, इसलिए उसे महत्वपूर्ण कामों में लगाना सीखें।"},
+{c:"जीवन",t:"आदमी की पहचान केवल बातों से नहीं, रोज के व्यवहार से बनती है।"},
+{c:"जीवन",t:"सही सवाल कई बार जल्दबाजी के जवाब से ज्यादा मूल्यवान होता है।"},
+{c:"जीवन",t:"जीवन को बेहतर बनाने के लिए हर चीज बदलना जरूरी नहीं; एक आदत से शुरू करें।"},
+{c:"जीवन",t:"अपनी जिम्मेदारी निभाते हुए दूसरों के लिए भी जगह बनाएँ।"}
+];
+function getNormalThought(){
+  const day=Math.floor(new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()).getTime()/86400000);
+  return HINDI_THOUGHTS[((day%HINDI_THOUGHTS.length)+HINDI_THOUGHTS.length)%HINDI_THOUGHTS.length];
+}
+function getTodaysThought(){
+  const key=getThoughtPreferenceKey();
+  try{const saved=JSON.parse(localStorage.getItem(key)||"null");if(saved&&saved.date===localDateKey()&&Number.isInteger(saved.index)&&HINDI_THOUGHTS[saved.index])return HINDI_THOUGHTS[saved.index];}catch(e){}
+  return getNormalThought();
+}
+function setTodayThought(index){
+  if(!Number.isInteger(index)||!HINDI_THOUGHTS[index])return;
+  localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),index:index}));
+  renderHomeExtras();
+  alert("यह विचार आज के लिए Home Page पर सेट हो गया है।");
+}
+function resetTodayThought(){localStorage.removeItem(getThoughtPreferenceKey());renderHomeExtras();}
+function renderHomeExtras(){
+  const reminder=document.getElementById("attendanceReminder");
+  if(reminder){
+    const active=students.filter(s=>s.active!==false);
+    const today=localDateKey();
+    const pending=active.filter(s=>!Array.isArray(s.attendance)||!s.attendance.some(a=>a.date===today));
+    if(active.length&&pending.length){reminder.style.display="block";reminder.textContent=pending.length===1?"📌 1 विद्यार्थी की आज की Attendance बाकी है।":"📌 "+pending.length+" विद्यार्थियों की आज की Attendance बाकी है।";}
+    else{reminder.style.display="none";reminder.textContent="";}
+  }
+  const thought=getTodaysThought();
+  const text=document.getElementById("homeThoughtText");if(text)text.textContent=thought.t;
+}
+function openThoughtsLibrary(){showSection("thoughtsSection","homeNav");renderThoughtsLibrary();}
+function renderThoughtsLibrary(){
+  const area=document.getElementById("thoughtsLibraryArea");if(!area)return;
+  const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLowerCase();
+  const items=HINDI_THOUGHTS.map((thought,index)=>({...thought,index})).filter(x=>(x.t+" "+x.c).toLowerCase().includes(query));
+  if(!items.length){area.innerHTML='<div class="emptyState">कोई विचार नहीं मिला।</div>';return;}
+  area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtCategory">'+escapeHtml(x.c)+'</div><div class="thoughtItemText">'+escapeHtml(x.t)+'</div><button class="thoughtBtn" onclick="setTodayThought('+x.index+')">आज का विचार बनाएँ</button></div>').join('');
+}
+
 function getOwnerName() {
   return (localStorage.getItem(getOwnerNameKey()) || "").trim();
 }
@@ -983,6 +1180,7 @@ function setDriveSyncStatus(text, type) {
 
 function saveLocalData(markPending = true) {
   localStorage.setItem(getDataKey(), JSON.stringify(students));
+  renderHomeExtras();
 
   if (markPending && currentAccountKey) {
     const meta = getSyncMeta();
@@ -1469,7 +1667,8 @@ function sectionNavId(sectionId){
     studentsSection:'studentsNav',
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
-    reportsSection:'reportsNav'
+    reportsSection:'reportsNav',
+    thoughtsSection:'homeNav'
   };
   return map[sectionId] || 'homeNav';
 }
@@ -1495,6 +1694,8 @@ function showSection(sectionId, navId, fromHistory){
   if(sectionId==='studentsSection') renderStudentsPage();
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='reportsSection') renderReports();
+  if(sectionId==='thoughtsSection') renderThoughtsLibrary();
+  renderHomeExtras();
 }
 
 function goHome(){
@@ -1954,6 +2155,7 @@ function render(){
   renderReports();
   renderStudentsPage();
   renderFeesPage();
+  renderHomeExtras();
 }
 
 function customStatus(index){
@@ -3373,6 +3575,7 @@ async function initializeApp(){
       updateOwnerNameDisplay();
     }
     render();
+    renderHomeExtras();
     checkLock();
 
     // Re-obtain a short-lived Drive token after every page load.
