@@ -534,238 +534,189 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 
 
 
-/* Theme system: colorful light surfaces and a complete dark palette */
-body:not(.theme-dark){
-  background:linear-gradient(180deg,#f5f8ff 0%,#fff8e8 48%,#f7d978 100%) fixed!important;
-  color:#182230;
-}
-body.theme-dark{
-  background:#111214!important;
-  color:#f3f4f6!important;
-  color-scheme:dark;
-}
-body.theme-dark .appShell{color:#f3f4f6;}
-body.theme-dark .dashboardWelcome p,
-body.theme-dark .pageHead p,
-body.theme-dark .studentMeta,
-body.theme-dark .feeDetailsJoining,
-body.theme-dark .feeStatusMeta{color:#a7adba!important;}
-body.theme-dark .card,
-body.theme-dark .quickBox,
-body.theme-dark .modernPanel,
-body.theme-dark .attendanceDateBox,
-body.theme-dark .popupContent,
-body.theme-dark .thoughtItem,
-body.theme-dark .myNoteCard,
-body.theme-dark .noteCard,
-body.theme-dark .reportCard,
-body.theme-dark .feeSummaryBox,
-body.theme-dark .personalThoughtEditor,
-body.theme-dark .thoughtSourcePanel,
-body.theme-dark .savedFeeIntervalUse,
-body.theme-dark .backHomeBtn,
-body.theme-dark .quickBtn,
-body.theme-dark .student,
-body.theme-dark .emptyStateBox{
-  background:#1d2026!important;
-  color:#f3f4f6!important;
-  border-color:#343943!important;
-  box-shadow:0 3px 14px rgba(0,0,0,.22)!important;
-}
-body.theme-dark .modernStudent,
-body.theme-dark .attendanceRow,
-body.theme-dark .feeDetailRow,
-body.theme-dark .trashStudent,
-body.theme-dark .previousStudentsTitle,
-body.theme-dark .modernMenuItem{border-color:#343943!important;}
-body.theme-dark input:not([type="checkbox"]),
-body.theme-dark select,
-body.theme-dark textarea,
-body.theme-dark .personalThoughtEditor textarea{
-  background:#282c34!important;color:#f3f4f6!important;border-color:#454c58!important;
-}
-body.theme-dark input::placeholder,
-body.theme-dark textarea::placeholder{color:#a0a7b4!important;}
-body.theme-dark .bottomNav{background:rgba(25,27,32,.97)!important;border-color:#353943!important;}
-body.theme-dark .navItem{color:#b8bec9!important;}
-body.theme-dark .navItem.active{color:#9da8ff!important;}
-body.theme-dark #menuPopup,
-body.theme-dark #menuPopup>div,
-body.theme-dark #menuPopup .modernMenuProfile,
-body.theme-dark #menuPopup .modernMenuItem,
-body.theme-dark #menuPopup .modernMenuAccount{
-  background:#20232a!important;color:#f3f4f6!important;border-color:#383e49!important;
-}
-body.theme-dark #menuPopup .modernMenuLabel,
-body.theme-dark #menuPopup .modernMenuItem,
-body.theme-dark #menuPopup .modernMenuProfileName,
-body.theme-dark #menuPopup .modernMenuAccount,
-body.theme-dark #menuPopup #googleEmailDisplay{color:#f3f4f6!important;}
-body.theme-dark #menuPopup .ownerEditBtn{background:#343a49!important;color:#dce1ff!important;}
-body.theme-dark .thoughtTabs{background:#292d36!important;}
-body.theme-dark .thoughtTab{color:#c7cbd4!important;}
-body.theme-dark .thoughtSourceTitle,
-body.theme-dark .personalThoughtEditor label{color:#e5e7eb!important;}
-body.theme-dark .thoughtSourceCompact{background:#292d36!important;border-color:#3b414d!important;color:#d1d5db!important;}
-body.theme-dark .thoughtSourceChip{background:#242832!important;color:#c7caff!important;border-color:#444b59!important;}
-body.theme-dark .feeDetailsName,
-body.theme-dark .feeDetailsSectionTitle,
-body.theme-dark .studentMain,
-body.theme-dark .modernPanel h2,
-body.theme-dark .modernPanel h3,
-body.theme-dark .pageHead h2{color:#f3f4f6!important;}
-body.theme-dark .status,
-body.theme-dark .summary{filter:brightness(.78) saturate(.9);}
-body.theme-dark .modernMenuItem:active{background:#303642!important;}
-body.theme-dark .emptyState{color:#aeb5c1!important;}
-body.theme-dark .developerEmailBtn{background:#282c34!important;color:#f3f4f6!important;border-color:#454c58!important;}
-.themeMenuItem{min-height:52px;}
-.themeMenuItem .modernMenuLabel{font-weight:700;}
+/* ===== Dark mode + readability and colorful highlights ===== */
+body.darkMode{background:#0d1018!important;color:#edf1ff!important;}
+body.darkMode .appHeader{background:linear-gradient(125deg,#172b66 0%,#4931a6 55%,#713fc1 100%);box-shadow:0 12px 30px rgba(39,45,145,.35);}
+body.darkMode .card,body.darkMode .modernPanel,body.darkMode .quickBox,body.darkMode .attendanceDateBox,body.darkMode #reportArea .student,body.darkMode .thoughtCard,body.darkMode .myNoteItem{background:linear-gradient(145deg,#202633,#171c27)!important;color:#f2f4ff!important;border:1px solid #303b52!important;box-shadow:0 8px 22px rgba(0,0,0,.30)!important;}
+body.darkMode .pageHead h2,body.darkMode .dashboardWelcome h2,body.darkMode .modernPanel h3,body.darkMode .quickTitle,body.darkMode .feeDetailsSectionTitle{color:#f5f2ff!important;}
+body.darkMode .pageHead p,body.darkMode .dashboardWelcome p,body.darkMode .studentMeta,body.darkMode .feeDetailsJoining,body.darkMode .feeStatusMeta,body.darkMode .attendanceDateBox label,body.darkMode #attendanceLegend{color:#b8c3d9!important;}
+body.darkMode .studentMain b,body.darkMode .attendanceName,body.darkMode .feeDetailsName,body.darkMode .trashStudentName,body.darkMode #reportArea .student b,body.darkMode .reportStudentName,body.darkMode .studentName,body.darkMode .modernStudent .studentMain b{color:#ffd978!important;text-shadow:0 0 12px rgba(255,204,90,.22);font-weight:900;letter-spacing:.15px;}
+body.darkMode .avatar,body.darkMode .attendanceAvatar{background:linear-gradient(145deg,#303b78,#6847bd)!important;color:#fff!important;border:1px solid #8b83f0;box-shadow:0 5px 12px rgba(0,0,0,.35),inset 0 1px 4px rgba(255,255,255,.22);}
+body.darkMode .studentSearchPanel{padding:9px!important;}
+body.darkMode .searchWrap{background:#242b39!important;border:1px solid #48536b!important;padding:0 9px!important;min-height:48px!important;box-shadow:inset 0 2px 5px rgba(0,0,0,.25);}
+body.darkMode .searchWrap input{background:transparent!important;color:#fff!important;padding:8px 0!important;}
+body.darkMode .searchWrap input::placeholder{color:#b3bfd5!important;}
+body.darkMode .searchIcon{color:#f7cf73!important;}
+body.darkMode .feeDetailsPopupContent,body.darkMode .popupContent,body.darkMode .developerPopupContent{background:#1c222e!important;color:#f1f4ff!important;border:1px solid #39445a!important;}
+body.darkMode .developerPopupContent h3,body.darkMode .developerPopupByline,body.darkMode .developerEmailBtn{color:#edf1ff!important;}
+body.darkMode .developerEmailBtn{background:#293246!important;border-color:#52617e!important;}
+body.darkMode .feeDetailsName{color:#ffe08a!important;font-size:23px;text-shadow:0 0 14px rgba(255,207,95,.28);}
+body.darkMode .feeCredited{color:#42e38b!important;font-weight:900;text-shadow:0 0 9px rgba(43,220,125,.22);}
+body.darkMode .feePending{color:#ff727d!important;font-weight:900;text-shadow:0 0 9px rgba(255,80,95,.18);}
+body.darkMode .feeDetailPeriod{color:#e8edff!important;}
+body.darkMode .feeDetailRow{border-bottom-color:#394253!important;}
+body.darkMode .feeDetailRow>span:not(.feeCredited):not(.feePending){color:#c5cee0!important;}
+body.darkMode .feeDetailsJoining,body.darkMode .feeDetailsJoining b{color:#c6d0e5!important;}
+body.darkMode .feeDetailsPopupContent select,body.darkMode input:not([type=checkbox]),body.darkMode select,body.darkMode textarea{background:#252d3b!important;color:#f4f6ff!important;border-color:#4a5872!important;}
+body.darkMode input::placeholder,body.darkMode textarea::placeholder{color:#aab6cc!important;}
+body.darkMode .feeDetailsPopupContent>div[style*="Total Collections"]{color:#ffe18c!important;background:linear-gradient(90deg,rgba(95,71,180,.24),rgba(27,145,120,.18));border-radius:10px;padding:12px!important;border-top:1px solid #6c5db7!important;}
+body.darkMode .thoughtText,body.darkMode .thoughtItemText,body.darkMode .myNoteContent{color:#f3efff!important;}
+body.darkMode .thoughtCardHead h3{color:#d9c8ff!important;}
+body.darkMode .thoughtTabs{background:#151b28!important;border:1px solid #38445e!important;}
+body.darkMode .thoughtTab{background:#252d3b!important;color:#d1d9ec!important;border:1px solid #46516a!important;}
+body.darkMode .thoughtTab.active{background:linear-gradient(135deg,#5142d5,#9a48d5)!important;color:#fff!important;border-color:#c0a2ff!important;box-shadow:0 0 0 1px rgba(194,165,255,.35),0 5px 15px rgba(99,69,220,.35)!important;}
+body.darkMode .thoughtSourceCompact{background:#1d2635!important;border-color:#46516a!important;color:#dbe4f6!important;}
+body.darkMode .thoughtSourceChip{background:#293348!important;color:#d9d5ff!important;border-color:#596586!important;}
+body.darkMode .thoughtSourceChip.activeSource{background:linear-gradient(135deg,#5142d5,#9a48d5)!important;color:#fff!important;border-color:#c4a8ff!important;}
+body.darkMode .thoughtItem{border-bottom-color:#3a4355!important;}
+body.darkMode .thoughtCategory{color:#c6a9ff!important;}
+body.darkMode .thoughtNumber{color:#ffd978!important;}
+body.darkMode .personalThoughtEditor{background:#222b3a!important;border-color:#46516a!important;}
+body.darkMode .personalThoughtEditor label,body.darkMode .personalThoughtSaveStatus,body.darkMode .thoughtSourceTitle{color:#d8e0f2!important;}
+body.darkMode .attendanceRow{border-bottom-color:#394253!important;}
+body.darkMode .attendanceChoice{background:#293244!important;color:#edf1ff!important;border-color:#53617b!important;}
+body.darkMode .summary,body.darkMode .feeSummaryBox{background:#26394a!important;color:#e8f4ff!important;border:1px solid #3e6079!important;}
+body.darkMode .status{background:#49391e!important;color:#ffe6a6!important;}
+body.darkMode .bottomNav{background:rgba(20,25,36,.97)!important;border-top:1px solid #39445a!important;box-shadow:0 -7px 22px rgba(0,0,0,.4)!important;}
+body.darkMode .navItem{color:#aeb9d0!important;text-shadow:0 2px 3px #000;}
+body.darkMode .navItem span:first-child{filter:drop-shadow(0 3px 2px rgba(0,0,0,.65));}
+body.darkMode .navItem.active{color:#9bc7ff!important;text-shadow:0 0 12px rgba(75,150,255,.8);}
+body.darkMode .backHomeBtn,body.darkMode .quickBtn,body.darkMode .reportSlideBtn,body.darkMode .reportSlideNumber{background:#293246!important;color:#e7eaff!important;border:1px solid #4a5872!important;}
+body.darkMode .emptyState{color:#c2cbe0!important;}
+body.darkMode #menuPopup,body.darkMode #menuPopup>div,body.darkMode #menuPopup .modernMenuProfile,body.darkMode #menuPopup .modernMenuItem,body.darkMode #menuPopup .modernMenuAccount{background:#1c2330!important;color:#f0f3ff!important;}
+body.darkMode #menuPopup .modernMenuItem{border-bottom-color:#37445b!important;color:#f0f3ff!important;}
+body.darkMode #menuPopup .modernMenuLabel,body.darkMode #menuPopup .modernMenuProfileName,body.darkMode #menuPopup .modernMenuAccount #googleEmailDisplay{color:#f0f3ff!important;}
+body.darkMode #menuPopup .modernMenuItem:active{background:#303b55!important;}
+body.darkMode .featureCard{transform:translateY(0);border:1px solid rgba(255,255,255,.22);box-shadow:0 10px 0 rgba(0,0,0,.24),0 15px 24px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.3)!important;}
+body.darkMode .featureCard:active{transform:translateY(4px);box-shadow:0 5px 0 rgba(0,0,0,.24),0 8px 14px rgba(0,0,0,.3)!important;}
+body.darkMode .featureIcon{filter:drop-shadow(0 4px 2px rgba(0,0,0,.45));}
+body.darkMode .miniBtn{background:transparent!important;color:#80baff!important;border:0!important;padding:6px!important;font-size:19px!important;text-shadow:0 0 10px rgba(90,160,255,.35);}
+body.darkMode .miniBtn.red{background:transparent!important;color:#ff727d!important;text-shadow:0 0 10px rgba(255,80,95,.3);}
+body.darkMode .miniBtn.iconOnly{font-size:22px!important;padding:4px 6px!important;min-width:30px;}
+body.darkMode .editIcon{color:#67d8ff!important;text-shadow:0 0 11px rgba(55,200,255,.5)!important;}
+body.darkMode .studentActions .miniBtn:not(.iconOnly){background:#29334a!important;color:#cbdcff!important;border-radius:9px!important;font-size:12px!important;padding:7px 8px!important;}
+body.darkMode .modernStudent{border-bottom-color:#3b4559!important;}
+body.darkMode .studentMeta{color:#b7c2d8!important;}
+body.darkMode .myNoteItem{border-color:#3d4a62!important;}
+body.darkMode .trashStudent{border-bottom-color:#394253!important;}
+body.darkMode .attendanceReminderItem{background:#46351d!important;border-color:#8c6428!important;color:#ffe4a6!important;}
+body.darkMode .thoughtBtn.secondary{background:#303a52!important;color:#e2dcff!important;}
+body.darkMode .feeStatusMeta{color:#c1cce1!important;}
+
+/* 3D controls and icon-only edit/delete actions */
+.featureCard{transition:transform .16s ease,box-shadow .16s ease;box-shadow:0 7px 0 rgba(25,35,80,.14),0 12px 20px rgba(20,30,60,.13),inset 0 1px 2px rgba(255,255,255,.28)!important;}
+.featureCard:active{transform:translateY(3px)!important;}
+.navItem span:first-child{filter:drop-shadow(0 3px 2px rgba(0,0,0,.22));}
+.miniBtn.iconOnly{background:transparent!important;border:0!important;box-shadow:none!important;min-width:30px;padding:4px 6px!important;font-size:21px!important;}
+.miniBtn.iconOnly.red{color:#e34b5a!important;background:transparent!important;}
+.miniBtn.iconOnly.editIcon{color:#2879d8!important;background:transparent!important;}
+.themeMenuGlyph{width:30px;min-width:30px;text-align:center;font-size:22px;color:#f2c94c;}
+.menuThemeSwitch{margin-left:auto!important;flex:0 0 46px!important;}
+.themeSlider{position:absolute;inset:0;border-radius:20px;background:#596579;transition:.22s;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);}
+.themeSlider:before{content:'☀';position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;color:#d48b16;font-size:14px;box-shadow:0 2px 5px rgba(0,0,0,.3);transition:.22s;}
+.menuThemeSwitch input:checked + .themeSlider{background:#219b63;}
+.menuThemeSwitch input:checked + .themeSlider:before{content:'☾';transform:translateX(18px);background:#fff;color:#5143b8;}
+.menuLockItem .modernMenuLabel{margin-left:0;}
+.menuLockItem .modernMenuIcon{display:none!important;}
 
 
-
-/* Dark-mode readability and dimensional icon polish */
-body.theme-dark .developerPopupContent,
-body.theme-dark .developerPopupContent h3,
-body.theme-dark .developerPopupContent p,
-body.theme-dark .developerPopupContent b,
-body.theme-dark .developerPopupContent .developerPopupByline,
-body.theme-dark .developerPopupContent .popupClose{
-  color:#f4f6ff!important;
+/* ===== HTML 3 requested refinements (presentation-only overrides) ===== */
+.pageHead h2{
+  background:linear-gradient(100deg,#e04b62 0%,#2878d7 52%,#7952c8 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-body.theme-dark .developerPopupContent .developerPopupIcon{filter:drop-shadow(0 5px 5px rgba(0,0,0,.55));}
-body.theme-dark .developerPopupContent .popupSave{color:#fff!important;}
-body.theme-dark .developerEmailBtn{background:linear-gradient(135deg,#29334d,#25283b)!important;color:#f7f8ff!important;border-color:#59627a!important;}
-
-/* Reports: make attendance legend and summary readable, including inline colours */
-body.theme-dark #reportArea .summary,
-body.theme-dark #reportArea .summary *{
-  color:#f4f6ff!important;
-  opacity:1!important;
-  filter:none!important;
+body.darkMode .pageHead h2{
+  background:linear-gradient(100deg,#ff8794 0%,#77b8ff 52%,#c19aff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-body.theme-dark #reportArea .summary{background:linear-gradient(135deg,#26344d,#30264a)!important;border:1px solid #53658c!important;box-shadow:0 4px 15px rgba(0,0,0,.28)!important;}
-body.theme-dark #reportArea .summary span[style*="green"],
-body.theme-dark #reportArea .summary span[style*="rgb(0, 128, 0)"]{color:#65e6a5!important;}
-body.theme-dark #reportArea .summary span[style*="red"]{color:#ff858e!important;}
-body.theme-dark #attendanceLegend,
-body.theme-dark #attendanceLegend *{color:#e8edff!important;}
-
-/* Fee details: protect the Total Collections line and history text from dark inline colours */
-body.theme-dark #feeDetailsContent,
-body.theme-dark #feeDetailsContent *{text-shadow:none;}
-body.theme-dark #feeDetailsContent div[style*="Total Collections"]{
-  color:#fff!important;
-  background:linear-gradient(110deg,#273c63,#3b2d61)!important;
-  border:1px solid #6574b8!important;
-  border-radius:12px!important;
-  padding:12px 8px!important;
-  box-shadow:0 4px 14px rgba(0,0,0,.3)!important;
+.studentMain b,.attendanceName,.feeDetailsName,.reportStudentName,
+#reportArea .student h3,.trashStudentName{
+  color:#a97816!important;
+  text-shadow:none!important;font-weight:800;
 }
-body.theme-dark #feeDetailsContent [style*="color:#202638"],
-body.theme-dark #feeDetailsContent [style*="color: #202638"],
-body.theme-dark #feeDetailsContent [style*="color:#606775"],
-body.theme-dark #feeDetailsContent [style*="color: #606775"]{color:#e5eaff!important;}
-body.theme-dark #feeDetailsContent .feeDetailsJoining,
-body.theme-dark #feeDetailsContent .feeDetailsJoining *{color:#c3cada!important;}
-body.theme-dark #feeDetailsContent .feeDetailsSectionTitle{color:#b9c5ff!important;}
-body.theme-dark #feeDetailsContent .feeDetailRow,
-body.theme-dark #feeDetailsContent .feeDetailRow *{color:#edf0fa!important;}
-body.theme-dark #feeDetailsContent .feeStatusLine{color:#65e6a5!important;}
-body.theme-dark #feeDetailsContent .feeStatusMeta{color:#aeb8ca!important;}
-
-/* Keep all dark cards colourful without sacrificing text contrast */
-body.theme-dark .feeSummaryBox{background:linear-gradient(135deg,#26364d,#302747)!important;border:1px solid #4b5d83!important;color:#f5f7ff!important;}
-body.theme-dark .thoughtCard{background:linear-gradient(135deg,#292846,#202c43)!important;border-color:#514b83!important;color:#f5f3ff!important;}
-body.theme-dark .myNotesHomeCard{background:linear-gradient(135deg,#1e3443,#282746)!important;border-color:#42627d!important;}
-body.theme-dark .myNoteItem,
-body.theme-dark .noteCard{background:linear-gradient(135deg,#242b3a,#29243d)!important;border-color:#414c69!important;}
-body.theme-dark .myNoteContent{color:#f0f3ff!important;}
-body.theme-dark .attendanceReminderItem{background:linear-gradient(135deg,#3b3020,#34263b)!important;color:#fff0c2!important;border-color:#a77b32!important;}
-
-/* 3D-like navigation icons */
-.navItem span:first-child{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:30px;min-height:29px;padding:3px 5px;border-radius:10px;
-  text-shadow:0 2px 0 rgba(0,0,0,.16),0 4px 7px rgba(0,0,0,.18);
-  filter:drop-shadow(0 3px 2px rgba(30,40,80,.22));
-  transition:transform .18s ease,filter .18s ease;
+body.darkMode .studentMain b,body.darkMode .attendanceName,
+body.darkMode .feeDetailsName,body.darkMode .reportStudentName,
+body.darkMode #reportArea .student h3,body.darkMode .trashStudentName{
+  color:#ffd978!important;text-shadow:0 0 8px rgba(255,204,90,.12)!important;
 }
-.navItem.active span:first-child{transform:translateY(-2px) scale(1.08);filter:drop-shadow(0 4px 3px rgba(70,95,220,.42));}
-body.theme-dark .navItem span:first-child{text-shadow:0 2px 0 rgba(0,0,0,.7),0 0 10px rgba(130,150,255,.25);filter:drop-shadow(0 3px 3px rgba(0,0,0,.7));}
-body.theme-dark .navItem.active span:first-child{filter:drop-shadow(0 0 5px rgba(133,155,255,.7)) drop-shadow(0 4px 3px rgba(0,0,0,.7));}
-.themeMenuItem .modernMenuIcon{
-  width:34px!important;min-width:34px!important;height:34px;border-radius:11px;
-  display:inline-flex;align-items:center;justify-content:center;
-  background:linear-gradient(145deg,#e8edff,#c9d4ff);
-  box-shadow:inset 1px 1px 2px rgba(255,255,255,.9),inset -2px -2px 4px rgba(60,75,150,.18),0 3px 6px rgba(30,45,100,.2);
-  font-size:21px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));
+.studentEditText{background:#eef2ff!important;color:#3947a7!important;font-size:12px!important;padding:8px 9px!important;}
+body.darkMode .studentEditText{background:#29334a!important;color:#cbdcff!important;}
+.trashIconBtn,.miniBtn.iconOnly.red{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 6px!important;min-width:30px!important;}
+.trashIconBtn svg,.miniBtn.iconOnly.red svg{width:21px;height:21px;display:block;fill:none;stroke:#e04452;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+body.darkMode .trashIconBtn svg,body.darkMode .miniBtn.iconOnly.red svg{stroke:#ff727d;}
+.attendanceDateBox + .modernPanel{
+  border:1px solid #c9d8f2;
+  box-shadow:0 4px 15px rgba(45,82,145,.09);
 }
-body.theme-dark .themeMenuItem .modernMenuIcon{
-  background:linear-gradient(145deg,#4a3b78,#242c50);
-  box-shadow:inset 1px 1px 3px rgba(255,255,255,.16),inset -2px -2px 4px rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.45);
+body.darkMode .attendanceDateBox + .modernPanel{
+  border:1px solid #465b83!important;
+  box-shadow:0 7px 22px rgba(0,0,0,.32)!important;
 }
-body.theme-dark .themeMenuItem{background:linear-gradient(100deg,#252b3b,#29243d)!important;border-top:1px solid #454d69!important;border-bottom:1px solid #454d69!important;}
-body.theme-dark .themeMenuItem .modernMenuLabel{color:#f5f3ff!important;}
-body.theme-dark .themeMenuItem .switch .slider{box-shadow:0 0 0 1px #6575a5,0 2px 6px rgba(0,0,0,.4);}
-body.theme-dark .bottomNav{box-shadow:0 -5px 20px rgba(0,0,0,.45)!important;}
+#attendanceLegend,#attendanceLegend *{color:#606775!important;}
+body.darkMode #attendanceLegend,body.darkMode #attendanceLegend *{color:#d2daeb!important;}
+.attendanceCountSummary{display:flex;flex-wrap:wrap;gap:3px 5px;align-items:center;}
+.attendanceCountSummary .countP{color:#168b50!important;font-weight:800;}
+.attendanceCountSummary .countA{color:#d93645!important;font-weight:800;}
+.attendanceCountSummary .countL{color:#8a48c7!important;font-weight:800;}
+.attendanceCountSummary .countS{color:#2878d7!important;font-weight:800;}
+.attendanceCountSummary .countM{color:#168b50!important;font-weight:800;}
+.attendanceCountSummary .countH{color:#d97706!important;font-weight:800;}
+body.darkMode .attendanceCountSummary .countP,body.darkMode .attendanceCountSummary .countM{color:#54dc91!important;}
+body.darkMode .attendanceCountSummary .countA{color:#ff737e!important;}
+body.darkMode .attendanceCountSummary .countL{color:#c394ff!important;}
+body.darkMode .attendanceCountSummary .countS{color:#83baff!important;}
+body.darkMode .attendanceCountSummary .countH{color:#ffb45e!important;}
+.featureCard{
+  border:1px solid rgba(255,255,255,.26)!important;
+  box-shadow:0 9px 0 rgba(28,39,83,.18),0 15px 23px rgba(20,30,60,.16),inset 0 1px 3px rgba(255,255,255,.34)!important;
+}
+.featureIcon{
+  filter:drop-shadow(0 3px 1px rgba(0,0,0,.25)) drop-shadow(0 6px 5px rgba(0,0,0,.16));
+  text-shadow:0 2px 3px rgba(0,0,0,.22);
+}
+body.darkMode .featureCard{
+  box-shadow:0 9px 0 rgba(0,0,0,.30),0 16px 24px rgba(0,0,0,.38),inset 0 1px 3px rgba(255,255,255,.25)!important;
+}
+.navItem.active span:first-child{
+  transform:translateY(-2px) scale(1.10);
+}
+.navItem span:first-child{transition:transform .16s ease;}
+.popupClose,.popup button[onclick^="close"],#feePopup button[onclick="closeFeePopup()"],#feeStatusPopup button[onclick="closeFeeStatus()"]{
+  color:#aeb4bf!important;
+}
+body.darkMode .popupClose,body.darkMode .popup button[onclick^="close"],
+body.darkMode #feePopup button[onclick="closeFeePopup()"],
+body.darkMode #feeStatusPopup button[onclick="closeFeeStatus()"]{
+  color:#c2c8d2!important;
+}
+body.darkMode .modernPanel,body.darkMode .attendanceDateBox,
+body.darkMode .quickBox,body.darkMode #reportArea .student{
+  color:#edf1ff!important;
+}
+body.darkMode .feeDetailsPopupContent>div[style*="Total Collections"]{
+  color:#ffe18c!important;
+}
+body.darkMode .feeDetailRow,body.darkMode .feeDetailRow b,
+body.darkMode .feeDetailRow span:not(.feeCredited):not(.feePending){
+  color:#e5eaf6;
+}
+body.darkMode .feeDetailsSectionTitle{color:#d9c8ff!important;}
+body.darkMode .summary{color:#f0f4ff!important;}
+body.darkMode .attendanceReminderItem{color:#ffe4a6!important;}
+body.darkMode .popupContent{color:#f1f4ff;}
+body.darkMode .modernMenuItem,body.darkMode .modernMenuLabel{color:#f0f3ff!important;}
+@media(max-width:390px){
+  .navItem.active span:first-child{transform:translateY(-2px) scale(1.08);}
+}
 
 
-/* Requested final visual refinements */
-.currentSectionTitle{font-size:14px;font-weight:900;letter-spacing:.25px;margin-top:3px;background:linear-gradient(90deg,#ef4444 0%,#f59e0b 28%,#22c55e 55%,#3b82f6 78%,#a855f7 100%);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 1px 1px rgba(0,0,0,.08)}
-.currentSectionTitle[data-section="studentsSection"]{background-image:linear-gradient(90deg,#f59e0b,#ef4444,#d946ef)}
-.currentSectionTitle[data-section="attendanceSection"]{background-image:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444)}
-.currentSectionTitle[data-section="feesSection"]{background-image:linear-gradient(90deg,#f59e0b,#fb7185,#f97316)}
-.currentSectionTitle[data-section="reportsSection"]{background-image:linear-gradient(90deg,#8b5cf6,#3b82f6,#ec4899)}
-body.theme-dark .currentSectionTitle{text-shadow:0 1px 2px rgba(0,0,0,.55)}
-/* richer but restrained 3D dashboard cards */
-.featureCard{transform:translateY(0);border:1px solid rgba(255,255,255,.28);box-shadow:inset 0 2px 2px rgba(255,255,255,.34),inset 0 -5px 9px rgba(0,0,0,.13),0 8px 0 rgba(20,30,60,.12),0 13px 22px rgba(20,30,60,.18);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease}
-.featureCard:before{content:"";position:absolute;inset:0 0 48% 0;background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0));pointer-events:none;border-radius:inherit}
-.featureCard:active{transform:translateY(3px) scale(.985);box-shadow:inset 0 2px 4px rgba(0,0,0,.12),0 3px 0 rgba(20,30,60,.12),0 6px 10px rgba(20,30,60,.14)}
-.featureIcon{filter:drop-shadow(0 3px 2px rgba(0,0,0,.28));text-shadow:0 2px 0 rgba(0,0,0,.18)}
-body.theme-dark .featureCard{border-color:rgba(255,255,255,.3);box-shadow:inset 0 2px 3px rgba(255,255,255,.25),inset 0 -6px 10px rgba(0,0,0,.2),0 8px 0 rgba(0,0,0,.3),0 14px 24px rgba(0,0,0,.42)}
-/* bottom navigation selected item rises and enlarges */
-.navItem{position:relative;transition:transform .18s ease,color .18s ease}
-.navItem.active{transform:translateY(-3px);color:#3947a7!important}
-.navItem.active span:first-child{transform:translateY(-2px) scale(1.2);background:linear-gradient(145deg,#eef2ff,#cbd5ff);box-shadow:inset 1px 1px 2px #fff,inset -2px -2px 4px rgba(57,71,167,.2),0 5px 9px rgba(57,71,167,.25);padding:5px 8px}
-body.theme-dark .navItem.active span:first-child{background:linear-gradient(145deg,#3d4770,#272c42);box-shadow:inset 1px 1px 2px rgba(255,255,255,.18),inset -2px -2px 4px rgba(0,0,0,.35),0 5px 10px rgba(0,0,0,.45)}
-/* lock switch with lock glyph inside the moving thumb */
-.menuLockItem>.modernMenuIcon{display:none!important}
-.menuLockItem .switch{margin-left:auto}
-.switch .lockSlider:before{content:""}
-.lockSlider .switchLockGlyph{position:absolute;z-index:2;left:5px;top:3px;font-size:10px;line-height:18px;width:18px;height:18px;text-align:center;border-radius:50%;background:#fff;color:#6b7280;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s ease}
-#lockSwitch:checked + .lockSlider .switchLockGlyph{transform:translateX(20px);color:#15803d}
-#lockSwitch:checked + .lockSlider{background:#16a34a!important}
-#lockSwitch:not(:checked) + .lockSlider{background:#9ca3af!important}
-/* attendance legend: neutral, consistent text; controls retain their status colours */
-#attendanceLegend,#attendanceLegend *{color:#566174!important;font-weight:700}
-body.theme-dark #attendanceLegend,body.theme-dark #attendanceLegend *{color:#e8edff!important}
-.attendanceDateBox{cursor:pointer;border:1px solid rgba(59,130,246,.22);}
-body.theme-dark .attendanceDateBox{border:1px solid #4b668d!important;box-shadow:0 0 0 1px rgba(96,165,250,.12),0 5px 16px rgba(0,0,0,.25)!important}
-.attendanceRow .attendanceName,body.theme-dark .attendanceRow .attendanceName{color:#d7b45a!important;font-weight:800}
-.studentMain b,body.theme-dark .studentMain b{color:#c79b35!important;text-shadow:0 1px 0 rgba(120,80,10,.12)}
-#reportArea .studentMain b,#reportArea .studentMain,body.theme-dark #reportArea .studentMain b{color:#d7b45a!important}
-.feeDetailsName,body.theme-dark .feeDetailsName{color:#d7b45a!important}
-body.theme-dark #feesArea .studentMain b{color:#d7b45a!important}
-/* improve Total Collections in the fee popup and Fees page */
-body.theme-dark #feeDetailsContent div[style*="Total Collections"],body.theme-dark #feesArea [class*="total"],body.theme-dark #feesArea [style*="Total Collections"]{color:#fff!important;background:linear-gradient(110deg,#263b5e,#3b2b5d)!important;border:1px solid #6276a8!important;border-radius:11px;padding:10px!important}
-/* clear icon-only delete button, modelled on the reference bin icon */
-.iconOnlyDelete{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border:0!important;background:transparent!important;color:#dc2626!important;border-radius:0!important;padding:0!important;font-size:23px!important;font-weight:900;line-height:1;box-shadow:none!important}
-.iconOnlyDelete:before{content:"";position:absolute}
-.iconOnlyDelete{position:relative}
-.iconOnlyDelete:after{content:"";width:12px;height:13px;border:2px solid currentColor;border-top:0;border-radius:0 0 3px 3px;display:block;position:absolute;top:13px;left:11px;box-shadow:inset 3px 0 0 -1px currentColor,inset -3px 0 0 -1px currentColor}
-.iconOnlyDelete{font-size:0!important}
-.iconOnlyDelete:before{width:16px;height:2px;background:currentColor;top:9px;left:9px;border-radius:2px}
-.iconOnlyDelete.feeDeleteIcon{background:transparent!important}
-/* selected attendance buttons retain their individual fills */
-.attendanceChoice.selected{color:#fff!important;box-shadow:0 0 0 2px rgba(255,255,255,.25),0 3px 7px rgba(0,0,0,.22)!important;transform:translateY(-1px) scale(1.07)}
-/* Cross buttons: visible but soft, never neon */
-.popupClose,.photoViewerBtn[aria-label*="close"],button[title="Close"]{color:#aeb4bf!important}
-body.theme-dark .popupClose,body.theme-dark button[title="Close"]{color:#c2c8d2!important}
-.popupClose{font-weight:700!important;text-shadow:none!important}
-/* all student names in report cards */
-#reportArea .student b,#reportArea .student .studentMain b{color:#c79b35!important}
-body.theme-dark #reportArea .student b,body.theme-dark #reportArea .student .studentMain b{color:#e0bd63!important}
+body.darkMode #lockScreen{background:#0d1018!important;color:#edf1ff!important;}
+body.darkMode #lockScreen>div{background:#1c222e!important;color:#f1f4ff!important;border:1px solid #39445a!important;box-shadow:0 10px 28px rgba(0,0,0,.4)!important;}
+body.darkMode #lockScreen p{color:#c5cee0!important;}
+body.darkMode #lockScreen button[title="Unlock with fingerprint"]{background:#293246!important;border-color:#52617e!important;}
+body.darkMode #resetPopup>div{background:#1c222e!important;color:#f1f4ff!important;border:1px solid #39445a!important;}
+body.darkMode #resetPopup p{color:#e0e6f4!important;}
+body.darkMode .photoViewer{background:rgba(5,8,15,.97)!important;}
 
 </style>  
 </head>  
@@ -950,7 +901,7 @@ Reset PIN
   <header class="appHeader">
     <div class="appHeaderTop">
       <div>
-        <div class="appTitle">Tuition Manager</div><div id="currentSectionTitle" class="currentSectionTitle" aria-live="polite">Home</div>
+        <div class="appTitle">Tuition Manager</div>
         <div class="appSubtitle">Simple • Organized • Made for Teachers</div>
       </div>
       <div class="headerActions">
@@ -966,19 +917,18 @@ Reset PIN
               <button class="ownerEditBtn" type="button" onclick="event.stopPropagation(); editOwnerName()" title="Edit Name" aria-label="Edit Name">✎</button>
             </div>
             <div class="modernMenuItem menuLockItem" onclick="toggleLock()">
-              <span class="modernMenuIcon">⚙️</span>
               <span class="modernMenuLabel">App Lock</span>
               <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
                 <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
-                <span class="slider lockSlider"><span class="switchLockGlyph">🔒</span></span>
+                <span class="slider"></span>
               </label>
             </div>
-            <div class="modernMenuItem themeMenuItem" onclick="event.stopPropagation(); toggleDarkMode();">
-              <span class="modernMenuIcon" id="themeMenuIcon">🌙</span>
+            <div class="modernMenuItem menuThemeItem" onclick="toggleDarkModeFromRow()">
+              <span class="themeMenuGlyph" id="themeMenuGlyph">☾</span>
               <span class="modernMenuLabel" id="themeMenuLabel">Dark Mode</span>
-              <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
+              <label class="switch menuThemeSwitch" onclick="event.stopPropagation();">
                 <input type="checkbox" id="darkModeSwitch" onchange="setDarkMode(this.checked)">
-                <span class="slider"></span>
+                <span class="themeSlider"></span>
               </label>
             </div>
             <div class="modernMenuItem" onclick="backupData()">
@@ -1107,7 +1057,7 @@ Reset PIN
 
     <section id="attendanceSection" class="section">
       <div class="pageHead"><div><h2>Daily Attendance</h2><p>Mark attendance for all active students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
-      <div class="attendanceDateBox" onclick="if(event.target.id!=='attDate' && event.target.id!=='sundayBtn'){const d=document.getElementById('attDate');if(d){d.focus();if(d.showPicker){try{d.showPicker()}catch(e){}}}}">
+      <div class="attendanceDateBox">
         <label for="attDate">Attendance Date</label>
         <input type="date" id="attDate">
         <button id="sundayBtn" class="saveBtn" style="display:none;background:#6f42c1;margin-bottom:0;" onclick="markAllSunday()">Mark All Sunday</button>
@@ -1248,30 +1198,6 @@ Reset PIN
 </div>
 
 <script>
-// Light/Dark appearance preference (kept separately from student data and backups).
-function applyTheme(isDark){
-  document.body.classList.toggle('theme-dark',!!isDark);
-  const sw=document.getElementById('darkModeSwitch');
-  const label=document.getElementById('themeMenuLabel');
-  const icon=document.getElementById('themeMenuIcon');
-  if(sw) sw.checked=!!isDark;
-  if(label) label.textContent=isDark?'Light Mode':'Dark Mode';
-  if(icon) icon.textContent=isDark?'☀️':'🌙';
-  const meta=document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content',isDark?'#111214':'#f5f8ff');
-}
-function setDarkMode(isDark){
-  localStorage.setItem('tuitionAppDarkMode',isDark?'1':'0');
-  applyTheme(isDark);
-}
-function toggleDarkMode(){
-  const current=document.body.classList.contains('theme-dark');
-  setDarkMode(!current);
-}
-(function initSavedTheme(){
-  const saved=localStorage.getItem('tuitionAppDarkMode');
-  applyTheme(saved==='1');
-})();
 const GOOGLE_CLIENT_ID = "858615378828-7b1vhd70qn7h0f8c4l7vdjf4clp1qm4e.apps.googleusercontent.com";
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
 const DRIVE_FILE_NAME = "Tuition_Attendance_Manager_Data.json";
@@ -2498,9 +2424,6 @@ function showSection(sectionId, navId, fromHistory){
   }
 
   currentSectionId=sectionId;
-  const sectionNames={homeSection:'Home',studentsSection:'Students',attendanceSection:'Attendance',feesSection:'Fees',reportsSection:'Reports',thoughtsSection:'विचार',trashSection:'Deleted Students',myNotesSection:'My Notes'};
-  const sectionTitle=document.getElementById('currentSectionTitle');
-  if(sectionTitle){sectionTitle.textContent=sectionNames[sectionId]||'Home';sectionTitle.dataset.section=sectionId;}
   document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
   section.classList.add('active');
   document.querySelectorAll('.navItem').forEach(el=>el.classList.remove('active'));
@@ -2516,12 +2439,10 @@ function showSection(sectionId, navId, fromHistory){
 }
 
 function goHome(){
-  // Home is the root of the app. If we are several screens deep, jump back
-  // to the guard entry in one operation so Back on Home can behave normally.
+  // Back/Home controls move one navigation step, not directly to the root.
   if(currentSectionId==='homeSection') return;
   if(sectionHistoryStack.length){
-    pendingHomeNavigation=true;
-    history.go(-sectionHistoryStack.length);
+    history.back();
     return;
   }
   showSection('homeSection','homeNav',true);
@@ -2549,8 +2470,8 @@ function renderStudentsPage(){
       <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
       <div class="studentActions">
         <button class="miniBtn" onclick="openStudentDetails(${index})">View</button>
-        <button class="miniBtn" onclick="editStudent(${index})">Edit</button>
-        <button class="iconOnlyDelete" aria-label="Delete student" title="Delete" onclick="deleteStudent(${index})">▤</button>
+        <button class="miniBtn studentEditText" aria-label="Edit student" title="Edit" onclick="editStudent(${index})">Edit</button>
+        <button class="miniBtn iconOnly trashIconBtn" aria-label="Delete student" title="Delete" onclick="deleteStudent(${index})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5"/></svg></button>
       </div>
     </div>`;
   }).join('');
@@ -3155,15 +3076,19 @@ function renderReports(){
     slidesHtml += `
     <div class="student reportSlide ${slideIndex===reportSlideIndex?'active':''}" data-report-slide="${slideIndex}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
-        <h3 style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
+        <h3 class="reportStudentName" style="font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
         <button class="feeBtn" onclick="downloadPDF(${index})" style="padding:7px 10px;min-width:0;white-space:nowrap;">Print Report</button>
       </div>
 
       ${attendanceHtml}
 
-      <div class="summary">
-        P : ${present} | A : ${absent} | L : ${leave} | S : ${sunday}
-        ${extraHoliday > 0 ? `| EH : ${extraHoliday}` : ""}
+      <div class="summary attendanceCountSummary">
+        <span class="countP">P : ${present}</span> |
+        <span class="countA">A : ${absent}</span> |
+        <span class="countL">L : ${leave}</span> |
+        <span class="countS">S : ${sunday}</span> |
+        <span class="countM">M : ${sundayManage}</span> |
+        <span class="countH">H : ${extraHoliday}</span>
       </div>
     </div>`;
   });
@@ -3355,7 +3280,7 @@ function renderFeeDetails(st){
       hasCredited=true;
       const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
       const mode=rec.mode || 'Mode not set';
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="iconOnlyDelete feeDeleteIcon" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})">▤</button></div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5"/></svg></button></div>`;
     }else{
       rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feePending">Pending</span>${amount ? ` · ₹${amount}` : ''}</div>`;
     }
@@ -3376,7 +3301,7 @@ function renderFeeDetails(st){
   },0);
 
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn" style="margin-left:6px;padding:5px 8px;" onclick="editJoiningDate()">Edit</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:700;color:#202638;">${year} • Total Collections - ₹${totalCollections}</div>`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:700;color:#202638;">${year} • Total Collections - ₹${totalCollections}</div>`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
@@ -3764,7 +3689,6 @@ function downloadPDF(index){
       <div style="font-weight:700;font-size:18px;">Tuition Attendance Manager</div>
     </div>
 
-
 </body></html>`);
   reportWindow.document.close();
 }
@@ -4041,26 +3965,19 @@ window.addEventListener("popstate", function(event){
   }
   if(closeTopOverlayFromBack()) return;
 
-  // One Back from any main card returns directly Home. Skip the remaining
-  // stale card-history entries so a later Back on Home exits the app.
+  // Each Back press returns exactly one section step. Popups and drawers
+  // are handled above and therefore close before section navigation.
   if(pendingHomeNavigation){
     pendingHomeNavigation=false;
-    sectionHistoryStack=[];
-    handlingSectionPop=true;
-    showSection('homeSection','homeNav',true);
-    handlingSectionPop=false;
-    return;
   }
   if(currentSectionId!=='homeSection'){
-    const extraSteps=Math.max(0,sectionHistoryStack.length-1);
-    sectionHistoryStack=[];
+    if(sectionHistoryStack.length) sectionHistoryStack.pop();
+    const previousSection=sectionHistoryStack.length
+      ? sectionHistoryStack[sectionHistoryStack.length-1]
+      : 'homeSection';
     handlingSectionPop=true;
-    showSection('homeSection','homeNav',true);
+    showSection(previousSection,sectionNavId(previousSection),true);
     handlingSectionPop=false;
-    if(extraSteps>0){
-      pendingHomeNavigation=true;
-      history.go(-extraSteps);
-    }
   }
   return;
 });
@@ -4389,6 +4306,17 @@ async function initializeApp(){
     checkSundayButton();
     renderAttendance();
   });
+  const attendanceDateBox=document.querySelector(".attendanceDateBox");
+  if(attendanceDateBox){
+    attendanceDateBox.addEventListener("click",function(event){
+      const dateInput=document.getElementById("attDate");
+      if(!dateInput || event.target===dateInput || event.target.closest("#sundayBtn")) return;
+      try{
+        if(typeof dateInput.showPicker==="function") dateInput.showPicker();
+        else dateInput.focus();
+      }catch(error){ dateInput.focus(); }
+    });
+  }
   document.getElementById("reportMonth").value =
     String(today.getMonth() + 1).padStart(2, "0");
 
@@ -4448,20 +4376,37 @@ if ("serviceWorker" in navigator) {
 }
   </script>
 
+
 <script>
-
-// Cross-button navigation: follow one Back step rather than jumping Home.
-document.addEventListener('click',function(ev){
-  const btn=ev.target.closest('.popupClose,button[aria-label="Close"],button[title="Close"]');
-  if(!btn) return;
-  const popup=btn.closest('.popup');
-  if(!popup) return;
-  if(sectionHistoryStack.length>0 && popup.id!=='lockScreen'){
-    ev.preventDefault();ev.stopImmediatePropagation();
-    history.back();
+(function(){
+  const KEY='tuitionManagerDarkMode_v1';
+  function applyDarkMode(enabled){
+    document.body.classList.toggle('darkMode',!!enabled);
+    const sw=document.getElementById('darkModeSwitch');
+    const glyph=document.getElementById('themeMenuGlyph');
+    const label=document.getElementById('themeMenuLabel');
+    if(sw) sw.checked=!!enabled;
+    if(glyph) glyph.textContent=enabled?'☾':'☀';
+    if(label) label.textContent=enabled?'Dark Mode':'Light Mode';
+    const meta=document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.setAttribute('content',enabled?'#0d1018':'#263b8f');
   }
-},true);
-
+  window.setDarkMode=function(enabled){
+    try{localStorage.setItem(KEY,enabled?'1':'0');}catch(e){}
+    applyDarkMode(enabled);
+  };
+  window.toggleDarkModeFromRow=function(){
+    const sw=document.getElementById('darkModeSwitch');
+    window.setDarkMode(!(sw?sw.checked:document.body.classList.contains('darkMode')));
+  };
+  function init(){
+    let enabled=false;
+    try{enabled=localStorage.getItem(KEY)==='1';}catch(e){}
+    applyDarkMode(enabled);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
+  else init();
+})();
 </script>
 </body>  
 </html>
