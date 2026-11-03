@@ -622,6 +622,94 @@ body.theme-dark .developerEmailBtn{background:#282c34!important;color:#f3f4f6!im
 .themeMenuItem{min-height:52px;}
 .themeMenuItem .modernMenuLabel{font-weight:700;}
 
+
+
+/* Dark-mode readability and dimensional icon polish */
+body.theme-dark .developerPopupContent,
+body.theme-dark .developerPopupContent h3,
+body.theme-dark .developerPopupContent p,
+body.theme-dark .developerPopupContent b,
+body.theme-dark .developerPopupContent .developerPopupByline,
+body.theme-dark .developerPopupContent .popupClose{
+  color:#f4f6ff!important;
+}
+body.theme-dark .developerPopupContent .developerPopupIcon{filter:drop-shadow(0 5px 5px rgba(0,0,0,.55));}
+body.theme-dark .developerPopupContent .popupSave{color:#fff!important;}
+body.theme-dark .developerEmailBtn{background:linear-gradient(135deg,#29334d,#25283b)!important;color:#f7f8ff!important;border-color:#59627a!important;}
+
+/* Reports: make attendance legend and summary readable, including inline colours */
+body.theme-dark #reportArea .summary,
+body.theme-dark #reportArea .summary *{
+  color:#f4f6ff!important;
+  opacity:1!important;
+  filter:none!important;
+}
+body.theme-dark #reportArea .summary{background:linear-gradient(135deg,#26344d,#30264a)!important;border:1px solid #53658c!important;box-shadow:0 4px 15px rgba(0,0,0,.28)!important;}
+body.theme-dark #reportArea .summary span[style*="green"],
+body.theme-dark #reportArea .summary span[style*="rgb(0, 128, 0)"]{color:#65e6a5!important;}
+body.theme-dark #reportArea .summary span[style*="red"]{color:#ff858e!important;}
+body.theme-dark #attendanceLegend,
+body.theme-dark #attendanceLegend *{color:#e8edff!important;}
+
+/* Fee details: protect the Total Collections line and history text from dark inline colours */
+body.theme-dark #feeDetailsContent,
+body.theme-dark #feeDetailsContent *{text-shadow:none;}
+body.theme-dark #feeDetailsContent div[style*="Total Collections"]{
+  color:#fff!important;
+  background:linear-gradient(110deg,#273c63,#3b2d61)!important;
+  border:1px solid #6574b8!important;
+  border-radius:12px!important;
+  padding:12px 8px!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.3)!important;
+}
+body.theme-dark #feeDetailsContent [style*="color:#202638"],
+body.theme-dark #feeDetailsContent [style*="color: #202638"],
+body.theme-dark #feeDetailsContent [style*="color:#606775"],
+body.theme-dark #feeDetailsContent [style*="color: #606775"]{color:#e5eaff!important;}
+body.theme-dark #feeDetailsContent .feeDetailsJoining,
+body.theme-dark #feeDetailsContent .feeDetailsJoining *{color:#c3cada!important;}
+body.theme-dark #feeDetailsContent .feeDetailsSectionTitle{color:#b9c5ff!important;}
+body.theme-dark #feeDetailsContent .feeDetailRow,
+body.theme-dark #feeDetailsContent .feeDetailRow *{color:#edf0fa!important;}
+body.theme-dark #feeDetailsContent .feeStatusLine{color:#65e6a5!important;}
+body.theme-dark #feeDetailsContent .feeStatusMeta{color:#aeb8ca!important;}
+
+/* Keep all dark cards colourful without sacrificing text contrast */
+body.theme-dark .feeSummaryBox{background:linear-gradient(135deg,#26364d,#302747)!important;border:1px solid #4b5d83!important;color:#f5f7ff!important;}
+body.theme-dark .thoughtCard{background:linear-gradient(135deg,#292846,#202c43)!important;border-color:#514b83!important;color:#f5f3ff!important;}
+body.theme-dark .myNotesHomeCard{background:linear-gradient(135deg,#1e3443,#282746)!important;border-color:#42627d!important;}
+body.theme-dark .myNoteItem,
+body.theme-dark .noteCard{background:linear-gradient(135deg,#242b3a,#29243d)!important;border-color:#414c69!important;}
+body.theme-dark .myNoteContent{color:#f0f3ff!important;}
+body.theme-dark .attendanceReminderItem{background:linear-gradient(135deg,#3b3020,#34263b)!important;color:#fff0c2!important;border-color:#a77b32!important;}
+
+/* 3D-like navigation icons */
+.navItem span:first-child{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:30px;min-height:29px;padding:3px 5px;border-radius:10px;
+  text-shadow:0 2px 0 rgba(0,0,0,.16),0 4px 7px rgba(0,0,0,.18);
+  filter:drop-shadow(0 3px 2px rgba(30,40,80,.22));
+  transition:transform .18s ease,filter .18s ease;
+}
+.navItem.active span:first-child{transform:translateY(-2px) scale(1.08);filter:drop-shadow(0 4px 3px rgba(70,95,220,.42));}
+body.theme-dark .navItem span:first-child{text-shadow:0 2px 0 rgba(0,0,0,.7),0 0 10px rgba(130,150,255,.25);filter:drop-shadow(0 3px 3px rgba(0,0,0,.7));}
+body.theme-dark .navItem.active span:first-child{filter:drop-shadow(0 0 5px rgba(133,155,255,.7)) drop-shadow(0 4px 3px rgba(0,0,0,.7));}
+.themeMenuItem .modernMenuIcon{
+  width:34px!important;min-width:34px!important;height:34px;border-radius:11px;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#e8edff,#c9d4ff);
+  box-shadow:inset 1px 1px 2px rgba(255,255,255,.9),inset -2px -2px 4px rgba(60,75,150,.18),0 3px 6px rgba(30,45,100,.2);
+  font-size:21px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));
+}
+body.theme-dark .themeMenuItem .modernMenuIcon{
+  background:linear-gradient(145deg,#4a3b78,#242c50);
+  box-shadow:inset 1px 1px 3px rgba(255,255,255,.16),inset -2px -2px 4px rgba(0,0,0,.35),0 3px 8px rgba(0,0,0,.45);
+}
+body.theme-dark .themeMenuItem{background:linear-gradient(100deg,#252b3b,#29243d)!important;border-top:1px solid #454d69!important;border-bottom:1px solid #454d69!important;}
+body.theme-dark .themeMenuItem .modernMenuLabel{color:#f5f3ff!important;}
+body.theme-dark .themeMenuItem .switch .slider{box-shadow:0 0 0 1px #6575a5,0 2px 6px rgba(0,0,0,.4);}
+body.theme-dark .bottomNav{box-shadow:0 -5px 20px rgba(0,0,0,.45)!important;}
+
 </style>  
 </head>  
   <body>
