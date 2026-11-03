@@ -729,8 +729,11 @@ body.darkMode #reportArea .student{
 
 
 /* Requested visual refinements. */
+body.darkMode #reportArea .reportStatusPresent{color:#86efac!important;}
 body.darkMode #reportArea .reportStatusSunday{color:#fbbf24!important;}
-body.darkMode #reportArea .reportStatusSundayManage{color:#86efac!important;}
+body.darkMode #reportArea .reportStatusSundayManage{color:#008000!important;}
+body.darkMode .attendanceCountCode.countP{color:#86efac!important;}
+body.darkMode .attendanceCountCode.countS{color:#fbbf24!important;}
 body.darkMode .featureCard{will-change:transform,box-shadow;}
 .welcomeWave{display:inline-block;transform-origin:72% 78%;}
 .welcomeWave.waveAnimate{animation:welcomeWaveMotion .72s ease-in-out 2;}
@@ -743,6 +746,17 @@ body.darkMode .featureCard{will-change:transform,box-shadow;}
 }
 @media(prefers-reduced-motion:reduce){.welcomeWave.waveAnimate{animation:none!important;}}
 
+
+
+/* Final touch: slightly shorter, equal-height student action buttons. */
+.studentActions .miniBtn{
+  height:42px!important;
+  min-height:42px!important;
+  box-sizing:border-box!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
 </style>  
 </head>  
   <body>
@@ -1874,9 +1888,13 @@ function updateOwnerNameDisplay() {
   if (welcomeName) { welcomeName.textContent = name || "Welcome"; welcomeName.style.overflowWrap = "anywhere"; welcomeName.style.wordBreak = "normal"; }
 }
 
+let welcomeWavePlayedForEntry = false;
 function animateWelcomeWave(){
   const wave=document.getElementById("welcomeWave");
-  if(!wave) return;
+  if(!wave || welcomeWavePlayedForEntry) return;
+  const lockScreen=document.getElementById("lockScreen");
+  if(lockScreen && getComputedStyle(lockScreen).display!=="none") return;
+  welcomeWavePlayedForEntry = true;
   wave.classList.remove("waveAnimate");
   void wave.offsetWidth;
   wave.classList.add("waveAnimate");
@@ -3092,7 +3110,7 @@ function renderReports(){
         const displayStatus = a.status.startsWith("EH|") ? a.status.split("|").slice(1).join("|") : a.status;
         const safeDate = a.date.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 
-        const statusClass = a.status==="Sunday" ? "reportStatusSunday" : (a.status==="Sunday Manage ✅" ? "reportStatusSundayManage" : "");
+        const statusClass = a.status==="Present" ? "reportStatusPresent" : (a.status==="Sunday" ? "reportStatusSunday" : (a.status==="Sunday Manage ✅" ? "reportStatusSundayManage" : ""));
         attendanceHtml +=
         `<p class="${statusClass}" onclick="openAttendanceStatus(${index},'${safeDate}')" style="
         width:220px;
@@ -4400,8 +4418,8 @@ async function initializeApp(){
     }
     render();
     renderHomeExtras();
-    animateWelcomeWave();
     checkLock();
+    if(!localStorage.getItem(getPinKey())) animateWelcomeWave();
 
     // Re-obtain a short-lived Drive token after every page load.
     // No manual backup action is required.
