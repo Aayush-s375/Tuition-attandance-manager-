@@ -534,6 +534,20 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 
 
 
+/* Consistent popup close and outline delete icons */
+.popupClose, .overlayCloseBtn{
+  color:#aeb5c2!important;
+  background:transparent!important;
+  border:0!important;
+  font-size:22px!important;
+  font-weight:700!important;
+  line-height:1!important;
+  padding:6px 9px!important;
+}
+.deleteOutlineIcon{width:22px;height:22px;display:inline-block;vertical-align:middle;stroke:#ff443d;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.feeTotalCollections{color:#eef1fa!important;background:rgba(112,124,151,.16);border-radius:10px;padding:12px!important;border-top:1px solid #58647b!important;}
+body.darkMode .feeTotalCollections{color:#f0e6ff!important;background:linear-gradient(90deg,rgba(95,71,180,.24),rgba(27,145,120,.18));border-top:1px solid #6c5db7!important;}
+
 /* ===== Dark mode + readability and colorful highlights ===== */
 body.darkMode{background:#0d1018!important;color:#edf1ff!important;}
 body.darkMode .appHeader{background:linear-gradient(125deg,#172b66 0%,#4931a6 55%,#713fc1 100%);box-shadow:0 12px 30px rgba(39,45,145,.35);}
@@ -871,7 +885,7 @@ Reset PIN
               <span class="modernMenuLabel">My Notes</span>
             </div>
             <div class="modernMenuItem" onclick="openTrashFromMenu(event)">
-              <span class="modernMenuIcon">🗑️</span>
+              <span class="modernMenuIcon"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></span>
               <span class="modernMenuLabel">Deleted Students</span>
             </div>
             <div class="modernMenuAccount">
@@ -1019,7 +1033,7 @@ Reset PIN
 
 <div class="popup" id="developerPopup">
   <div class="popupContent developerPopupContent">
-    <button class="popupClose" onclick="closeDeveloperPopup()">✕</button>
+    <button class="popupClose" type="button" aria-label="Back" onclick="closeOverlayOneStep()">✕</button>
     <div class="developerPopupIcon">👨‍💻</div>
     <h3>Tuition Attendance Manager</h3>
     <p class="developerPopupByline">Developed by <b>Aayush Kumar</b></p>
@@ -1032,7 +1046,7 @@ Reset PIN
   <div class="popupContent feeDetailsPopupContent">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
       <h3 id="feeUpdateTitle" style="margin:0;"></h3>
-      <button onclick="closeFeePopup()" style="border:none;background:none;font-size:22px;font-weight:bold;">✕</button>
+      <button class="overlayCloseBtn" type="button" aria-label="Back" onclick="closeOverlayOneStep()">✕</button>
     </div>
     <div style="font-size:18px;font-weight:800;margin-top:10px;">Update Fee</div>
 
@@ -1071,7 +1085,7 @@ Reset PIN
   <input type="date" id="joiningDatePicker" aria-label="Tuition Joining Date" onchange="saveJoiningDateFromPicker(this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
   <div class="popupContent" style="max-height:90vh;overflow:auto;">
     <div style="display:flex;justify-content:flex-end;align-items:center;">
-      <button onclick="closeFeeStatus()" style="border:none;background:none;font-size:22px;font-weight:bold;">✕</button>
+      <button class="overlayCloseBtn" type="button" aria-label="Back" onclick="closeOverlayOneStep()">✕</button>
     </div>
     <div id="feeDetailsContent" style="margin-top:14px;text-align:left;"></div>
   </div>
@@ -1165,7 +1179,7 @@ function writeTrash(items){localStorage.setItem(getTrashKey(),JSON.stringify(ite
 function openTrashFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)closeMenuDrawer();overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("trashSection","homeNav");renderTrashStudents();setTimeout(()=>{menuNavigationInProgress=false;},300);}
 function renderTrashStudents(){
   const area=document.getElementById("trashStudentsArea");if(!area)return;const items=readTrash();
-  if(!items.length){area.innerHTML='<div class="emptyState"><div style="font-size:34px">🗑️</div><b>Trash खाली है</b><div style="margin-top:6px">डिलीट किए गए विद्यार्थी यहाँ 30 दिनों तक रहेंगे।</div></div>';return;}
+  if(!items.length){area.innerHTML='<div class="emptyState"><div style="font-size:34px"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></div><b>Trash खाली है</b><div style="margin-top:6px">डिलीट किए गए विद्यार्थी यहाँ 30 दिनों तक रहेंगे।</div></div>';return;}
   area.innerHTML=items.map((item,i)=>{const days=Math.max(0,30-Math.floor((Date.now()-Number(item.deletedAt))/(24*60*60*1000)));return '<div class="trashStudent"><div class="trashStudentInfo"><div class="trashStudentName">'+escapeHtml(item.student?.name||'Unnamed Student')+'</div><div class="trashStudentMeta">वापस हटने में '+days+' दिन बाकी<br>Attendance: '+(item.student?.attendance?.length||0)+' रिकॉर्ड · Fees: '+(item.student?.fees?.length||0)+' रिकॉर्ड</div></div><div class="trashActions"><button class="trashRecover" onclick="recoverDeletedStudent('+i+')">Recover</button><button class="trashPermanent" onclick="permanentlyDeleteStudent('+i+')">Delete Permanently</button></div></div>';}).join('');
 }
 function recoverDeletedStudent(index){const items=readTrash();const item=items[index];if(!item)return;if(students.some(s=>String(s.id||'')===String(item.student?.id||'')&&s.id)){alert('यह विद्यार्थी पहले से मौजूद है।');return;}students.push(item.student);items.splice(index,1);writeTrash(items);saveLocalData(true);render();renderTrashStudents();alert('विद्यार्थी और उसका पूरा रिकॉर्ड वापस आ गया है।');}
@@ -2384,7 +2398,7 @@ function renderStudentsPage(){
       <div class="studentActions">
         <button class="miniBtn" onclick="openStudentDetails(${index})">View</button>
         <button class="miniBtn iconOnly editIcon" aria-label="Edit student" title="Edit" onclick="editStudent(${index})">✎</button>
-        <button class="miniBtn red" onclick="deleteStudent(${index})">🗑️</button>
+        <button class="miniBtn red" onclick="deleteStudent(${index})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button>
       </div>
     </div>`;
   }).join('');
@@ -3189,7 +3203,7 @@ function renderFeeDetails(st){
       hasCredited=true;
       const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
       const mode=rec.mode || 'Mode not set';
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})">🗑️</button></div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
     }else{
       rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feePending">Pending</span>${amount ? ` · ₹${amount}` : ''}</div>`;
     }
@@ -3210,7 +3224,7 @@ function renderFeeDetails(st){
   },0);
 
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:700;color:#202638;">${year} • Total Collections - ₹${totalCollections}</div>`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
@@ -3824,6 +3838,18 @@ function setupOverlayBackHandling(){
   });
 
   overlayObserverReady = true;
+}
+
+function closeOverlayOneStep(){
+  // Pop the current overlay history entry; popstate closes only that overlay.
+  for(let i=overlayHistoryStack.length-1;i>=0;i--){
+    if(isOverlayVisible(overlayHistoryStack[i])){
+      history.back();
+      return;
+    }
+  }
+  // Fallback for an overlay opened before history tracking was initialized.
+  closeTopOverlayFromBack();
 }
 
 function closeTopOverlayFromBack(){
