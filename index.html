@@ -575,6 +575,16 @@ body.darkMode .personalThoughtEditor{background:#222b3a!important;border-color:#
 body.darkMode .personalThoughtEditor label,body.darkMode .personalThoughtSaveStatus,body.darkMode .thoughtSourceTitle{color:#d8e0f2!important;}
 body.darkMode .attendanceRow{border-bottom-color:#394253!important;}
 body.darkMode .attendanceChoice{background:#293244!important;color:#edf1ff!important;border-color:#53617b!important;}
+/* Keep the selected attendance status colors visible in dark mode. */
+body.darkMode .attendanceChoice.selected.statusP{background:#16a34a!important;border-color:#16a34a!important;color:#fff!important;}
+body.darkMode .attendanceChoice.selected.statusA{background:#dc2626!important;border-color:#dc2626!important;color:#fff!important;}
+body.darkMode .attendanceChoice.selected.statusL{background:#9333ea!important;border-color:#9333ea!important;color:#fff!important;}
+body.darkMode .attendanceChoice.selected.statusS{background:#2563eb!important;border-color:#2563eb!important;color:#fff!important;}
+body.darkMode .attendanceChoice.selected.statusM{background:#059669!important;border-color:#059669!important;color:#fff!important;}
+body.darkMode .attendanceChoice.selected.statusH{background:#ea580c!important;border-color:#ea580c!important;color:#fff!important;}
+body.darkMode #attendanceLegend,body.darkMode #attendanceLegend b{color:#b8c3d9!important;}
+body.darkMode .attendanceDateBox{cursor:pointer;}
+body.darkMode .attendanceDateBox label{cursor:pointer;}
 body.darkMode .summary,body.darkMode .feeSummaryBox{background:#26394a!important;color:#e8f4ff!important;border:1px solid #3e6079!important;}
 body.darkMode .status{background:#49391e!important;color:#ffe6a6!important;}
 body.darkMode .bottomNav{background:rgba(20,25,36,.97)!important;border-top:1px solid #39445a!important;box-shadow:0 -7px 22px rgba(0,0,0,.4)!important;}
@@ -4208,9 +4218,26 @@ async function initializeApp(){
   document.getElementById("attDate").valueAsDate = today;
   checkSundayButton();
 
-  document.getElementById("attDate").addEventListener("change", function(){
+  const attendanceDateInput = document.getElementById("attDate");
+  attendanceDateInput.addEventListener("change", function(){
     checkSundayButton();
     renderAttendance();
+  });
+
+  // Make the complete Attendance Date panel open the native date picker.
+  document.querySelector(".attendanceDateBox").addEventListener("click", function(event){
+    if(event.target === attendanceDateInput || event.target.closest("#sundayBtn")) return;
+    try{
+      if(typeof attendanceDateInput.showPicker === "function"){
+        attendanceDateInput.showPicker();
+      }else{
+        attendanceDateInput.focus();
+        attendanceDateInput.click();
+      }
+    }catch(error){
+      attendanceDateInput.focus();
+      attendanceDateInput.click();
+    }
   });
   document.getElementById("reportMonth").value =
     String(today.getMonth() + 1).padStart(2, "0");
