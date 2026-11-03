@@ -4224,9 +4224,14 @@ async function initializeApp(){
     renderAttendance();
   });
 
-  // Make the complete Attendance Date panel open the native date picker.
-  document.querySelector(".attendanceDateBox").addEventListener("click", function(event){
-    if(event.target === attendanceDateInput || event.target.closest("#sundayBtn")) return;
+  // Open the native date picker when any part of the Attendance Date panel is tapped.
+  const attendanceDateBox = document.querySelector(".attendanceDateBox");
+  let openingAttendanceDatePicker = false;
+  attendanceDateBox.style.cursor = "pointer";
+  attendanceDateBox.addEventListener("click", function(event){
+    if(event.target.closest("#sundayBtn") || openingAttendanceDatePicker) return;
+    event.preventDefault();
+    openingAttendanceDatePicker = true;
     try{
       if(typeof attendanceDateInput.showPicker === "function"){
         attendanceDateInput.showPicker();
@@ -4235,9 +4240,12 @@ async function initializeApp(){
         attendanceDateInput.click();
       }
     }catch(error){
-      attendanceDateInput.focus();
-      attendanceDateInput.click();
+      try{
+        attendanceDateInput.focus();
+        attendanceDateInput.click();
+      }catch(fallbackError){}
     }
+    setTimeout(function(){ openingAttendanceDatePicker = false; }, 250);
   });
   document.getElementById("reportMonth").value =
     String(today.getMonth() + 1).padStart(2, "0");
