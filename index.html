@@ -670,6 +670,49 @@ body:not(.darkMode) .feeTotalCollections{
   box-shadow:0 2px 8px rgba(31,41,55,.06)!important;
 }
 
+
+
+/* Requested refinements: dark-mode section headings and report-sheet outline;
+   selected bottom navigation icon is raised in both themes. */
+body.darkMode #studentsSection .pageHead h2{
+  color:#5ee0a0!important;
+  text-shadow:0 0 10px rgba(94,224,160,.22);
+}
+body.darkMode #attendanceSection .pageHead h2{
+  color:#65baff!important;
+  text-shadow:0 0 10px rgba(101,186,255,.24);
+}
+body.darkMode #feesSection .pageHead h2{
+  color:#ffc66d!important;
+  text-shadow:0 0 10px rgba(255,198,109,.22);
+}
+body.darkMode #reportsSection .pageHead h2{
+  color:#c4a0ff!important;
+  text-shadow:0 0 10px rgba(196,160,255,.24);
+}
+body.darkMode #reportArea .student{
+  border:1px solid #456b83!important;
+  box-shadow:0 0 0 1px rgba(76,175,205,.10),0 8px 22px rgba(0,0,0,.30)!important;
+}
+.navItem{
+  position:relative;
+  overflow:visible;
+  transition:transform .2s ease,color .2s ease;
+}
+.navItem span:first-child{
+  display:inline-block;
+  transform:translateY(0) scale(1);
+  transform-origin:center bottom;
+  transition:transform .2s ease,filter .2s ease;
+}
+.navItem.active{
+  transform:translateY(-4px);
+  z-index:2;
+}
+.navItem.active span:first-child{
+  transform:translateY(-2px) scale(1.24);
+}
+
 </style>  
 </head>  
   <body>
