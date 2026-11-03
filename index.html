@@ -532,6 +532,96 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
   .personalThoughtActions button{padding:7px 8px;}
 }
 
+
+
+/* Theme system: colorful light surfaces and a complete dark palette */
+body:not(.theme-dark){
+  background:linear-gradient(180deg,#f5f8ff 0%,#fff8e8 48%,#f7d978 100%) fixed!important;
+  color:#182230;
+}
+body.theme-dark{
+  background:#111214!important;
+  color:#f3f4f6!important;
+  color-scheme:dark;
+}
+body.theme-dark .appShell{color:#f3f4f6;}
+body.theme-dark .dashboardWelcome p,
+body.theme-dark .pageHead p,
+body.theme-dark .studentMeta,
+body.theme-dark .feeDetailsJoining,
+body.theme-dark .feeStatusMeta{color:#a7adba!important;}
+body.theme-dark .card,
+body.theme-dark .quickBox,
+body.theme-dark .modernPanel,
+body.theme-dark .attendanceDateBox,
+body.theme-dark .popupContent,
+body.theme-dark .thoughtItem,
+body.theme-dark .myNoteCard,
+body.theme-dark .noteCard,
+body.theme-dark .reportCard,
+body.theme-dark .feeSummaryBox,
+body.theme-dark .personalThoughtEditor,
+body.theme-dark .thoughtSourcePanel,
+body.theme-dark .savedFeeIntervalUse,
+body.theme-dark .backHomeBtn,
+body.theme-dark .quickBtn,
+body.theme-dark .student,
+body.theme-dark .emptyStateBox{
+  background:#1d2026!important;
+  color:#f3f4f6!important;
+  border-color:#343943!important;
+  box-shadow:0 3px 14px rgba(0,0,0,.22)!important;
+}
+body.theme-dark .modernStudent,
+body.theme-dark .attendanceRow,
+body.theme-dark .feeDetailRow,
+body.theme-dark .trashStudent,
+body.theme-dark .previousStudentsTitle,
+body.theme-dark .modernMenuItem{border-color:#343943!important;}
+body.theme-dark input:not([type="checkbox"]),
+body.theme-dark select,
+body.theme-dark textarea,
+body.theme-dark .personalThoughtEditor textarea{
+  background:#282c34!important;color:#f3f4f6!important;border-color:#454c58!important;
+}
+body.theme-dark input::placeholder,
+body.theme-dark textarea::placeholder{color:#a0a7b4!important;}
+body.theme-dark .bottomNav{background:rgba(25,27,32,.97)!important;border-color:#353943!important;}
+body.theme-dark .navItem{color:#b8bec9!important;}
+body.theme-dark .navItem.active{color:#9da8ff!important;}
+body.theme-dark #menuPopup,
+body.theme-dark #menuPopup>div,
+body.theme-dark #menuPopup .modernMenuProfile,
+body.theme-dark #menuPopup .modernMenuItem,
+body.theme-dark #menuPopup .modernMenuAccount{
+  background:#20232a!important;color:#f3f4f6!important;border-color:#383e49!important;
+}
+body.theme-dark #menuPopup .modernMenuLabel,
+body.theme-dark #menuPopup .modernMenuItem,
+body.theme-dark #menuPopup .modernMenuProfileName,
+body.theme-dark #menuPopup .modernMenuAccount,
+body.theme-dark #menuPopup #googleEmailDisplay{color:#f3f4f6!important;}
+body.theme-dark #menuPopup .ownerEditBtn{background:#343a49!important;color:#dce1ff!important;}
+body.theme-dark .thoughtTabs{background:#292d36!important;}
+body.theme-dark .thoughtTab{color:#c7cbd4!important;}
+body.theme-dark .thoughtSourceTitle,
+body.theme-dark .personalThoughtEditor label{color:#e5e7eb!important;}
+body.theme-dark .thoughtSourceCompact{background:#292d36!important;border-color:#3b414d!important;color:#d1d5db!important;}
+body.theme-dark .thoughtSourceChip{background:#242832!important;color:#c7caff!important;border-color:#444b59!important;}
+body.theme-dark .feeDetailsName,
+body.theme-dark .feeDetailsSectionTitle,
+body.theme-dark .studentMain,
+body.theme-dark .modernPanel h2,
+body.theme-dark .modernPanel h3,
+body.theme-dark .pageHead h2{color:#f3f4f6!important;}
+body.theme-dark .status,
+body.theme-dark .summary{filter:brightness(.78) saturate(.9);}
+body.theme-dark .modernMenuItem:active{background:#303642!important;}
+body.theme-dark .emptyState{color:#aeb5c1!important;}
+body.theme-dark .developerEmailBtn{background:#282c34!important;color:#f3f4f6!important;border-color:#454c58!important;}
+.themeMenuItem{min-height:52px;}
+.themeMenuItem .modernMenuLabel{font-weight:700;}
+
 </style>  
 </head>  
   <body>
@@ -735,6 +825,14 @@ Reset PIN
               <span class="modernMenuLabel">App Lock</span>
               <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
                 <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div class="modernMenuItem themeMenuItem" onclick="event.stopPropagation(); toggleDarkMode();">
+              <span class="modernMenuIcon" id="themeMenuIcon">🌙</span>
+              <span class="modernMenuLabel" id="themeMenuLabel">Dark Mode</span>
+              <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
+                <input type="checkbox" id="darkModeSwitch" onchange="setDarkMode(this.checked)">
                 <span class="slider"></span>
               </label>
             </div>
@@ -1005,6 +1103,30 @@ Reset PIN
 </div>
 
 <script>
+// Light/Dark appearance preference (kept separately from student data and backups).
+function applyTheme(isDark){
+  document.body.classList.toggle('theme-dark',!!isDark);
+  const sw=document.getElementById('darkModeSwitch');
+  const label=document.getElementById('themeMenuLabel');
+  const icon=document.getElementById('themeMenuIcon');
+  if(sw) sw.checked=!!isDark;
+  if(label) label.textContent=isDark?'Light Mode':'Dark Mode';
+  if(icon) icon.textContent=isDark?'☀️':'🌙';
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content',isDark?'#111214':'#f5f8ff');
+}
+function setDarkMode(isDark){
+  localStorage.setItem('tuitionAppDarkMode',isDark?'1':'0');
+  applyTheme(isDark);
+}
+function toggleDarkMode(){
+  const current=document.body.classList.contains('theme-dark');
+  setDarkMode(!current);
+}
+(function initSavedTheme(){
+  const saved=localStorage.getItem('tuitionAppDarkMode');
+  applyTheme(saved==='1');
+})();
 const GOOGLE_CLIENT_ID = "858615378828-7b1vhd70qn7h0f8c4l7vdjf4clp1qm4e.apps.googleusercontent.com";
 const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata";
 const DRIVE_FILE_NAME = "Tuition_Attendance_Manager_Data.json";
