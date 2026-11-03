@@ -643,6 +643,22 @@ body.darkMode .feeStatusMeta{color:#c1cce1!important;}
 .menuLockItem .modernMenuLabel{margin-left:0;}
 .menuLockItem .modernMenuIcon{display:none!important;}
 
+
+/* Light mode refinements: warm white-to-yellow page background and readable fee totals. */
+body:not(.darkMode){
+  background:linear-gradient(180deg,#ffffff 0%,#fffdf7 34%,#fff0c2 68%,#ffdf83 100%) fixed!important;
+}
+body:not(.darkMode) .feeTotalCollections{
+  color:#263246!important;
+  background:linear-gradient(110deg,#f1f4fa 0%,#fff4d8 100%)!important;
+  border-top:1px solid #d8dee9!important;
+  border:1px solid #e1e5ec!important;
+  border-radius:12px!important;
+  font-weight:800!important;
+  text-shadow:none!important;
+  box-shadow:0 2px 8px rgba(31,41,55,.06)!important;
+}
+
 </style>  
 </head>  
   <body>
