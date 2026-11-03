@@ -619,105 +619,6 @@ body.darkMode .feeStatusMeta{color:#c1cce1!important;}
 .menuLockItem .modernMenuLabel{margin-left:0;}
 .menuLockItem .modernMenuIcon{display:none!important;}
 
-
-/* ===== HTML 3 requested refinements (presentation-only overrides) ===== */
-.pageHead h2{
-  background:linear-gradient(100deg,#e04b62 0%,#2878d7 52%,#7952c8 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-body.darkMode .pageHead h2{
-  background:linear-gradient(100deg,#ff8794 0%,#77b8ff 52%,#c19aff 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.studentMain b,.attendanceName,.feeDetailsName,.reportStudentName,
-#reportArea .student h3,.trashStudentName{
-  color:#a97816!important;
-  text-shadow:none!important;font-weight:800;
-}
-body.darkMode .studentMain b,body.darkMode .attendanceName,
-body.darkMode .feeDetailsName,body.darkMode .reportStudentName,
-body.darkMode #reportArea .student h3,body.darkMode .trashStudentName{
-  color:#ffd978!important;text-shadow:0 0 8px rgba(255,204,90,.12)!important;
-}
-.studentEditText{background:#eef2ff!important;color:#3947a7!important;font-size:12px!important;padding:8px 9px!important;}
-body.darkMode .studentEditText{background:#29334a!important;color:#cbdcff!important;}
-.trashIconBtn,.miniBtn.iconOnly.red{background:transparent!important;border:0!important;box-shadow:none!important;padding:4px 6px!important;min-width:30px!important;}
-.trashIconBtn svg,.miniBtn.iconOnly.red svg{width:21px;height:21px;display:block;fill:none;stroke:#e04452;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-body.darkMode .trashIconBtn svg,body.darkMode .miniBtn.iconOnly.red svg{stroke:#ff727d;}
-.attendanceDateBox + .modernPanel{
-  border:1px solid #c9d8f2;
-  box-shadow:0 4px 15px rgba(45,82,145,.09);
-}
-body.darkMode .attendanceDateBox + .modernPanel{
-  border:1px solid #465b83!important;
-  box-shadow:0 7px 22px rgba(0,0,0,.32)!important;
-}
-#attendanceLegend,#attendanceLegend *{color:#606775!important;}
-body.darkMode #attendanceLegend,body.darkMode #attendanceLegend *{color:#d2daeb!important;}
-.attendanceCountSummary{display:flex;flex-wrap:wrap;gap:3px 5px;align-items:center;}
-.attendanceCountSummary .countP{color:#168b50!important;font-weight:800;}
-.attendanceCountSummary .countA{color:#d93645!important;font-weight:800;}
-.attendanceCountSummary .countL{color:#8a48c7!important;font-weight:800;}
-.attendanceCountSummary .countS{color:#2878d7!important;font-weight:800;}
-.attendanceCountSummary .countM{color:#168b50!important;font-weight:800;}
-.attendanceCountSummary .countH{color:#d97706!important;font-weight:800;}
-body.darkMode .attendanceCountSummary .countP,body.darkMode .attendanceCountSummary .countM{color:#54dc91!important;}
-body.darkMode .attendanceCountSummary .countA{color:#ff737e!important;}
-body.darkMode .attendanceCountSummary .countL{color:#c394ff!important;}
-body.darkMode .attendanceCountSummary .countS{color:#83baff!important;}
-body.darkMode .attendanceCountSummary .countH{color:#ffb45e!important;}
-.featureCard{
-  border:1px solid rgba(255,255,255,.26)!important;
-  box-shadow:0 9px 0 rgba(28,39,83,.18),0 15px 23px rgba(20,30,60,.16),inset 0 1px 3px rgba(255,255,255,.34)!important;
-}
-.featureIcon{
-  filter:drop-shadow(0 3px 1px rgba(0,0,0,.25)) drop-shadow(0 6px 5px rgba(0,0,0,.16));
-  text-shadow:0 2px 3px rgba(0,0,0,.22);
-}
-body.darkMode .featureCard{
-  box-shadow:0 9px 0 rgba(0,0,0,.30),0 16px 24px rgba(0,0,0,.38),inset 0 1px 3px rgba(255,255,255,.25)!important;
-}
-.navItem.active span:first-child{
-  transform:translateY(-2px) scale(1.10);
-}
-.navItem span:first-child{transition:transform .16s ease;}
-.popupClose,.popup button[onclick^="close"],#feePopup button[onclick="closeFeePopup()"],#feeStatusPopup button[onclick="closeFeeStatus()"]{
-  color:#aeb4bf!important;
-}
-body.darkMode .popupClose,body.darkMode .popup button[onclick^="close"],
-body.darkMode #feePopup button[onclick="closeFeePopup()"],
-body.darkMode #feeStatusPopup button[onclick="closeFeeStatus()"]{
-  color:#c2c8d2!important;
-}
-body.darkMode .modernPanel,body.darkMode .attendanceDateBox,
-body.darkMode .quickBox,body.darkMode #reportArea .student{
-  color:#edf1ff!important;
-}
-body.darkMode .feeDetailsPopupContent>div[style*="Total Collections"]{
-  color:#ffe18c!important;
-}
-body.darkMode .feeDetailRow,body.darkMode .feeDetailRow b,
-body.darkMode .feeDetailRow span:not(.feeCredited):not(.feePending){
-  color:#e5eaf6;
-}
-body.darkMode .feeDetailsSectionTitle{color:#d9c8ff!important;}
-body.darkMode .summary{color:#f0f4ff!important;}
-body.darkMode .attendanceReminderItem{color:#ffe4a6!important;}
-body.darkMode .popupContent{color:#f1f4ff;}
-body.darkMode .modernMenuItem,body.darkMode .modernMenuLabel{color:#f0f3ff!important;}
-@media(max-width:390px){
-  .navItem.active span:first-child{transform:translateY(-2px) scale(1.08);}
-}
-
-
-body.darkMode #lockScreen{background:#0d1018!important;color:#edf1ff!important;}
-body.darkMode #lockScreen>div{background:#1c222e!important;color:#f1f4ff!important;border:1px solid #39445a!important;box-shadow:0 10px 28px rgba(0,0,0,.4)!important;}
-body.darkMode #lockScreen p{color:#c5cee0!important;}
-body.darkMode #lockScreen button[title="Unlock with fingerprint"]{background:#293246!important;border-color:#52617e!important;}
-body.darkMode #resetPopup>div{background:#1c222e!important;color:#f1f4ff!important;border:1px solid #39445a!important;}
-body.darkMode #resetPopup p{color:#e0e6f4!important;}
-body.darkMode .photoViewer{background:rgba(5,8,15,.97)!important;}
-
 </style>  
 </head>  
   <body>
@@ -2439,10 +2340,12 @@ function showSection(sectionId, navId, fromHistory){
 }
 
 function goHome(){
-  // Back/Home controls move one navigation step, not directly to the root.
+  // Home is the root of the app. If we are several screens deep, jump back
+  // to the guard entry in one operation so Back on Home can behave normally.
   if(currentSectionId==='homeSection') return;
   if(sectionHistoryStack.length){
-    history.back();
+    pendingHomeNavigation=true;
+    history.go(-sectionHistoryStack.length);
     return;
   }
   showSection('homeSection','homeNav',true);
@@ -2470,8 +2373,8 @@ function renderStudentsPage(){
       <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
       <div class="studentActions">
         <button class="miniBtn" onclick="openStudentDetails(${index})">View</button>
-        <button class="miniBtn studentEditText" aria-label="Edit student" title="Edit" onclick="editStudent(${index})">Edit</button>
-        <button class="miniBtn iconOnly trashIconBtn" aria-label="Delete student" title="Delete" onclick="deleteStudent(${index})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5"/></svg></button>
+        <button class="miniBtn iconOnly editIcon" aria-label="Edit student" title="Edit" onclick="editStudent(${index})">✎</button>
+        <button class="miniBtn red" onclick="deleteStudent(${index})">🗑️</button>
       </div>
     </div>`;
   }).join('');
@@ -3076,19 +2979,15 @@ function renderReports(){
     slidesHtml += `
     <div class="student reportSlide ${slideIndex===reportSlideIndex?'active':''}" data-report-slide="${slideIndex}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
-        <h3 class="reportStudentName" style="font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
+        <h3 style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
         <button class="feeBtn" onclick="downloadPDF(${index})" style="padding:7px 10px;min-width:0;white-space:nowrap;">Print Report</button>
       </div>
 
       ${attendanceHtml}
 
-      <div class="summary attendanceCountSummary">
-        <span class="countP">P : ${present}</span> |
-        <span class="countA">A : ${absent}</span> |
-        <span class="countL">L : ${leave}</span> |
-        <span class="countS">S : ${sunday}</span> |
-        <span class="countM">M : ${sundayManage}</span> |
-        <span class="countH">H : ${extraHoliday}</span>
+      <div class="summary">
+        P : ${present} | A : ${absent} | L : ${leave} | S : ${sunday}
+        ${extraHoliday > 0 ? `| EH : ${extraHoliday}` : ""}
       </div>
     </div>`;
   });
@@ -3280,7 +3179,7 @@ function renderFeeDetails(st){
       hasCredited=true;
       const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
       const mode=rec.mode || 'Mode not set';
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-9 0 1 13h10l1-13M10 11v5m4-5v5"/></svg></button></div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})">🗑️</button></div>`;
     }else{
       rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feePending">Pending</span>${amount ? ` · ₹${amount}` : ''}</div>`;
     }
@@ -3965,19 +3864,26 @@ window.addEventListener("popstate", function(event){
   }
   if(closeTopOverlayFromBack()) return;
 
-  // Each Back press returns exactly one section step. Popups and drawers
-  // are handled above and therefore close before section navigation.
+  // One Back from any main card returns directly Home. Skip the remaining
+  // stale card-history entries so a later Back on Home exits the app.
   if(pendingHomeNavigation){
     pendingHomeNavigation=false;
+    sectionHistoryStack=[];
+    handlingSectionPop=true;
+    showSection('homeSection','homeNav',true);
+    handlingSectionPop=false;
+    return;
   }
   if(currentSectionId!=='homeSection'){
-    if(sectionHistoryStack.length) sectionHistoryStack.pop();
-    const previousSection=sectionHistoryStack.length
-      ? sectionHistoryStack[sectionHistoryStack.length-1]
-      : 'homeSection';
+    const extraSteps=Math.max(0,sectionHistoryStack.length-1);
+    sectionHistoryStack=[];
     handlingSectionPop=true;
-    showSection(previousSection,sectionNavId(previousSection),true);
+    showSection('homeSection','homeNav',true);
     handlingSectionPop=false;
+    if(extraSteps>0){
+      pendingHomeNavigation=true;
+      history.go(-extraSteps);
+    }
   }
   return;
 });
@@ -4306,17 +4212,6 @@ async function initializeApp(){
     checkSundayButton();
     renderAttendance();
   });
-  const attendanceDateBox=document.querySelector(".attendanceDateBox");
-  if(attendanceDateBox){
-    attendanceDateBox.addEventListener("click",function(event){
-      const dateInput=document.getElementById("attDate");
-      if(!dateInput || event.target===dateInput || event.target.closest("#sundayBtn")) return;
-      try{
-        if(typeof dateInput.showPicker==="function") dateInput.showPicker();
-        else dateInput.focus();
-      }catch(error){ dateInput.focus(); }
-    });
-  }
   document.getElementById("reportMonth").value =
     String(today.getMonth() + 1).padStart(2, "0");
 
