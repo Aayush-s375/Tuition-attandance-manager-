@@ -624,6 +624,15 @@ body.darkMode #menuPopup .modernMenuLabel,body.darkMode #menuPopup .modernMenuPr
 body.darkMode #menuPopup .modernMenuItem:active{background:#303b55!important;}
 body.darkMode .featureCard{transform:translateY(0);border:1px solid rgba(255,255,255,.22);box-shadow:0 10px 0 rgba(0,0,0,.24),0 15px 24px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.3)!important;}
 body.darkMode .featureCard:active{transform:translateY(4px);box-shadow:0 5px 0 rgba(0,0,0,.24),0 8px 14px rgba(0,0,0,.3)!important;}
+body.darkMode .featureCard{
+  transform:translateY(0) perspective(700px) rotateX(1deg);
+  border:1px solid rgba(255,255,255,.24)!important;
+  box-shadow:0 9px 0 rgba(0,0,0,.30),0 16px 25px rgba(0,0,0,.38),inset 0 2px 3px rgba(255,255,255,.32),inset 0 -2px 4px rgba(0,0,0,.16)!important;
+}
+body.darkMode .featureCard:active{
+  transform:translateY(5px) perspective(700px) rotateX(0deg)!important;
+  box-shadow:0 4px 0 rgba(0,0,0,.28),0 8px 13px rgba(0,0,0,.30),inset 0 1px 2px rgba(255,255,255,.22)!important;
+}
 body.darkMode .featureIcon{filter:drop-shadow(0 4px 2px rgba(0,0,0,.45));}
 body.darkMode .miniBtn{background:transparent!important;color:#80baff!important;border:0!important;padding:6px!important;font-size:19px!important;text-shadow:0 0 10px rgba(90,160,255,.35);}
 body.darkMode .miniBtn.red{background:transparent!important;color:#ff727d!important;text-shadow:0 0 10px rgba(255,80,95,.3);}
@@ -638,13 +647,18 @@ body.darkMode .attendanceReminderItem{background:#46351d!important;border-color:
 body.darkMode .thoughtBtn.secondary{background:#303a52!important;color:#e2dcff!important;}
 body.darkMode .feeStatusMeta{color:#c1cce1!important;}
 
-/* 3D controls and icon-only edit/delete actions */
-.featureCard{transition:transform .16s ease,box-shadow .16s ease;box-shadow:0 7px 0 rgba(25,35,80,.14),0 12px 20px rgba(20,30,60,.13),inset 0 1px 2px rgba(255,255,255,.28)!important;}
-.featureCard:active{transform:translateY(3px)!important;}
+/* Edit/View/Delete controls share the same compact touch target. */
+.featureCard{transition:transform .16s ease,box-shadow .16s ease;}
 .navItem span:first-child{filter:drop-shadow(0 3px 2px rgba(0,0,0,.22));}
-.miniBtn.iconOnly{background:transparent!important;border:0!important;box-shadow:none!important;min-width:30px;padding:4px 6px!important;font-size:21px!important;}
-.miniBtn.iconOnly.red{color:#e34b5a!important;background:transparent!important;}
-.miniBtn.iconOnly.editIcon{color:#2879d8!important;background:transparent!important;}
+.studentActions .miniBtn{
+  width:44px!important;height:44px!important;min-width:44px!important;
+  padding:0!important;display:inline-flex!important;align-items:center!important;
+  justify-content:center!important;box-sizing:border-box!important;
+}
+.miniBtn.iconOnly{border:0!important;box-shadow:none!important;font-size:21px!important;}
+.miniBtn.iconOnly.red{color:#e34b5a!important;}
+.miniBtn.iconOnly.editIcon{color:#2879d8!important;background:#eef2ff!important;border-radius:9px!important;}
+body.darkMode .miniBtn.iconOnly.editIcon{color:#67d8ff!important;background:#29334a!important;border:1px solid #3e4b66!important;box-shadow:0 3px 8px rgba(0,0,0,.22)!important;}
 .themeMenuGlyph{width:30px;min-width:30px;text-align:center;font-size:22px;color:#f2c94c;}
 .menuThemeSwitch{margin-left:auto!important;flex:0 0 46px!important;}
 .themeSlider{position:absolute;inset:0;border-radius:20px;background:#596579;transition:.22s;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);}
@@ -712,6 +726,22 @@ body.darkMode #reportArea .student{
 .navItem.active span:first-child{
   transform:translateY(-2px) scale(1.24);
 }
+
+
+/* Requested visual refinements. */
+body.darkMode #reportArea .reportStatusSunday{color:#fbbf24!important;}
+body.darkMode #reportArea .reportStatusSundayManage{color:#86efac!important;}
+body.darkMode .featureCard{will-change:transform,box-shadow;}
+.welcomeWave{display:inline-block;transform-origin:72% 78%;}
+.welcomeWave.waveAnimate{animation:welcomeWaveMotion .72s ease-in-out 2;}
+@keyframes welcomeWaveMotion{
+  0%,100%{transform:rotate(0deg)}
+  18%{transform:rotate(18deg)}
+  36%{transform:rotate(-12deg)}
+  54%{transform:rotate(16deg)}
+  72%{transform:rotate(-7deg)}
+}
+@media(prefers-reduced-motion:reduce){.welcomeWave.waveAnimate{animation:none!important;}}
 
 </style>  
 </head>  
@@ -971,7 +1001,7 @@ Reset PIN
   <main>
     <section id="homeSection" class="section active">
       <div class="dashboardWelcome">
-        <h2>Welcome back, <span id="welcomeName">Welcome</span> 👋</h2>
+        <h2>Welcome back, <span id="welcomeName">Welcome</span> <span id="welcomeWave" class="welcomeWave" aria-label="hello">👋</span></h2>
         <p>Choose what you want to manage today.</p>
       </div>
       <div class="featureGrid">
@@ -1844,6 +1874,14 @@ function updateOwnerNameDisplay() {
   if (welcomeName) { welcomeName.textContent = name || "Welcome"; welcomeName.style.overflowWrap = "anywhere"; welcomeName.style.wordBreak = "normal"; }
 }
 
+function animateWelcomeWave(){
+  const wave=document.getElementById("welcomeWave");
+  if(!wave) return;
+  wave.classList.remove("waveAnimate");
+  void wave.offsetWidth;
+  wave.classList.add("waveAnimate");
+}
+
 function editOwnerName() {
   const currentName = getOwnerName();
   const newName = prompt("Enter your name", currentName || "");
@@ -1983,6 +2021,7 @@ function handleGoogleLogin(response) {
     loadAccountData();
     updateGoogleEmailDisplay();
     updateOwnerNameDisplay();
+    animateWelcomeWave();
     document.body.classList.add("googleLoggedIn");
     document.getElementById("googleLogin").style.display = "none";
     render();
@@ -3053,8 +3092,9 @@ function renderReports(){
         const displayStatus = a.status.startsWith("EH|") ? a.status.split("|").slice(1).join("|") : a.status;
         const safeDate = a.date.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 
+        const statusClass = a.status==="Sunday" ? "reportStatusSunday" : (a.status==="Sunday Manage ✅" ? "reportStatusSundayManage" : "");
         attendanceHtml +=
-        `<p onclick="openAttendanceStatus(${index},'${safeDate}')" style="
+        `<p class="${statusClass}" onclick="openAttendanceStatus(${index},'${safeDate}')" style="
         width:220px;
         margin:auto;
         text-align:left;
@@ -3810,6 +3850,7 @@ function unlockApp(){
     document.getElementById("lockSwitch").checked = true;
     document.getElementById("lockScreen").style.display = "none";
     document.getElementById("unlockPin").value="";
+    animateWelcomeWave();
   }else{
     alert("Wrong PIN");
     document.getElementById("unlockPin").value="";
@@ -4359,6 +4400,7 @@ async function initializeApp(){
     }
     render();
     renderHomeExtras();
+    animateWelcomeWave();
     checkLock();
 
     // Re-obtain a short-lived Drive token after every page load.
