@@ -435,6 +435,17 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .reportSwipeHint{text-align:center;color:#777;font-size:12px;margin:-3px 0 9px;}
 
 #reportArea .summary{border-radius:10px;}
+.attendanceCountCode{font-weight:900;}
+.attendanceCountCode.countP{color:#16803c!important;}
+.attendanceCountCode.countA{color:#dc2626!important;}
+.attendanceCountCode.countL{color:#9333ea!important;}
+.attendanceCountCode.countS{color:#2563eb!important;}
+.attendanceCountCode.countH{color:#ea580c!important;}
+body.darkMode .attendanceCountCode.countP{color:#4ade80!important;}
+body.darkMode .attendanceCountCode.countA{color:#f87171!important;}
+body.darkMode .attendanceCountCode.countL{color:#c084fc!important;}
+body.darkMode .attendanceCountCode.countS{color:#60a5fa!important;}
+body.darkMode .attendanceCountCode.countH{color:#fb923c!important;}
 .bottomNav{position:fixed;left:0;right:0;bottom:0;height:66px;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid #e7e9ee;display:flex;justify-content:center;z-index:5000;box-shadow:0 -4px 18px rgba(20,30,60,.08);}
 .bottomNavInner{width:100%;max-width:720px;display:grid;grid-template-columns:repeat(5,1fr);}
 .navItem{border:0;background:none;color:#858b98;font-size:10px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;}
@@ -3019,15 +3030,18 @@ function renderReports(){
     slidesHtml += `
     <div class="student reportSlide ${slideIndex===reportSlideIndex?'active':''}" data-report-slide="${slideIndex}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
-        <h3 style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
+        <h3 class="reportStudentName" style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
         <button class="feeBtn" onclick="downloadPDF(${index})" style="padding:7px 10px;min-width:0;white-space:nowrap;">Print Report</button>
       </div>
 
       ${attendanceHtml}
 
       <div class="summary">
-        P : ${present} | A : ${absent} | L : ${leave} | S : ${sunday}
-        ${extraHoliday > 0 ? `| EH : ${extraHoliday}` : ""}
+        <span class="attendanceCountCode countP">P</span> : ${present} |
+        <span class="attendanceCountCode countA">A</span> : ${absent} |
+        <span class="attendanceCountCode countL">L</span> : ${leave} |
+        <span class="attendanceCountCode countS">S</span> : ${sunday}
+        ${extraHoliday > 0 ? `| <span class="attendanceCountCode countH">EH</span> : ${extraHoliday}` : ""}
       </div>
     </div>`;
   });
@@ -3412,8 +3426,8 @@ function toggleStudentActiveFromDetails(){
 }
 
 function closeStudentDetails(){
-  document.getElementById("studentDetailsPopup").style.display = "none";
-  selectedStudentDetails = null;
+  // Close only this popup and return to the immediately previous screen.
+  closeOverlayOneStep();
 }
 
 function editStudent(index){
