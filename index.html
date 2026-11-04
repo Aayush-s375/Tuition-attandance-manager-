@@ -307,6 +307,18 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
 .modernMenuPopup .modernMenuItem:active{background:#f2f4ff;}
 .modernMenuProfile{min-height:58px;box-sizing:border-box;padding:10px 12px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;background:#fff;}
 .modernMenuProfileName{min-width:0;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:#202638;}
+.modernMenuProfileAvatar{width:30px;height:30px;min-width:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;font-size:22px;line-height:1;cursor:pointer;background:transparent;}
+.modernMenuProfileAvatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
+#profilePhotoModal{position:fixed;inset:0;z-index:10050;background:rgba(5,9,18,.96);display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;box-sizing:border-box;color:#fff;}
+.profilePhotoTop{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;right:16px;display:flex;justify-content:flex-start;}
+.profilePhotoBack{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:10px 17px;font-weight:700;font-size:15px;}
+#profilePhotoLarge{width:min(78vw,360px);height:min(78vw,360px);max-height:55vh;object-fit:contain;border-radius:18px;background:#182131;box-shadow:0 12px 40px rgba(0,0,0,.45);}
+.profilePhotoEmpty{width:min(62vw,260px);height:min(62vw,260px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:#202b42;font-size:110px;}
+.profilePhotoActions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:26px;width:100%;}
+.profilePhotoActions button{border:0;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:800;cursor:pointer;}
+.profilePhotoChange{background:#536dfe;color:#fff;}
+.profilePhotoRemove{background:#fff0f0;color:#b42318;}
+body.darkMode #profilePhotoModal{background:rgba(5,8,15,.98);}
 .modernMenuProfileName #ownerNameDisplay{min-width:0;max-width:185px;overflow-wrap:anywhere;white-space:normal;}
 .ownerEditBtn{width:34px;height:34px;flex:0 0 34px;border:0;border-radius:9px;background:#eef2ff;color:#3947a7;font-size:21px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .ownerEditBtn:active{background:#dde3ff;}
@@ -950,7 +962,7 @@ Reset PIN
           <div id="menuPopup" class="modernMenuPopup" style="display:none;position:fixed;background:white;border:1px solid #ddd;box-shadow:0 8px 24px rgba(0,0,0,.16);z-index:9999;">
             <div class="modernMenuProfile">
               <div class="modernMenuProfileName">
-                <span class="modernMenuIcon">👤</span>
+                <span class="modernMenuProfileAvatar" id="ownerProfileAvatar" role="button" tabindex="0" onclick="openProfilePhoto()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProfilePhoto();}" title="View profile photo"><span id="ownerProfileFallback">👤</span><img id="ownerProfileThumb" alt="Profile photo" style="display:none"></span>
                 <span id="ownerNameDisplay">Set Your Name</span>
               </div>
               <button class="ownerEditBtn" type="button" onclick="event.stopPropagation(); editOwnerName()" title="Edit Name" aria-label="Edit Name">✎</button>
@@ -1279,6 +1291,72 @@ function getSyncKey() {
 
 function getOwnerNameKey() {
   return currentAccountKey ? OWNER_NAME_KEY_PREFIX + currentAccountKey : "tuitionOwnerName_v1";
+}
+
+function getOwnerProfilePhotoKey() {
+  return "tuitionOwnerPhoto_v1_" + (currentAccountKey || "local");
+}
+function getOwnerProfilePhoto() {
+  return localStorage.getItem(getOwnerProfilePhotoKey()) || "";
+}
+function updateProfilePhotoDisplay() {
+  const photo=getOwnerProfilePhoto();
+  const thumb=document.getElementById("ownerProfileThumb");
+  const fallback=document.getElementById("ownerProfileFallback");
+  const large=document.getElementById("profilePhotoLarge");
+  const empty=document.getElementById("profilePhotoEmpty");
+  const remove=document.getElementById("removeProfilePhotoBtn");
+  if(thumb){thumb.src=photo;thumb.style.display=photo?"block":"none";}
+  if(fallback)fallback.style.display=photo?"none":"inline";
+  if(large){large.src=photo;large.style.display=photo?"block":"none";}
+  if(empty)empty.style.display=photo?"none":"flex";
+  if(remove)remove.style.display=photo?"inline-block":"none";
+}
+function openProfilePhoto(){
+  updateProfilePhotoDisplay();
+  const modal=document.getElementById("profilePhotoModal");
+  if(modal)modal.style.display="flex";
+}
+function closeProfilePhoto(){
+  const modal=document.getElementById("profilePhotoModal");
+  if(modal)modal.style.display="none";
+}
+function changeProfilePhoto(){
+  const input=document.getElementById("profilePhotoInput");
+  if(input)input.click();
+}
+function handleProfilePhoto(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  if(!file.type||!file.type.startsWith("image/")){alert("Please select an image.");event.target.value="";return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const max=512,scale=Math.min(1,max/Math.max(img.width,img.height));
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.max(1,Math.round(img.width*scale));
+      canvas.height=Math.max(1,Math.round(img.height*scale));
+      const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      const data=canvas.toDataURL("image/jpeg",0.78);
+      try{
+        localStorage.setItem(getOwnerProfilePhotoKey(),data);
+        const meta=getSyncMeta();meta.updatedAt=Date.now();meta.pending=true;setSyncMeta(meta);
+        updateProfilePhotoDisplay();scheduleDriveSync();
+      }catch(err){alert("Photo save nahi ho paya. Chhoti image select karke dobara try karein.");}
+    };
+    img.onerror=function(){alert("Image open nahi ho payi.");};
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value="";
+}
+function removeProfilePhoto(){
+  if(!getOwnerProfilePhoto())return;
+  if(!confirm("Kya aap profile photo hatana chahte hain?"))return;
+  localStorage.removeItem(getOwnerProfilePhotoKey());
+  const meta=getSyncMeta();meta.updatedAt=Date.now();meta.pending=true;setSyncMeta(meta);
+  updateProfilePhotoDisplay();scheduleDriveSync();
 }
 
 function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;", "'":"&#39;"}[ch];});}
@@ -1885,6 +1963,7 @@ function updateOwnerNameDisplay() {
   const welcomeName = document.getElementById("welcomeName");
 
   if (nameDisplay) nameDisplay.textContent = name || "Set Your Name";
+  updateProfilePhotoDisplay();
   if (welcomeName) { welcomeName.textContent = name || "Welcome"; welcomeName.style.overflowWrap = "anywhere"; welcomeName.style.wordBreak = "normal"; }
 }
 
@@ -2236,6 +2315,7 @@ async function syncWithGoogleDrive() {
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt || Date.now(),
         ownerName: getDriveBackupOwnerName(),
+        profilePhoto: getOwnerProfilePhoto(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students,
         deletedStudents: readTrash(),
@@ -2272,6 +2352,7 @@ async function syncWithGoogleDrive() {
         email: localStorage.getItem("googleEmail") || "",
         updatedAt: localUpdatedAt,
         ownerName: getDriveBackupOwnerName(),
+        profilePhoto: getOwnerProfilePhoto(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students,
         deletedStudents: readTrash(),
@@ -2306,11 +2387,16 @@ async function syncWithGoogleDrive() {
         if (Object.prototype.hasOwnProperty.call(driveBackup, "ownerName") && String(driveBackup.ownerName || "").trim()) {
           localStorage.setItem(getOwnerNameKey(), String(driveBackup.ownerName).trim());
         }
+        if (Object.prototype.hasOwnProperty.call(driveBackup, "profilePhoto")) {
+          if(driveBackup.profilePhoto) localStorage.setItem(getOwnerProfilePhotoKey(), driveBackup.profilePhoto);
+          else localStorage.removeItem(getOwnerProfilePhotoKey());
+        }
         if (Object.prototype.hasOwnProperty.call(driveBackup, "appPin")) {
           if (driveBackup.appPin) localStorage.setItem(getPinKey(), driveBackup.appPin);
           else localStorage.removeItem(getPinKey());
         }
         setSyncMeta({updatedAt: driveUpdatedAt, pending: false, driveFileId: driveFile.id});
+        updateOwnerNameDisplay();
         render();
       }
       setDriveSyncStatus("Synced with Google Drive", "ok");
@@ -3909,6 +3995,7 @@ function confirmReset(){
 
 const appOverlayIds = [
   "menuPopup",
+  "profilePhotoModal",
   "developerPopup",
   "feePopup",
   "feeStatusPopup",
@@ -4200,6 +4287,10 @@ async function restoreFromGoogleDrive(){
     if (Object.prototype.hasOwnProperty.call(backup, "ownerName") && String(backup.ownerName || "").trim()) {
       localStorage.setItem(getOwnerNameKey(), String(backup.ownerName).trim());
     }
+    if (Object.prototype.hasOwnProperty.call(backup, "profilePhoto")) {
+      if(backup.profilePhoto) localStorage.setItem(getOwnerProfilePhotoKey(), backup.profilePhoto);
+      else localStorage.removeItem(getOwnerProfilePhotoKey());
+    }
     if (Object.prototype.hasOwnProperty.call(backup, "appPin")) {
       if (backup.appPin) localStorage.setItem(getPinKey(), backup.appPin);
       else localStorage.removeItem(getPinKey());
@@ -4223,6 +4314,7 @@ function backupData(){
     students: students,
     deletedStudents: readTrash(),
     ownerName: getOwnerName(),
+    profilePhoto: getOwnerProfilePhoto(),
     appPin: localStorage.getItem(getPinKey()),
     ...getThoughtBackupData()
   };
@@ -4279,6 +4371,10 @@ function restoreBackup(event){
 
       if(backup.ownerName && String(backup.ownerName).trim()){
         localStorage.setItem(getOwnerNameKey(), String(backup.ownerName).trim());
+      }
+      if(Object.prototype.hasOwnProperty.call(backup,"profilePhoto")){
+        if(backup.profilePhoto)localStorage.setItem(getOwnerProfilePhotoKey(),backup.profilePhoto);
+        else localStorage.removeItem(getOwnerProfilePhotoKey());
       }
       if(backup.appPin){
         localStorage.setItem(getPinKey(), backup.appPin);
@@ -4441,6 +4537,16 @@ window.addEventListener("load", function(){
   initializeApp();
 });
 </script>  
+<div id="profilePhotoModal" role="dialog" aria-modal="true" aria-label="Profile photo">
+  <div class="profilePhotoTop"><button type="button" class="profilePhotoBack" onclick="closeProfilePhoto()">← Back</button></div>
+  <img id="profilePhotoLarge" src="" alt="Profile photo" style="display:none">
+  <div id="profilePhotoEmpty" class="profilePhotoEmpty">👤</div>
+  <div class="profilePhotoActions">
+    <button type="button" class="profilePhotoChange" onclick="changeProfilePhoto()">📷 Change Photo</button>
+    <button type="button" class="profilePhotoRemove" id="removeProfilePhotoBtn" onclick="removeProfilePhoto()">🗑 Remove Photo</button>
+  </div>
+</div>
+<input type="file" id="profilePhotoInput" accept="image/*" style="display:none" onchange="handleProfilePhoto(event)">
 <input
 type="file"
 id="restoreFile"
