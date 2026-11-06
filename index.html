@@ -785,6 +785,14 @@ body.darkMode .aboutAppPanel{background:linear-gradient(145deg,#202b40,#1b2436 5
 body.darkMode .aboutAppName,body.darkMode .aboutAppContactTitle{color:#c9d9ff!important;}
 body.darkMode .aboutAppDeveloper{color:#f0f3ff!important;}
 body.darkMode .aboutAppByline,body.darkMode .aboutAppWork{color:#b9c7df!important;}
+.teachingMotto{display:block;width:100%;box-sizing:border-box;text-align:center;padding:19px 8px 13px;margin:4px 0 2px;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#52627e;font-family:Georgia,'Times New Roman',serif;font-size:clamp(20px,5.4vw,25px);font-weight:700;font-style:italic;letter-spacing:.35px;text-shadow:0 1px 0 rgba(255,255,255,.45);}
+.teachingMotto span{color:#e34b65;font-style:normal;font-size:1.04em;}
+.aboutMottoSetting{width:100%;max-width:340px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;padding-top:16px;border-top:1px solid #dfe5ef;color:#52627e;font-size:13px;font-weight:750;text-align:left;}
+.aboutMottoSwitch{flex:0 0 48px;width:48px;}
+body.darkMode .teachingMotto{color:#d7e2f7!important;text-shadow:0 1px 5px rgba(0,0,0,.35);}
+body.darkMode .teachingMotto span{color:#ff8294!important;}
+body.darkMode .aboutMottoSetting{color:#c5d2e9!important;border-color:#3b4d70!important;}
+body.darkMode .feeTotalCollections{color:#ffe18c!important;background:linear-gradient(90deg,rgba(95,71,180,.24),rgba(27,145,120,.18));border-top-color:#6c5db7!important;border-radius:10px;padding:12px!important;}
 
 /* ===== Puzzle & Facts ===== */
 .pfHomeCard{margin-top:14px;border:1px solid #cfe0ff;border-radius:18px;padding:15px;background:linear-gradient(135deg,#f5f8ff 0%,#edf4ff 55%,#f8f4ff 100%);box-shadow:0 5px 18px rgba(55,91,160,.10);color:#202b43;}
@@ -1090,6 +1098,7 @@ Reset PIN
         <div class="thoughtCardHead"><h3>📝 My Notes</h3></div>
         <div id="homeMyNotesContent" class="thoughtText" style="font-size:15px;font-weight:600;white-space:pre-wrap;"></div>
       </div>
+      <div id="teachingMottoHome" class="teachingMotto" aria-label="I love teaching" style="display:none;">I <span aria-hidden="true">♥</span> Teaching</div>
     </section>
 
     <section id="thoughtsSection" class="section">
@@ -1159,6 +1168,10 @@ Reset PIN
             <span>Email</span>
           </a>
         </div>
+        <div class="aboutMottoSetting">
+          <span>Show “I ♥ Teaching” on Home Display</span>
+          <label class="switch aboutMottoSwitch"><input type="checkbox" id="teachingMottoSwitch" checked onchange="setTeachingMottoDisplay(this.checked)"><span class="slider"></span></label>
+        </div>
       </div>
     </section>
 
@@ -1189,6 +1202,12 @@ Reset PIN
     <section id="feesSection" class="section">
       <div class="pageHead"><div><h2>Fees</h2><p>Record and manage student payments</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div id="feesArea" class="modernPanel"></div>
+    </section>
+
+    <section id="feeDetailsSection" class="section">
+      <div class="pageHead"><div><h2>Monthly Fee Details</h2><p>Student payment history and fee status</p></div><button class="backHomeBtn" onclick="showSection('feesSection','feesNav')">← Back</button></div>
+      <input type="date" id="joiningDatePicker" aria-label="Tuition Joining Date" onchange="saveJoiningDateFromPicker(this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
+      <div id="feeDetailsContent" class="modernPanel" style="margin-top:4px;text-align:left;"></div>
     </section>
 
     <section id="reportsSection" class="section">
@@ -1263,16 +1282,6 @@ Reset PIN
     <button class="popupSave" onclick="saveFee()">Save Fee</button>
   </div>
 </div>
-<div class="popup feeDetailsPopup" id="feeStatusPopup">
-  <input type="date" id="joiningDatePicker" aria-label="Tuition Joining Date" onchange="saveJoiningDateFromPicker(this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;">
-  <div class="popupContent" style="max-height:90vh;overflow:auto;">
-    <div style="display:flex;justify-content:flex-end;align-items:center;">
-      <button class="overlayCloseBtn" type="button" aria-label="Back" onclick="closeOverlayOneStep()">✕</button>
-    </div>
-    <div id="feeDetailsContent" style="margin-top:14px;text-align:left;"></div>
-  </div>
-</div>
-
 <div class="popup" id="attendanceStatusPopup">
   <div class="popupContent">
     <h3>Attendance Status</h3>
@@ -1822,6 +1831,12 @@ function setPersonalThoughtForToday(id){
   alert('आपका विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।');
 }
 function resetTodayThought(){localStorage.removeItem(getThoughtPreferenceKey());normalThoughtCache=null;markThoughtChangeForSync();renderHomeExtras();}
+function teachingMottoKey(){return "tuitionTeachingMotto_v1_"+(currentAccountKey||"local");}
+function teachingMottoEnabled(){const saved=localStorage.getItem(teachingMottoKey());return saved===null?true:saved==="true";}
+function renderTeachingMotto(){const el=document.getElementById("teachingMottoHome");if(el)el.style.display=teachingMottoEnabled()?"block":"none";}
+function renderTeachingMottoSetting(){const sw=document.getElementById("teachingMottoSwitch");if(sw)sw.checked=teachingMottoEnabled();renderTeachingMotto();}
+function setTeachingMottoDisplay(value){localStorage.setItem(teachingMottoKey(),String(!!value));renderTeachingMotto();}
+
 function renderHomeExtras(){
   const reminder=document.getElementById("attendanceReminder");
   if(reminder){
@@ -1862,6 +1877,7 @@ function renderHomeExtras(){
   const thought=getTodaysThought();const text=document.getElementById("homeThoughtText");if(text)text.textContent=thought.t;
   renderHomeNotes();
   renderPuzzleFactsHome();
+  renderTeachingMotto();
 }
 function openThoughtsLibrary(){
   activeThoughtTab='ready';
@@ -2630,6 +2646,7 @@ function sectionNavId(sectionId){
     studentsSection:'studentsNav',
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
+    feeDetailsSection:'feesNav',
     reportsSection:'reportsNav',
     thoughtsSection:'homeNav',
     puzzleFactsSection:'homeNav',
@@ -2659,6 +2676,8 @@ function showSection(sectionId, navId, fromHistory){
   window.scrollTo({top:0,behavior:'smooth'});
   if(sectionId==='studentsSection') renderStudentsPage();
   if(sectionId==='feesSection') renderFeesPage();
+  if(sectionId==='feeDetailsSection' && students[currentStudent]) renderFeeDetails(students[currentStudent]);
+  if(sectionId==='aboutAppSection') renderTeachingMottoSetting();
   if(sectionId==='reportsSection') renderReports();
   if(sectionId==='thoughtsSection') renderThoughtsLibrary();
   if(sectionId==='puzzleFactsSection') renderPuzzleFactsPage();
@@ -3472,12 +3491,11 @@ function openFeeStatus(index){
   currentStudent=index;
   const st=students[index];
   if(!st) return;
-  renderFeeDetails(st);
-  document.getElementById('feeStatusPopup').style.display='flex';
+  showSection('feeDetailsSection','feesNav');
 }
 
 function closeFeeStatus(){
-  document.getElementById('feeStatusPopup').style.display='none';
+  showSection('feesSection','feesNav');
 }
 
 function renderFeeDetails(st){
@@ -4087,7 +4105,6 @@ const appOverlayIds = [
   "menuPopup",
   "profilePhotoModal",
   "feePopup",
-  "feeStatusPopup",
   "attendanceStatusPopup",
   "studentDetailsPopup",
   "resetPopup",
