@@ -2638,9 +2638,6 @@ function openPuzzleFactsFromMenu(event){if(event)event.stopPropagation();menuNav
 function openAboutAppFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById('menuPopup');if(menu)closeMenuDrawer();overlayHistoryStack=overlayHistoryStack.filter(id=>id!=='menuPopup');showSection('aboutAppSection','homeNav');setTimeout(()=>{menuNavigationInProgress=false;},300);}
 
 let currentSectionId = 'homeSection';
-let sectionHistoryStack = [];
-let pendingHomeNavigation = false;
-let handlingSectionPop = false;
 
 function sectionNavId(sectionId){
   const map={
@@ -2653,7 +2650,8 @@ function sectionNavId(sectionId){
     thoughtsSection:'homeNav',
     puzzleFactsSection:'homeNav',
     trashSection:'homeNav',
-    aboutAppSection:'homeNav'
+    aboutAppSection:'homeNav',
+    myNotesSection:'homeNav'
   };
   return map[sectionId] || 'homeNav';
 }
@@ -2662,11 +2660,14 @@ function showSection(sectionId, navId, fromHistory){
   const section=document.getElementById(sectionId);
   if(!section) return;
 
-  // A normal tap creates one browser-history step. Android Back can then
-  // return to the previous section instead of immediately leaving the app.
-  if(!fromHistory && !handlingSectionPop && sectionId!==currentSectionId){
-    history.pushState({tuitionSection:sectionId}, '', location.href);
-    sectionHistoryStack.push(sectionId);
+  // Main cards are not navigation-history steps. Only the Fee Details
+  // detail page gets one Back step that returns to the Fees card.
+  if(sectionId==='feeDetailsSection' && currentSectionId!=='feeDetailsSection' && !fromHistory){
+    history.pushState({tuitionDetail:'feeDetailsSection'}, '', location.href);
+  }else if(currentSectionId==='feeDetailsSection' && sectionId!=='feesSection' && !fromHistory){
+    // If another main card is selected directly, do not leave a stale
+    // Fee Details history entry behind.
+    history.replaceState({tuitionAppGuard:true}, '', location.href);
   }
 
   currentSectionId=sectionId;
@@ -2684,30 +2685,24 @@ function showSection(sectionId, navId, fromHistory){
   if(sectionId==='thoughtsSection') renderThoughtsLibrary();
   if(sectionId==='puzzleFactsSection') renderPuzzleFactsPage();
   if(sectionId==='trashSection') renderTrashStudents();
+  if(sectionId==='myNotesSection') renderMyNotesList();
   renderHomeExtras();
 }
 
 function navigateBackSection(){
-  // Use the existing browser-history entry so the screen Back button and
-  // Android Back button share the same single-step navigation behavior.
-  if(currentSectionId==='feeDetailsSection' && sectionHistoryStack.length){
+  // Fee Details is the only section-level detail: Back returns to Fees.
+  if(currentSectionId==='feeDetailsSection'){
     history.back();
     return;
   }
-  if(sectionHistoryStack.length){
-    history.back();
-    return;
-  }
-  showSection('feesSection','feesNav',true);
+  // When a main card is open, Back always returns directly to Home.
+  goHome();
 }
 
 function goHome(){
-  // Home is the root of the app. If we are several screens deep, jump back
-  // to the guard entry in one operation so Back on Home can behave normally.
   if(currentSectionId==='homeSection') return;
-  if(sectionHistoryStack.length){
-    pendingHomeNavigation=true;
-    history.go(-sectionHistoryStack.length);
+  if(currentSectionId==='feeDetailsSection'){
+    history.back();
     return;
   }
   showSection('homeSection','homeNav',true);
@@ -3511,7 +3506,7 @@ function openFeeStatus(index){
 }
 
 function closeFeeStatus(){
-  showSection('feesSection','feesNav');
+  navigateBackSection();
 }
 
 function renderFeeDetails(st){
@@ -4241,26 +4236,19 @@ window.addEventListener("popstate", function(event){
   }
   if(closeTopOverlayFromBack()) return;
 
-  // If the user pressed the in-app Home button, finish that navigation.
-  if(pendingHomeNavigation){
-    pendingHomeNavigation=false;
-    sectionHistoryStack=[];
-    handlingSectionPop=true;
-    showSection('homeSection','homeNav',true);
-    handlingSectionPop=false;
+  // Back from a detail page returns to its parent card.
+  if(currentSectionId==='feeDetailsSection'){
+    showSection('feesSection','feesNav',true);
     return;
   }
 
-  // Android/device Back follows the actual page sequence one step at a time.
-  // Example: Fee Details -> Fees -> previous page -> Home.
+  // Back from any main card/page goes straight to Home, never to
+  // whichever card happened to be opened previously.
   if(currentSectionId!=='homeSection'){
-    if(sectionHistoryStack.length) sectionHistoryStack.pop();
-    const previousSection=sectionHistoryStack.length
-      ? sectionHistoryStack[sectionHistoryStack.length-1]
-      : 'homeSection';
-    handlingSectionPop=true;
-    showSection(previousSection,sectionNavId(previousSection),true);
-    handlingSectionPop=false;
+    showSection('homeSection','homeNav',true);
+    // Re-arm the Home guard because this Back press consumed the old one.
+    history.pushState({tuitionAppGuard:true}, '', location.href);
+    return;
   }
   return;
 });
@@ -4268,7 +4256,6 @@ window.addEventListener("popstate", function(event){
 window.addEventListener("load", function(){
   setupOverlayBackHandling();
   currentSectionId='homeSection';
-  sectionHistoryStack=[];
   renderHomeNotes();
   // One guard entry lets the first Back press be intercepted while the app is open.
   history.pushState({tuitionAppGuard:true}, "", location.href);
