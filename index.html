@@ -785,9 +785,10 @@ body.darkMode .aboutAppPanel{background:linear-gradient(145deg,#202b40,#1b2436 5
 body.darkMode .aboutAppName,body.darkMode .aboutAppContactTitle{color:#c9d9ff!important;}
 body.darkMode .aboutAppDeveloper{color:#f0f3ff!important;}
 body.darkMode .aboutAppByline,body.darkMode .aboutAppWork{color:#b9c7df!important;}
-.teachingMotto{display:block;width:100%;box-sizing:border-box;text-align:center;padding:19px 8px 13px;margin:4px 0 2px;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#52627e;font-family:Georgia,'Times New Roman',serif;font-size:clamp(20px,5.4vw,25px);font-weight:700;font-style:italic;letter-spacing:.35px;text-shadow:0 1px 0 rgba(255,255,255,.45);}
+.teachingMotto{display:block;width:100%;max-width:100%;box-sizing:border-box;text-align:center;padding:24px 4px 18px;margin:8px 0 4px;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#52627e;font-family:Georgia,'Times New Roman',serif;font-size:clamp(30px,8vw,38px);font-weight:700;font-style:italic;letter-spacing:.2px;line-height:1.25;text-shadow:0 1px 0 rgba(255,255,255,.45);white-space:normal;overflow-wrap:anywhere;}
 .teachingMotto span{color:#e34b65;font-style:normal;font-size:1.04em;}
-.aboutMottoSetting{width:100%;max-width:340px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:28px;padding-top:16px;border-top:1px solid #dfe5ef;color:#52627e;font-size:13px;font-weight:750;text-align:left;}
+.aboutMottoSetting{width:100%;max-width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 auto 22px;padding:12px 8px 18px;border-top:1px solid #dfe5ef;color:#52627e;font-size:14px;font-weight:750;text-align:left;}
+.aboutMottoPreview{width:100%;max-width:100%;margin:22px auto 0;}
 .aboutMottoSwitch{flex:0 0 48px;width:48px;}
 body.darkMode .teachingMotto{color:#d7e2f7!important;text-shadow:0 1px 5px rgba(0,0,0,.35);}
 body.darkMode .teachingMotto span{color:#ff8294!important;}
@@ -1098,7 +1099,7 @@ Reset PIN
         <div class="thoughtCardHead"><h3>📝 My Notes</h3></div>
         <div id="homeMyNotesContent" class="thoughtText" style="font-size:15px;font-weight:600;white-space:pre-wrap;"></div>
       </div>
-      <div id="teachingMottoHome" class="teachingMotto" aria-label="I love teaching" style="display:none;">I <span aria-hidden="true">♥</span> Teaching</div>
+      <div id="teachingMottoHome" class="teachingMotto" aria-label="I love teaching" style="display:none;">I <span aria-hidden="true">♥</span> teaching</div>
     </section>
 
     <section id="thoughtsSection" class="section">
@@ -1168,10 +1169,11 @@ Reset PIN
             <span>Email</span>
           </a>
         </div>
-        <div class="aboutMottoSetting">
-          <span>Show “I ♥ Teaching” on Home Display</span>
-          <label class="switch aboutMottoSwitch"><input type="checkbox" id="teachingMottoSwitch" checked onchange="setTeachingMottoDisplay(this.checked)"><span class="slider"></span></label>
-        </div>
+      </div>
+      <div class="teachingMotto aboutMottoPreview" aria-label="I love teaching">I <span aria-hidden="true">♥</span> teaching</div>
+      <div class="aboutMottoSetting">
+        <span>Show “I ♥ teaching” on Home Display</span>
+        <label class="switch aboutMottoSwitch"><input type="checkbox" id="teachingMottoSwitch" checked onchange="setTeachingMottoDisplay(this.checked)"><span class="slider"></span></label>
       </div>
     </section>
 
@@ -4225,8 +4227,7 @@ window.addEventListener("popstate", function(event){
   }
   if(closeTopOverlayFromBack()) return;
 
-  // One Back from any main card returns directly Home. Skip the remaining
-  // stale card-history entries so a later Back on Home exits the app.
+  // If the user pressed the in-app Home button, finish that navigation.
   if(pendingHomeNavigation){
     pendingHomeNavigation=false;
     sectionHistoryStack=[];
@@ -4235,16 +4236,17 @@ window.addEventListener("popstate", function(event){
     handlingSectionPop=false;
     return;
   }
+
+  // Android/device Back follows the actual page sequence one step at a time.
+  // Example: Fee Details -> Fees -> previous page -> Home.
   if(currentSectionId!=='homeSection'){
-    const extraSteps=Math.max(0,sectionHistoryStack.length-1);
-    sectionHistoryStack=[];
+    if(sectionHistoryStack.length) sectionHistoryStack.pop();
+    const previousSection=sectionHistoryStack.length
+      ? sectionHistoryStack[sectionHistoryStack.length-1]
+      : 'homeSection';
     handlingSectionPop=true;
-    showSection('homeSection','homeNav',true);
+    showSection(previousSection,sectionNavId(previousSection),true);
     handlingSectionPop=false;
-    if(extraSteps>0){
-      pendingHomeNavigation=true;
-      history.go(-extraSteps);
-    }
   }
   return;
 });
