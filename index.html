@@ -1191,6 +1191,11 @@ Reset PIN
       <div id="studentsArea" class="modernPanel"></div>
     </section>
 
+    <section id="studentProfileSection" class="section">
+      <div class="pageHead"><div><h2>Student Profile</h2><p>Complete student information</p></div><button class="backHomeBtn" onclick="closeStudentProfile()">← Back</button></div>
+      <div id="studentProfileArea" class="modernPanel" style="padding:18px 14px;text-align:left;"></div>
+    </section>
+
     <section id="attendanceSection" class="section">
       <div class="pageHead"><div><h2>Daily Attendance</h2><p>Mark attendance for all active students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
       <div class="attendanceDateBox">
@@ -1338,6 +1343,9 @@ let currentAccountSub = null;
 
 let students = [];
 let currentStudent = null;
+let selectedStudentProfile = null;
+let studentProfileReturn = false;
+let profileReportStudentIndex = null;
 let selectedAttendanceStudent = null;
 let selectedAttendanceDate = null;
 let selectedStudentDetails = null;
@@ -2651,6 +2659,7 @@ function sectionNavId(sectionId){
   const map={
     homeSection:'homeNav',
     studentsSection:'studentsNav',
+    studentProfileSection:'studentsNav',
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
     feeDetailsSection:'feesNav',
@@ -2698,6 +2707,7 @@ function showSection(sectionId, navId, fromHistory){
 }
 
 function navigateBackSection(){
+  if(studentProfileReturn){ studentProfileReturn=false; showSection('studentProfileSection','studentsNav',true); return; }
   // Fee Details is the only section-level detail: Back returns to Fees.
   if(currentSectionId==='feeDetailsSection'){
     history.back();
@@ -2737,9 +2747,7 @@ function renderStudentsPage(){
       <input id="studentPhotoInput${index}" type="file" accept="image/*" style="display:none;" onchange="uploadStudentPhoto(event,${index})">
       <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
       <div class="studentActions">
-        <button class="miniBtn" onclick="openStudentDetails(${index})">View</button>
-        <button class="miniBtn iconOnly editIcon" aria-label="Edit student" title="Edit" onclick="editStudent(${index})">✎</button>
-        <button class="miniBtn red" onclick="deleteStudent(${index})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button>
+        <button class="miniBtn" onclick="openStudentProfile(${index})">View Profile</button>
       </div>
     </div>`;
   }).join('');
@@ -3250,8 +3258,8 @@ function renderReports(){
 
   const selectedMonth = document.getElementById("reportMonth").value;
   const selectedYear = document.getElementById("reportYear").value;
-  const activeReportStudents = students.filter(s=>s.active!==false).map(s=>({s,index:students.indexOf(s)}));
-  const inactiveReportStudents = students.filter(s=>s.active===false).map(s=>({s,index:students.indexOf(s)}));
+  const activeReportStudents = students.filter((s)=>s.active!==false).map(s=>({s,index:students.indexOf(s)})).filter(x=>profileReportStudentIndex===null || x.index===profileReportStudentIndex);
+  const inactiveReportStudents = students.filter((s)=>s.active===false).map(s=>({s,index:students.indexOf(s)})).filter(x=>profileReportStudentIndex===null || x.index===profileReportStudentIndex);
   if(inactiveReportStudents.length===0) showPreviousReports=false;
   const reportStudents = showPreviousReports ? [...activeReportStudents,...inactiveReportStudents] : activeReportStudents;
 
@@ -3665,6 +3673,79 @@ function saveFee(){
   closeFeePopup();
   renderFeesPage();
   renderReports();
+}
+
+function openStudentProfile(index){
+  if(!students[index]) return;
+  selectedStudentProfile=index;
+  renderStudentProfile();
+  showSection('studentProfileSection','studentsNav');
+}
+function closeStudentProfile(){
+  profileReportStudentIndex=null;
+  showSection('studentsSection','studentsNav',true);
+}
+function renderStudentProfile(){
+  const st=students[selectedStudentProfile];
+  const area=document.getElementById('studentProfileArea');
+  if(!st||!area) return;
+  const photo=st.photo ? `<img src="${st.photo}" alt="Student photo" style="width:104px;height:104px;border-radius:50%;object-fit:cover;border:3px solid #dce5f5;">` : `<div style="width:104px;height:104px;border-radius:50%;background:#e9eef8;color:#53658a;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:800;">${escapeHtml((st.name||'?').trim().charAt(0).toUpperCase())}</div>`;
+  area.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:2px;"><button class="miniBtn iconOnly editIcon" type="button" onclick="editStudentProfile()" aria-label="Edit profile" title="Edit profile">✎</button></div>
+    <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin:0 0 22px;">${photo}<div style="font-size:21px;font-weight:900;line-height:1.3;">${escapeHtml(st.name||'')}</div></div>
+    <div style="display:grid;gap:15px;text-align:left;">
+      <div><b>Parent/Guardian Name</b><div style="margin-top:4px;">${escapeHtml(st.parentName||'')}</div></div>
+      <div><b>Parent/Guardian Mobile Number</b><div style="margin-top:4px;">${escapeHtml(st.parentMobile||'')}</div></div>
+      <div><b>Student Mobile Number</b><div style="margin-top:4px;">${escapeHtml(st.mobile||'')}</div></div>
+      <div><b>Address</b><div style="margin-top:4px;white-space:pre-wrap;">${escapeHtml(st.address||'')}</div></div>
+    </div>
+    <div style="display:grid;gap:11px;margin-top:24px;">
+      <button class="saveBtn" type="button" onclick="openProfileFeeStatus()">View Fee Status</button>
+      <button class="saveBtn" type="button" style="background:#3978c8;" onclick="openProfileAttendanceReport()">View Attendance Report</button>
+      <button class="saveBtn" type="button" style="background:#dc5353;" onclick="deleteStudent(${selectedStudentProfile})">Delete Student</button>
+    </div>`;
+}
+function editStudentProfile(){
+  const st=students[selectedStudentProfile]; if(!st) return;
+  const area=document.getElementById('studentProfileArea');
+  area.innerHTML=`<div style="display:flex;justify-content:flex-end;"><button class="miniBtn" type="button" onclick="renderStudentProfile()">Cancel</button></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:9px;margin:8px 0 18px;">
+      ${st.photo?`<img src="${st.photo}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;">`:`<div style="width:100px;height:100px;border-radius:50%;background:#e9eef8;display:flex;align-items:center;justify-content:center;font-size:38px;">${escapeHtml((st.name||'?').charAt(0).toUpperCase())}</div>`}
+      <input id="profilePhotoInput" type="file" accept="image/*" style="max-width:100%;">
+    </div>
+    <label style="font-weight:700;display:block;margin-bottom:5px;">Student Name</label><input id="profileStudentName" value="${escapeHtml(st.name||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
+    <label style="font-weight:700;display:block;margin-bottom:5px;">Parent/Guardian Name</label><input id="profileParentName" value="${escapeHtml(st.parentName||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
+    <label style="font-weight:700;display:block;margin-bottom:5px;">Parent/Guardian Mobile Number</label><input id="profileParentMobile" type="tel" value="${escapeHtml(st.parentMobile||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
+    <label style="font-weight:700;display:block;margin-bottom:5px;">Student Mobile Number</label><input id="profileStudentMobile" type="tel" value="${escapeHtml(st.mobile||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
+    <label style="font-weight:700;display:block;margin-bottom:5px;">Address</label><textarea id="profileStudentAddress" style="width:100%;box-sizing:border-box;min-height:80px;">${escapeHtml(st.address||'')}</textarea>
+    <button class="popupSave" type="button" style="margin-top:16px;" onclick="saveStudentProfile()">Save Changes</button>`;
+}
+function saveStudentProfile(){
+  const st=students[selectedStudentProfile]; if(!st) return;
+  const name=document.getElementById('profileStudentName').value.trim();
+  if(name) st.name=name;
+  st.parentName=document.getElementById('profileParentName').value.trim();
+  st.parentMobile=document.getElementById('profileParentMobile').value.trim();
+  st.mobile=document.getElementById('profileStudentMobile').value.trim();
+  st.address=document.getElementById('profileStudentAddress').value.trim();
+  const file=document.getElementById('profilePhotoInput').files?.[0];
+  const finish=()=>{saveLocalData(true);renderStudentProfile();renderStudentsPage();};
+  if(file){
+    if(!file.type.startsWith('image/')){alert('Please select an image.');return;}
+    const reader=new FileReader(); reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const max=500;const scale=Math.min(1,max/Math.max(img.width,img.height));canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);st.photo=canvas.toDataURL('image/jpeg',0.82);finish();};img.src=e.target.result;};reader.readAsDataURL(file);
+  }else finish();
+}
+function openProfileFeeStatus(){
+  if(selectedStudentProfile===null)return;
+  currentStudent=selectedStudentProfile; studentProfileReturn=true;
+  showSection('feeDetailsSection','feesNav');
+}
+function openProfileAttendanceReport(){
+  if(selectedStudentProfile===null)return;
+  profileReportStudentIndex=selectedStudentProfile;
+  showPreviousReports=true;
+  const back=document.querySelector('#reportsSection .pageHead .backHomeBtn');
+  if(back){back.textContent='← Back';back.onclick=()=>{profileReportStudentIndex=null;showSection('studentProfileSection','studentsNav',true);};}
+  showSection('reportsSection','reportsNav');
 }
 
 function openStudentDetails(index){
@@ -4526,6 +4607,7 @@ function deleteStudent(index){
   if(confirm("इस विद्यार्थी को Trash में भेजें? वह 30 दिनों तक पूरा रिकॉर्ड सहित वापस लाया जा सकता है।")){
     const trash=readTrash();trash.unshift({student:JSON.parse(JSON.stringify(student)),deletedAt:Date.now()});writeTrash(trash);
     students.splice(index,1);saveLocalData(true);render();
+    if(selectedStudentProfile===index){selectedStudentProfile=null;showSection('studentsSection','studentsNav',true);}
   }
 }
 
