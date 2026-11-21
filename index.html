@@ -1346,7 +1346,10 @@ Reset PIN
       <div id="feePeriodDays" style="font-size:12px;color:#606775;margin-top:4px;"></div>
     </div>
 
-    <input type="number" id="feeAmount" placeholder="Enter Fee Amount" min="0" step="0.01">
+    <input type="number" id="feeAmount" placeholder="Enter Received Amount" min="0" step="0.01" oninput="updateFeeRemainingAmount()">
+    <label style="display:block;text-align:left;font-size:13px;font-weight:700;margin:10px 0 5px;">Remaining Amount (Editable)</label>
+    <input type="number" id="feeRemainingAmount" placeholder="Remaining amount" min="0" step="0.01">
+    <div id="feeDiscountHint" style="font-size:12px;text-align:left;color:#16845b;margin:0 0 8px;"></div>
     <select id="feeMode" style="margin-top:2px;">
       <option value="">Select Payment Mode</option>
       <option>Cash</option>
@@ -3106,7 +3109,7 @@ function feeItemStatusText(item, student){
     const second=`₹${amount}${item.record.date ? ` · ${formatFeeShortDate(item.record.date)}` : ''}${item.record.mode ? ` · ${item.record.mode}` : ''}`;
     return `<span class="feeStatusLine feeCredited">${first}</span><span class="feeStatusMeta">${second}</span>`;
   }
-  return `<span class="feeStatusLine feePending">${item.label} Fee Pending</span>${amount ? `<span class="feeStatusMeta">₹${amount}</span>` : ''}`;
+  return `<span class="feeStatusLine feePending">${item.label} Fee Pending</span>`;
 }
 
 function feeItemKey(item){
@@ -3585,6 +3588,8 @@ function openFee(index){
   populateFeeMonthSelect(st);
   document.getElementById('feeMode').value='';
   document.getElementById('feeAmount').value='';
+  document.getElementById('feeRemainingAmount').value=String(getKnownFeeAmount(st));
+  document.getElementById('feeDiscountHint').textContent='';
   document.getElementById('feeDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('feePopup').dataset.usedSavedInterval='false';
   document.getElementById('feePeriodStart').value=st.joiningDate || '';
@@ -3594,6 +3599,17 @@ function openFee(index){
   selectFeeUpdateMode(getFeeCycleMode(st));
   updateFeePeriodDays();
   document.getElementById('feePopup').style.display='flex';
+}
+
+function updateFeeRemainingAmount(){
+  const st=students[currentStudent];
+  const received=Number(document.getElementById('feeAmount')?.value||0);
+  const expected=getKnownFeeAmount(st);
+  const remaining=Math.max(0,expected-received);
+  const field=document.getElementById('feeRemainingAmount');
+  const hint=document.getElementById('feeDiscountHint');
+  if(field) field.value=String(remaining);
+  if(hint) hint.textContent='';
 }
 
 function closeFeePopup(){
@@ -3620,6 +3636,7 @@ function renderFeeDetails(st){
     content.innerHTML=`<div class="feeDetailsName">${st.name}</div>
       <div class="feeDetailsSectionTitle">Tuition Joining Date</div>
       <div style="font-size:13px;color:#606775;margin-bottom:8px;">Joining date is not set yet.</div>
+      <div class="feeDetailsJoining"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div>
       <button class="popupSave" onclick="editJoiningDate()">Set Joining Date</button>`;
     return;
   }
@@ -3641,9 +3658,9 @@ function renderFeeDetails(st){
       hasCredited=true;
       const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
       const mode=rec.mode || 'Mode not set';
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}${rec.remainingAmount!==undefined?`<br><span style="font-size:13px;color:#606775;">Remaining ₹${Number(rec.remainingAmount)||0}${Number(rec.discount)>0?` · Discount ₹${Number(rec.discount)}`:''}</span>`:''}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
     }else{
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feePending">Pending</span>${amount ? ` · ₹${amount}` : ''}</div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feePending">Pending</span></div>`;
     }
   });
 
@@ -3662,7 +3679,7 @@ function renderFeeDetails(st){
   },0);
 
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsJoining"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
@@ -3713,17 +3730,23 @@ function saveFee(){
   if(!st) return;
   const mode=document.getElementById('feeMode').value;
   const amount=document.getElementById('feeAmount').value;
+  const remainingValue=document.getElementById('feeRemainingAmount').value;
+  const remaining=Number(remainingValue);
   const date=document.getElementById('feeDate').value;
   const updateMode=document.getElementById('feePopup').dataset.updateMode || 'month';
-  if(!mode || !amount || !date){ alert('Fill all payment details'); return; }
-  if(Number(amount)<=0){ alert('Amount must be greater than 0'); return; }
+  if(!mode || !amount || !date || remainingValue===''){ alert('Fill all payment details'); return; }
+  if(Number(amount)<=0){ alert('Received amount must be greater than 0'); return; }
+  if(!Number.isFinite(remaining)||remaining<0){alert('Remaining amount cannot be negative');return;}
+  const expectedFee=getKnownFeeAmount(st);
+  const discount=Math.max(0,expectedFee-Number(amount)-remaining);
+  const paymentFields={amount:String(amount),remainingAmount:String(remaining),discount:String(discount)};
   if(!st.fees) st.fees=[];
 
   let record;
   if(updateMode==='month'){
     const key=document.getElementById('feeMonthSelect').value;
     if(!key){ alert('Select Fee Month'); return; }
-    record={type:'month',monthKey:key,status:'credited',amount:String(amount),mode,date,updatedAt:Date.now()};
+    record={type:'month',monthKey:key,status:'credited',...paymentFields,mode,date,updatedAt:Date.now()};
     const old=st.fees.find(f=>f.type==='month' && f.monthKey===key);
     if(old) Object.assign(old,record); else st.fees.push(record);
     st.feeCycle='month';
@@ -3750,7 +3773,7 @@ function saveFee(){
     }
 
     const days=daysBetweenDates(start,end);
-    record={type:'period',periodStart:start,periodEnd:end,days,status:'credited',amount:String(amount),mode,date,updatedAt:Date.now()};
+    record={type:'period',periodStart:start,periodEnd:end,days,status:'credited',...paymentFields,mode,date,updatedAt:Date.now()};
     st.fees.push(record);
     st.feeCycle='period';
 
@@ -3789,10 +3812,8 @@ function renderStudentProfile(){
     <div class="profileDetailsList">
       <div><b>Present Class</b><span class="profileColon">:</span><div>${escapeHtml(st.presentClass||'Not added')}</div></div>
       ${(Array.isArray(st.otherStudents)&&st.otherStudents.length)?`<div><b>Other Students</b><span class="profileColon">:</span><div>${st.otherStudents.map((item,i)=>`${i+1}. ${escapeHtml(item.name||'')} — ${escapeHtml(item.className||'Class not added')}`).join('<br>')}</div></div>`:''}
-      <div><b>Monthly Fee</b><span class="profileColon">:</span><div>${st.monthlyFee!==undefined&&st.monthlyFee!==''?`₹${escapeHtml(String(st.monthlyFee))}`:'Not added'}</div></div>
       <div><b>Parent/Guardian Name</b><span class="profileColon">:</span><div>${escapeHtml(st.parentName||'')}</div></div>
       <div><b>Parent/Guardian Mobile Number</b><span class="profileColon">:</span><div>${escapeHtml(st.parentMobile||'')}</div></div>
-      <div><b>Student Mobile Number</b><span class="profileColon">:</span><div>${escapeHtml(st.mobile||'')}</div></div>
       <div><b>Address</b><span class="profileColon">:</span><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
       <div><b>Date of Joining</b><span class="profileColon">:</span><div>${escapeHtml(st.joiningDate?formatFeeShortDate(st.joiningDate):'Not added')}</div></div>
     </div>
@@ -3801,6 +3822,7 @@ function renderStudentProfile(){
       <button class="profileActionBtn profileAttendanceBtn" type="button" onclick="openProfileAttendanceReport()">Attendance</button>
       <button class="profileActionBtn profileDeleteBtn" type="button" onclick="deleteStudent(${selectedStudentProfile})">Delete</button>
     </div>
+    ${(()=>{const today=getLocalFeeToday();const pending=getFeeStatusItems(st,today).filter(item=>item.kind==='pending'&&item.end<today);return pending.length?`<div class="profilePendingFees" style="margin-top:16px;padding-top:12px;border-top:1px solid #e2e6ee;"><b style="display:block;margin-bottom:7px;">Previous Pending Fees</b>${pending.map(item=>`<div style="padding:4px 0;">${escapeHtml(item.label)} Fee - <span style="color:#e04444;font-weight:800;">Pending</span></div>`).join('')}</div>`:'';})()}
 `;
 }
 function profileOtherStudentRow(item={},index=0){
@@ -3836,7 +3858,6 @@ function editStudentProfile(){
     <label class="profileFormLabel">Student Status</label><select id="profileStudentActive"><option value="active" ${st.active!==false?'selected':''}>Active</option><option value="inactive" ${st.active===false?'selected':''}>Inactive</option></select>
     <label class="profileFormLabel">Parent/Guardian Name</label><input id="profileParentName" value="${escapeHtml(st.parentName||'').replace(/"/g,'&quot;')}">
     <label class="profileFormLabel">Parent/Guardian Mobile Number</label><input id="profileParentMobile" type="tel" value="${escapeHtml(st.parentMobile||'').replace(/"/g,'&quot;')}">
-    <label class="profileFormLabel">Student Mobile Number</label><input id="profileStudentMobile" type="tel" value="${escapeHtml(st.mobile||'').replace(/"/g,'&quot;')}">
     <label class="profileFormLabel">Address</label><textarea id="profileStudentAddress">${escapeHtml(st.address||'')}</textarea>
     <label class="profileFormLabel">Date of Joining</label><input id="profileStudentJoiningDate" type="date" value="${escapeHtml(st.joiningDate||'')}">
     <button class="popupSave" type="button" style="margin-top:16px;" onclick="saveStudentProfile()">Save Changes</button>`;
@@ -3875,7 +3896,6 @@ function saveStudentProfile(){
   })).filter(item=>item.name||item.className);
   st.parentName=document.getElementById('profileParentName').value.trim();
   st.parentMobile=document.getElementById('profileParentMobile').value.trim();
-  st.mobile=document.getElementById('profileStudentMobile').value.trim();
   st.address=document.getElementById('profileStudentAddress').value.trim();
   const joiningDate=document.getElementById('profileStudentJoiningDate').value;
   if(joiningDate){
