@@ -816,8 +816,9 @@ body.darkMode .profileStudentName{color:#ffd978!important;text-shadow:0 0 12px r
 body.darkMode .profileStatus.isActive{background:#173d31;color:#69e2a0}
 body.darkMode .profileStatus.isInactive{background:#493021;color:#ffb17b}
 .profileDetailsList{display:grid;gap:13px;text-align:left}
-.profileDetailsList>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:10px;align-items:start}
+.profileDetailsList>div{display:grid;grid-template-columns:minmax(0,1.18fr) 20px minmax(0,1fr);column-gap:8px;align-items:start}
 .profileDetailsList b{display:block;min-width:0;line-height:1.45;overflow-wrap:normal;word-break:normal;hyphens:none}
+.profileDetailsList .profileColon{display:block;text-align:center;font-weight:800;line-height:1.45}
 .profileDetailsList>div>div{min-width:0;line-height:1.5;overflow-wrap:normal;word-break:normal;hyphens:none;white-space:pre-wrap}
 .profileAddress{white-space:pre-wrap;overflow-wrap:normal;word-break:normal}
 .profileStatusAction{margin-top:18px}
@@ -844,7 +845,7 @@ body.darkMode .profilePhotoEditBadge{border-color:#202633}
 #studentProfileArea #profileStudentAddress{min-height:80px}
 #studentProfileArea #profileStudentJoiningDate{width:100%;box-sizing:border-box;margin:0 0 13px;padding:10px;border-radius:9px}
 body.darkMode #studentProfileArea .profilePhotoHint{color:#b8c3d9}
-@media(max-width:380px){.profileDetailsList>div{grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);column-gap:7px}.profileDetailsList b,.profileDetailsList>div>div{font-size:13px}}
+@media(max-width:380px){.profileDetailsList>div{grid-template-columns:minmax(0,1.12fr) 16px minmax(0,1fr);column-gap:5px}.profileDetailsList b,.profileDetailsList>div>div,.profileDetailsList .profileColon{font-size:13px}}
 @media(max-width:360px){.profileActionRow{gap:6px}.profileActionBtn{font-size:11px;padding:8px 3px;min-height:37px}}
 </style>
 
@@ -2742,19 +2743,13 @@ function showSection(sectionId, navId, fromHistory){
   if(!section) return;
   if(sectionId===currentSectionId) return;
 
-  // Main cards never create navigation history. Switching between any of
-  // the four cards resets the in-app Back path; Back from a card goes Home.
-  // Detail pages still create exactly one step back to their parent page.
+  // App pages use one internal stack only. Browser history is kept separate
+  // for Android Back guarding and popup overlays, preventing double-pop exits.
   if(!fromHistory){
-    if(isMainCardNavigation(sectionId)){
+    if(isMainCardNavigation(sectionId) || sectionId==='homeSection'){
       appSectionHistory=[];
-      history.replaceState({tuitionAppGuard:true}, '', location.href);
-    }else if(sectionId==='homeSection'){
-      appSectionHistory=[];
-      history.replaceState({tuitionAppGuard:true}, '', location.href);
     }else{
       appSectionHistory.push(currentSectionId);
-      history.pushState({tuitionSection:sectionId}, '', location.href);
     }
   }
 
@@ -2779,15 +2774,19 @@ function showSection(sectionId, navId, fromHistory){
 
 function navigateBackSection(){
   if(currentSectionId==='homeSection') return;
-  // A main card always returns to Home, never to the previously selected card.
+  // Use the app's own section stack for in-app Back. Do not call history.back()
+  // here: browser history is reserved for the single Android Back guard and
+  // overlays. Mixing both stacks caused the app to exit after returning once.
   if(isMainCardNavigation(currentSectionId)){
     goHome();
     return;
   }
-  // Detail pages return one level to their actual parent (Profile -> Students,
-  // Fee Details -> Profile/Fees, etc.).
   if(appSectionHistory.length){
-    history.back();
+    const previous=appSectionHistory.pop();
+    if(currentSectionId==='reportsSection' && profileReportStudentIndex!==null) profileReportStudentIndex=null;
+    if(previous==='reportsSection') profileReportStudentIndex=null;
+    if(currentSectionId==='feeDetailsSection') studentProfileReturn=false;
+    showSection(previous,sectionNavId(previous),true);
     return;
   }
   goHome();
@@ -2797,7 +2796,6 @@ function goHome(){
   if(currentSectionId==='homeSection') return;
   appSectionHistory=[];
   showSection('homeSection','homeNav',true);
-  history.replaceState({tuitionAppGuard:true}, '', location.href);
 }
 
 function renderStudentsPage(){
@@ -3757,7 +3755,7 @@ function openStudentProfile(index){
 }
 function closeStudentProfile(){
   profileReportStudentIndex=null;
-  if(currentSectionId==='studentProfileSection' && window.history.length>1) history.back();
+  if(currentSectionId==='studentProfileSection') navigateBackSection();
   else showSection('studentsSection','studentsNav',true);
 }
 function renderStudentProfile(){
@@ -3775,11 +3773,11 @@ function renderStudentProfile(){
       <div class="profileStatus ${isActive?'isActive':'isInactive'}"><span></span>${isActive?'Active Student':'Inactive Student'}</div>
     </div>
     <div class="profileDetailsList">
-      <div><b>Parent/Guardian Name :</b><div>${escapeHtml(st.parentName||'')}</div></div>
-      <div><b>Parent/Guardian Mobile Number :</b><div>${escapeHtml(st.parentMobile||'')}</div></div>
-      <div><b>Student Mobile Number :</b><div>${escapeHtml(st.mobile||'')}</div></div>
-      <div><b>Address :</b><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
-      <div><b>Date of Joining :</b><div>${escapeHtml(st.joiningDate?formatFeeShortDate(st.joiningDate):'Not added')}</div></div>
+      <div><b>Parent/Guardian Name</b><span class="profileColon">:</span><div>${escapeHtml(st.parentName||'')}</div></div>
+      <div><b>Parent/Guardian Mobile Number</b><span class="profileColon">:</span><div>${escapeHtml(st.parentMobile||'')}</div></div>
+      <div><b>Student Mobile Number</b><span class="profileColon">:</span><div>${escapeHtml(st.mobile||'')}</div></div>
+      <div><b>Address</b><span class="profileColon">:</span><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
+      <div><b>Date of Joining</b><span class="profileColon">:</span><div>${escapeHtml(st.joiningDate?formatFeeShortDate(st.joiningDate):'Not added')}</div></div>
     </div>
     <div class="profileActionRow">
       <button class="profileActionBtn profileFeeBtn" type="button" onclick="openProfileFeeStatus()">Fees</button>
@@ -3861,7 +3859,7 @@ function openProfileAttendanceReport(){
   profileReportStudentIndex=selectedStudentProfile;
   showPreviousReports=true;
   const back=document.querySelector('#reportsSection .pageHead .backHomeBtn');
-  if(back){back.textContent='← Back';back.onclick=()=>{profileReportStudentIndex=null;history.back();};}
+  if(back){back.textContent='← Back';back.onclick=()=>{navigateBackSection();};}
   showSection('reportsSection','reportsNav');
 }
 
@@ -4332,6 +4330,7 @@ const appOverlayIds = [
 
 let overlayHistoryStack = [];
 let handlingBackOverlayClose = false;
+let skipNextOverlayPopstate = false;
 let pendingDeveloperPopup = false;
 let overlayObserverReady = false;
 let menuNavigationInProgress = false;
@@ -4368,8 +4367,9 @@ function setupOverlayBackHandling(){
       }else if(!visible && wasTracked){
         overlayHistoryStack = overlayHistoryStack.filter(x => x !== id);
         if(!handlingBackOverlayClose && !(id === "menuPopup" && menuNavigationInProgress)){
-          // The user closed the popup normally. Remove its history layer too,
-          // so the next Back press behaves normally.
+          // The user closed the popup normally. Remove only its history layer;
+          // ignore the resulting popstate so it cannot navigate the app section.
+          skipNextOverlayPopstate = true;
           history.back();
         }
       }
@@ -4436,6 +4436,10 @@ function handleOutsideTap(event){
 document.addEventListener("click", handleOutsideTap);
 
 window.addEventListener("popstate", function(event){
+  if(skipNextOverlayPopstate){
+    skipNextOverlayPopstate = false;
+    return;
+  }
   if(pendingDeveloperPopup){
     pendingDeveloperPopup = false;
     const popup=document.getElementById("developerPopup");
@@ -4460,6 +4464,7 @@ window.addEventListener("popstate", function(event){
   // Detail pages (Profile, Fee Details, etc.) return exactly one level.
   if(appSectionHistory.length){
     const previous=appSectionHistory.pop();
+    if(currentSectionId==='reportsSection' && profileReportStudentIndex!==null) profileReportStudentIndex=null;
     if(previous==='reportsSection') profileReportStudentIndex=null;
     if(currentSectionId==='feeDetailsSection') studentProfileReturn=false;
     showSection(previous,sectionNavId(previous),true);
@@ -4470,8 +4475,8 @@ window.addEventListener("popstate", function(event){
     showSection('homeSection','homeNav',true);
     history.pushState({tuitionAppGuard:true}, '', location.href);
   }else{
-    // Keep one in-app guard so a subsequent Back is intercepted too.
-    history.pushState({tuitionAppGuard:true}, '', location.href);
+    // At Home, allow the next Android Back press to leave the app normally.
+    return;
   }
   return;
 });
