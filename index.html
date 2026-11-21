@@ -1539,24 +1539,13 @@ function renderMyNotesList(){
   area.innerHTML=notes.map(n=>`<div class="myNoteItem"><div class="myNoteContent">${escapeHtml(n.text)}</div><div class="myNoteActions"><button class="myNoteEdit" type="button" onclick="editMyNote('${n.id}')">Edit</button><button class="myNoteEdit" type="button" onclick="toggleMyNoteHome('${n.id}')">${n.showHome===false?"Show":"Hide"}</button><button class="myNoteDelete" type="button" onclick="deleteMyNote('${n.id}')">Delete</button></div></div>`).join('');
 }
 function openMyNotesFromMenu(event){if(event)event.stopPropagation();menuNavigationInProgress=true;const menu=document.getElementById("menuPopup");if(menu)menu.style.display="none";overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");showSection("myNotesSection","homeNav");renderMyNotesList();setTimeout(()=>{menuNavigationInProgress=false;},300);}
-function openMyNoteEditor(id){editingMyNoteId=id||null;let note=editingMyNoteId?readMyNotes().find(n=>n.id===editingMyNoteId):null;const modal=document.getElementById("myNoteEditorPopup");const input=document.getElementById("myNoteEditorInput");if(!modal||!input)return;input.value=note?note.text:"";myNoteOriginalText=input.value;modal.style.display="flex";history.pushState({myNoteEditor:true}, "", location.href);setTimeout(()=>input.focus(),50);}
+function openMyNoteEditor(id){editingMyNoteId=id||null;let note=editingMyNoteId?readMyNotes().find(n=>n.id===editingMyNoteId):null;const modal=document.getElementById("myNoteEditorPopup");const input=document.getElementById("myNoteEditorInput");if(!modal||!input)return;input.value=note?note.text:"";myNoteOriginalText=input.value;modal.style.display="flex";setTimeout(()=>input.focus(),50);}
 function saveMyNote(){const input=document.getElementById("myNoteEditorInput");const value=String(input?.value||"").trim();if(!value){alert("पहले Note लिखें।");return;}const notes=readMyNotes();if(editingMyNoteId){const i=notes.findIndex(n=>n.id===editingMyNoteId);if(i>=0){notes[i].text=value;notes[i].updatedAt=Date.now();}else notes.unshift({id:editingMyNoteId,text:value,updatedAt:Date.now()});}else notes.unshift({id:"note_"+Date.now()+"_"+Math.random().toString(36).slice(2),text:value,updatedAt:Date.now()});localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));closeMyNoteEditor();renderMyNotesList();renderHomeNotes();}
 function editMyNote(id){openMyNoteEditor(id);}
 function toggleMyNoteHome(id){const notes=readMyNotes();const note=notes.find(n=>n.id===id);if(!note)return;note.showHome=note.showHome===false;localStorage.setItem(getMyNotesKey(),JSON.stringify(notes));renderMyNotesList();renderHomeNotes();}
 function deleteMyNote(id){if(!confirm("इस Note को Delete करना चाहते हैं?"))return;writeMyNotes(readMyNotes().filter(n=>n.id!==id));}
 function closeMyNoteEditor(){const modal=document.getElementById("myNoteEditorPopup");if(modal)modal.style.display="none";editingMyNoteId=null;myNoteOriginalText="";myNoteBackPending=false;}
 function cancelMyNote(){const input=document.getElementById("myNoteEditorInput");if(input&&String(input.value||"")!==myNoteOriginalText){if(!confirm("आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।"))return;}closeMyNoteEditor();}
-window.addEventListener("popstate",function(e){
- const modal=document.getElementById("myNoteEditorPopup"),input=document.getElementById("myNoteEditorInput");
- if(!modal||modal.style.display==="none")return;
- // A browser Back while the keyboard is open normally dismisses the keyboard first;
- // if it reaches this handler, protect unsaved text with an explicit choice.
- if(input&&String(input.value||"")!==myNoteOriginalText){
-   const save=confirm("Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।");
-   if(save){saveMyNote();}else{closeMyNoteEditor();}
- }else{closeMyNoteEditor();}
- history.pushState({myNoteEditor:true}, "", location.href);
-});
 function getThoughtSource(){return localStorage.getItem(getThoughtSourceKey())==="mine"?"mine":"ready";}
 function getThoughtBackupData(){return {myThoughts:readMyThoughts(),myNotes:readMyNotes(),thoughtSource:getThoughtSource(),thoughtOfDay:localStorage.getItem(getThoughtPreferenceKey()),thoughtRotation:localStorage.getItem(getThoughtRotationKey())};}
 function getPuzzleFactsBackupData(){return {puzzleFactsState:pfReadState()};}
@@ -4325,12 +4314,12 @@ const appOverlayIds = [
   "attendanceStatusPopup",
   "studentDetailsPopup",
   "resetPopup",
-  "studentPhotoViewer"
+  "studentPhotoViewer",
+  "myNoteEditorPopup"
 ];
 
 let overlayHistoryStack = [];
 let handlingBackOverlayClose = false;
-let skipNextOverlayPopstate = false;
 let pendingDeveloperPopup = false;
 let overlayObserverReady = false;
 let menuNavigationInProgress = false;
@@ -4357,66 +4346,57 @@ function setupOverlayBackHandling(){
       if(mutation.type !== "attributes" || mutation.attributeName !== "style") return;
       const id = mutation.target.id;
       if(!appOverlayIds.includes(id)) return;
-
       const visible = isOverlayVisible(id);
       const wasTracked = overlayHistoryStack.includes(id);
-
       if(visible && !wasTracked){
-        history.pushState({tuitionOverlay:id}, "", location.href);
         overlayHistoryStack.push(id);
       }else if(!visible && wasTracked){
         overlayHistoryStack = overlayHistoryStack.filter(x => x !== id);
-        if(!handlingBackOverlayClose && !(id === "menuPopup" && menuNavigationInProgress)){
-          // The user closed the popup normally. Remove only its history layer;
-          // ignore the resulting popstate so it cannot navigate the app section.
-          skipNextOverlayPopstate = true;
-          history.back();
-        }
       }
     });
   });
-
   appOverlayIds.forEach(id=>{
     const el=document.getElementById(id);
     if(el) observer.observe(el,{attributes:true,attributeFilter:["style"]});
+    if(isOverlayVisible(id) && !overlayHistoryStack.includes(id)) overlayHistoryStack.push(id);
   });
-
   overlayObserverReady = true;
 }
 
 function closeOverlayOneStep(){
-  // Pop the current overlay history entry; popstate closes only that overlay.
-  for(let i=overlayHistoryStack.length-1;i>=0;i--){
-    if(isOverlayVisible(overlayHistoryStack[i])){
-      history.back();
-      return;
-    }
-  }
-  // Fallback for an overlay opened before history tracking was initialized.
-  closeTopOverlayFromBack();
+  return closeTopOverlayFromBack();
 }
 
 function closeTopOverlayFromBack(){
   for(let i=overlayHistoryStack.length-1;i>=0;i--){
     const id=overlayHistoryStack[i];
-    if(isOverlayVisible(id)){
+    if(!isOverlayVisible(id)){
       overlayHistoryStack.splice(i,1);
-      handlingBackOverlayClose = true;
-      hideOverlay(id);
-      clearOverlaySelection();
-      setTimeout(()=>{ handlingBackOverlayClose=false; },0);
-      return true;
+      continue;
     }
     overlayHistoryStack.splice(i,1);
-  }
-
-  // Safety fallback in case an overlay was opened before the observer tracked it.
-  for(let i=appOverlayIds.length-1;i>=0;i--){
-    if(isOverlayVisible(appOverlayIds[i])){
-      handlingBackOverlayClose = true;
-      hideOverlay(appOverlayIds[i]);
+    handlingBackOverlayClose = true;
+    if(id === "myNoteEditorPopup"){
+      const input=document.getElementById("myNoteEditorInput");
+      if(input && String(input.value||"")!==myNoteOriginalText){
+        const save=confirm("Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।");
+        if(save) saveMyNote(); else closeMyNoteEditor();
+      }else closeMyNoteEditor();
+    }else{
+      hideOverlay(id);
       clearOverlaySelection();
-      setTimeout(()=>{ handlingBackOverlayClose=false; },0);
+    }
+    setTimeout(()=>{handlingBackOverlayClose=false;},0);
+    return true;
+  }
+  // Recover overlays opened before the observer started.
+  for(let i=appOverlayIds.length-1;i>=0;i--){
+    const id=appOverlayIds[i];
+    if(isOverlayVisible(id)){
+      handlingBackOverlayClose=true;
+      if(id === "myNoteEditorPopup") closeMyNoteEditor();
+      else { hideOverlay(id); clearOverlaySelection(); }
+      setTimeout(()=>{handlingBackOverlayClose=false;},0);
       return true;
     }
   }
@@ -4436,59 +4416,51 @@ function handleOutsideTap(event){
 document.addEventListener("click", handleOutsideTap);
 
 window.addEventListener("popstate", function(event){
-  if(skipNextOverlayPopstate){
-    skipNextOverlayPopstate = false;
+  // One Android/browser Back event performs exactly one app action.
+  // Popups are handled first, then detail pages, then main cards.
+  if(closeTopOverlayFromBack()){
+    history.pushState({tuitionAppGuard:true}, "", location.href);
     return;
   }
-  if(pendingDeveloperPopup){
-    pendingDeveloperPopup = false;
-    const popup=document.getElementById("developerPopup");
-    if(popup) popup.style.display="flex";
-    history.pushState({tuitionAppGuard:true}, '', location.href);
-    return;
-  }
-  if(closeTopOverlayFromBack()) return;
 
-  // IMPORTANT: once a detail page has returned to any main card, the next
-  // Android/browser Back must go Home, never leave the app or revisit a card.
-  // This check intentionally runs BEFORE the detail-page history stack.
   if(isMainCardNavigation(currentSectionId)){
     appSectionHistory=[];
     profileReportStudentIndex=null;
     studentProfileReturn=false;
     showSection('homeSection','homeNav',true);
-    history.pushState({tuitionAppGuard:true}, '', location.href);
+    history.pushState({tuitionAppGuard:true}, "", location.href);
     return;
   }
 
-  // Detail pages (Profile, Fee Details, etc.) return exactly one level.
   if(appSectionHistory.length){
     const previous=appSectionHistory.pop();
     if(currentSectionId==='reportsSection' && profileReportStudentIndex!==null) profileReportStudentIndex=null;
     if(previous==='reportsSection') profileReportStudentIndex=null;
     if(currentSectionId==='feeDetailsSection') studentProfileReturn=false;
     showSection(previous,sectionNavId(previous),true);
-    history.pushState({tuitionAppGuard:true}, '', location.href);
+    history.pushState({tuitionAppGuard:true}, "", location.href);
     return;
   }
+
   if(currentSectionId!=='homeSection'){
     showSection('homeSection','homeNav',true);
-    history.pushState({tuitionAppGuard:true}, '', location.href);
-  }else{
-    // At Home, allow the next Android Back press to leave the app normally.
+    history.pushState({tuitionAppGuard:true}, "", location.href);
     return;
   }
-  return;
+  // At Home, do not restore the guard: the next Back exits normally.
 });
 
-window.addEventListener("load", function(){
+function initializeBackNavigation(){
   setupOverlayBackHandling();
   currentSectionId='homeSection';
   appSectionHistory=[];
   renderHomeNotes();
-  // One guard entry lets the first Back press be intercepted while the app is open.
+  // Keep exactly one sentinel above the page entry while the app is active.
+  history.replaceState({tuitionBase:true}, "", location.href);
   history.pushState({tuitionAppGuard:true}, "", location.href);
-});
+}
+if(document.readyState === "complete") initializeBackNavigation();
+else window.addEventListener("load", initializeBackNavigation, {once:true});
 
 let menuCloseTimer=null;
 function closeMenuDrawer(){
