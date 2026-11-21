@@ -802,6 +802,56 @@ body.darkMode .feeTotalCollections{color:#ffe18c!important;background:linear-gra
 .pfPagePanel{border:1px solid #dbe4f3;border-radius:16px;padding:13px;margin:12px 0;background:#fff;box-shadow:0 3px 13px rgba(25,45,80,.05)}.pfSwitchRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;border-radius:13px;background:#edf3ff;color:#263d70;font-weight:800;margin-bottom:13px}.pfPageSection{margin-top:16px}.pfSectionTitle{font-size:15px;font-weight:900;color:#35558f;margin:0 0 8px}.pfListItem{padding:11px 10px;border:1px solid #e2e8f2;border-radius:12px;margin:8px 0;background:#f9fbff}.pfListText{font-size:14px;line-height:1.55;font-weight:650;color:#283449;white-space:pre-wrap}.pfListMeta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px;font-size:11px;color:#64748b}.pfListTools{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;min-height:30px}.pfEyeBtn,.pfUnmarkBtn{width:32px;height:30px;border:0;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;background:#e8efff;color:#3557a3}.pfUnmarkBtn{background:#fff0e8;color:#b64a32;font-size:16px}.pfListSpacer{width:32px;height:30px}.pfInlineAnswer{display:none;margin-top:9px;padding:9px 10px;border-radius:10px;background:#e5f5ed;border:1px solid #bce6ce;color:#17633b;font-size:13px;line-height:1.55;font-weight:700;white-space:pre-wrap}.pfInlineAnswer.show{display:block}.pfStatusMarked{color:#16804a;font-weight:900}.pfStatusSkipped{color:#b66a12;font-weight:900}.pfEmpty{font-size:13px;color:#7b8495;padding:9px 2px}.pfOpenBtn{border:0;background:#e8efff;color:#3557a3;border-radius:9px;padding:6px 10px;font-weight:800;font-size:11px}
 .pfDisplayToggle{width:48px;height:27px;flex:0 0 48px}.pfDisplayToggle .slider{display:block;background:#dc3545;border-radius:20px}.pfDisplayToggle .slider:before{content:"";position:absolute;left:3px;top:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:transform .2s}.pfDisplayToggle input:checked+.slider{background:#28a745}.pfDisplayToggle input:checked+.slider:before{content:"";transform:translateX(21px)}body.darkMode .pfHomeCard{background:linear-gradient(135deg,#202b40,#1b2436 58%,#28213b)!important;border-color:#3b4d70!important;color:#f0f4ff!important;box-shadow:0 8px 22px rgba(0,0,0,.3)!important}body.darkMode .pfTitle{color:#c9d9ff!important}body.darkMode .pfProgress{background:#293b5c!important;border-color:#465e89!important;color:#c8d9ff!important}body.darkMode .pfDate{color:#c8d9ff!important}body.darkMode .pfHomeEyeBtn{background:#303f5e!important;border-color:#465e89!important;color:#d7e3ff!important}body.darkMode .pfQuestion{color:#f0f3ff!important}body.darkMode .pfAnswer{background:#183a30!important;border-color:#28634b!important;color:#a9f0c8!important}body.darkMode .pfPrev{background:#303b50!important;border-color:#4b5b78!important;color:#e1eaff!important}body.darkMode .pfAnswerBtn{background:#493a24!important;border-color:#80632f!important;color:#ffdf9a!important}body.darkMode .pfPagePanel{background:linear-gradient(145deg,#202633,#171c27)!important;border-color:#39465e!important;color:#f2f4ff!important}body.darkMode .pfSwitchRow{background:#263650!important;color:#d9e5ff!important}body.darkMode .pfSectionTitle{color:#c7d8ff!important}body.darkMode .pfListItem{background:#222c3d!important;border-color:#3a4962!important}body.darkMode .pfListText{color:#edf2ff!important}body.darkMode .pfListMeta,body.darkMode .pfEmpty{color:#aebbd2!important}body.darkMode .pfOpenBtn{background:#303f5e!important;color:#d7e3ff!important}body.darkMode .pfEyeBtn{background:#303f5e!important;color:#d7e3ff!important}body.darkMode .pfUnmarkBtn{background:#4a302e!important;color:#ffb7a8!important}body.darkMode .pfInlineAnswer{background:#183a30!important;border-color:#28634b!important;color:#a9f0c8!important}body.darkMode .pfDisplayToggle .slider{background:#a94343!important}body.darkMode .pfDisplayToggle input:checked+.slider{background:#239b58!important}
 </style>  
+
+<style>
+/* Student profile compact actions, status and photo controls */
+.profileEditTop{display:flex;justify-content:flex-end;min-height:34px;margin-bottom:5px}
+.profileIdentity{display:flex;flex-direction:column;align-items:center;text-align:center;gap:9px;margin:0 0 22px}
+.profileStudentName{font-size:22px;font-weight:900;line-height:1.3;color:#b8860b;letter-spacing:.2px}
+body.darkMode .profileStudentName{color:#ffd978!important;text-shadow:0 0 12px rgba(255,204,90,.2)}
+.profileStatus{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:800}
+.profileStatus>span{width:8px;height:8px;border-radius:50%;background:currentColor}
+.profileStatus.isActive{background:#e7f7ed;color:#16834b}
+.profileStatus.isInactive{background:#fff0e8;color:#c45b27}
+body.darkMode .profileStatus.isActive{background:#173d31;color:#69e2a0}
+body.darkMode .profileStatus.isInactive{background:#493021;color:#ffb17b}
+.profileDetailsList{display:grid;gap:15px;text-align:left}
+.profileDetailsList b{display:block;margin-bottom:4px}
+.profileDetailsList>div>div{line-height:1.5;overflow-wrap:anywhere}
+.profileAddress{white-space:pre-wrap}
+.profileStatusAction{margin-top:18px}
+.profileToggleStatus{width:100%;border:1px solid transparent;border-radius:11px;padding:10px 12px;font-size:13px;font-weight:800}
+.profileToggleStatus.makeInactive{background:#fff1d6;color:#936000;border-color:#f2d18c}
+.profileToggleStatus.makeActive{background:#e6f7ed;color:#147a43;border-color:#b8e4c9}
+body.darkMode .profileToggleStatus.makeInactive{background:#45391f;color:#ffdc8a;border-color:#77602e}
+body.darkMode .profileToggleStatus.makeActive{background:#173b30;color:#79e5a9;border-color:#286b4d}
+.profileActionRow{display:grid;grid-template-columns:1fr 1fr .82fr;gap:8px;margin-top:12px}
+.profileActionBtn{min-width:0;min-height:39px;padding:8px 5px;border:0;border-radius:10px;font-size:12px;font-weight:800;white-space:nowrap}
+.profileFeeBtn{background:#1769d2;color:#fff}
+.profileAttendanceBtn{background:#16845b;color:#fff}
+.profileDeleteBtn{background:#d94b55;color:#fff}
+body.darkMode .profileActionBtn{box-shadow:0 3px 9px rgba(0,0,0,.22)}
+.profileEditPhotoBlock{display:flex;flex-direction:column;align-items:center;gap:7px;margin:8px 0 19px}
+.profileEditPhotoWrap{position:relative;width:104px;height:104px;border-radius:50%;cursor:pointer;overflow:visible}
+.profileEditPhotoWrap>img,.profileEditAvatarFallback{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #dce5f5}
+.profileEditAvatarFallback{display:flex;align-items:center;justify-content:center;background:#e9eef8;color:#53658a;font-size:40px;font-weight:800;box-sizing:border-box}
+.profilePhotoEditBadge{position:absolute;right:-3px;bottom:1px;width:31px;height:31px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#1769d2;color:#fff;border:3px solid #fff;font-size:17px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+body.darkMode .profilePhotoEditBadge{border-color:#202633}
+.profilePhotoHint{font-size:11px;color:#7b8190}
+.profileFormLabel{display:block;margin:0 0 5px;font-size:13px;font-weight:800}
+#studentProfileArea #profileStudentName,#studentProfileArea #profileParentName,#studentProfileArea #profileParentMobile,#studentProfileArea #profileStudentMobile,#studentProfileArea #profileStudentAddress{width:100%;box-sizing:border-box;margin:0 0 13px;padding:10px;border-radius:9px}
+#studentProfileArea #profileStudentAddress{min-height:80px}
+body.darkMode #studentProfileArea .profilePhotoHint{color:#b8c3d9}
+@media(max-width:360px){.profileActionRow{gap:6px}.profileActionBtn{font-size:11px;padding:8px 3px;min-height:37px}}
+</style>
+
+
+<style>
+.studentViewProfileText{display:inline-block;padding:8px 2px;color:#5266bd;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer;background:transparent;border:0;box-shadow:none}
+body.darkMode .studentViewProfileText{color:#8fc4ff}
+.studentViewProfileText:active{text-decoration:underline}
+</style>
+
 </head>  
   <body>
 
@@ -1104,7 +1154,7 @@ Reset PIN
     </section>
 
     <section id="thoughtsSection" class="section">
-      <div class="pageHead"><div><h2>हिंदी विचार</h2><p>तैयार विचार चुनें या अपने विचार लिखें</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>हिंदी विचार</h2><p>तैयार विचार चुनें या अपने विचार लिखें</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div class="thoughtSourceCompact" aria-label="सामान्य विचार का स्रोत"><span>Loop:</span><button id="thoughtSourceReady" class="thoughtSourceChip" type="button" onclick="setThoughtSource('ready')">250 तैयार</button><button id="thoughtSourceMine" class="thoughtSourceChip" type="button" onclick="setThoughtSource('mine')">मेरे विचार</button></div>
       <div class="thoughtTabs" role="tablist" aria-label="विचारों के प्रकार">
         <button id="thoughtTabReady" class="thoughtTab active" role="tab" aria-selected="true" onclick="switchThoughtTab('ready')">250 तैयार विचार</button>
@@ -1131,7 +1181,7 @@ Reset PIN
     </section>
 
     <section id="puzzleFactsSection" class="section">
-      <div class="pageHead"><div><h2>🧩 Puzzle &amp; Facts</h2><p>Paheliyan aur rochak jaankari</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>🧩 Puzzle &amp; Facts</h2><p>Paheliyan aur rochak jaankari</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div class="pfPagePanel">
         <div class="pfSwitchRow"><span>Show on Display</span><label class="switch pfDisplayToggle"><input type="checkbox" id="pfDisplaySwitch" checked onchange="pfSetDisplay(this.checked)"><span class="slider"></span></label></div>
         <div class="pfPageSection"><h3 class="pfSectionTitle">🧩 Puzzles</h3><div id="pfPuzzleList"></div></div>
@@ -1141,7 +1191,7 @@ Reset PIN
     </section>
 
     <section id="myNotesSection" class="section">
-      <div class="pageHead"><div><h2>📝 My Notes</h2><p>अपने काम और याद रखने वाली बातें लिखें</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>📝 My Notes</h2><p>अपने काम और याद रखने वाली बातें लिखें</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div class="modernPanel" style="padding:14px;">
         <button class="thoughtBtn" type="button" onclick="openMyNoteEditor()">＋ Add Note</button>
         <div id="myNotesList" style="margin-top:12px;"></div>
@@ -1149,12 +1199,12 @@ Reset PIN
     </section>
 
     <section id="trashSection" class="section">
-      <div class="pageHead"><div><h2>Deleted Students</h2><p>30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Deleted Students</h2><p>30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div id="trashStudentsArea" class="modernPanel"></div>
     </section>
 
     <section id="aboutAppSection" class="section">
-      <div class="pageHead"><div><h2>About App</h2><p>Application information and developer contact</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>About App</h2><p>Application information and developer contact</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div class="aboutAppPanel">
         <div class="aboutAppIdentity">
           <div class="aboutAppName">TUITION MANAGER</div>
@@ -1181,7 +1231,7 @@ Reset PIN
     </section>
 
     <section id="studentsSection" class="section">
-      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Students</h2><p>View and manage all your students</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div class="modernPanel studentSearchPanel">
         <div class="searchWrap">
           <span class="searchIcon">🔍</span>
@@ -1197,7 +1247,7 @@ Reset PIN
     </section>
 
     <section id="attendanceSection" class="section">
-      <div class="pageHead"><div><h2>Daily Attendance</h2><p>Mark attendance for all active students</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Daily Attendance</h2><p>Mark attendance for all active students</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div class="attendanceDateBox">
         <label for="attDate">Attendance Date</label>
         <input type="date" id="attDate">
@@ -1210,7 +1260,7 @@ Reset PIN
     </section>
 
     <section id="feesSection" class="section">
-      <div class="pageHead"><div><h2>Fees</h2><p>Record and manage student payments</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Fees</h2><p>Record and manage student payments</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div id="feesArea" class="modernPanel"></div>
     </section>
 
@@ -1221,7 +1271,7 @@ Reset PIN
     </section>
 
     <section id="reportsSection" class="section">
-      <div class="pageHead"><div><h2>Reports</h2><p>Monthly attendance & fee records</p></div><button class="backHomeBtn" onclick="goHome()">Home</button></div>
+      <div class="pageHead"><div><h2>Reports</h2><p>Monthly attendance & fee records</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
       <div class="modernPanel" style="padding:12px;">
         <div style="display:flex;gap:8px;">
           <select id="reportMonth" style="flex:1;min-width:0;" onchange="renderReports()">
@@ -2673,18 +2723,19 @@ function sectionNavId(sectionId){
   return map[sectionId] || 'homeNav';
 }
 
+let appSectionHistory=[];
+
 function showSection(sectionId, navId, fromHistory){
   const section=document.getElementById(sectionId);
   if(!section) return;
+  if(sectionId===currentSectionId) return;
 
-  // Main cards are not navigation-history steps. Only the Fee Details
-  // detail page gets one Back step that returns to the Fees card.
-  if(sectionId==='feeDetailsSection' && currentSectionId!=='feeDetailsSection' && !fromHistory){
-    history.pushState({tuitionDetail:'feeDetailsSection'}, '', location.href);
-  }else if(currentSectionId==='feeDetailsSection' && sectionId!=='feesSection' && !fromHistory){
-    // If another main card is selected directly, do not leave a stale
-    // Fee Details history entry behind.
-    history.replaceState({tuitionAppGuard:true}, '', location.href);
+  // Every in-app page transition is one Back step. This preserves the
+  // actual parent page (Students -> Profile -> Fees/Reports) instead of
+  // forcing Android/browser Back to Home.
+  if(!fromHistory){
+    appSectionHistory.push(currentSectionId);
+    history.pushState({tuitionSection:sectionId}, '', location.href);
   }
 
   currentSectionId=sectionId;
@@ -2707,23 +2758,21 @@ function showSection(sectionId, navId, fromHistory){
 }
 
 function navigateBackSection(){
-  if(studentProfileReturn){ studentProfileReturn=false; showSection('studentProfileSection','studentsNav',true); return; }
-  // Fee Details is the only section-level detail: Back returns to Fees.
-  if(currentSectionId==='feeDetailsSection'){
+  if(currentSectionId==='homeSection') return;
+  if(history.state && (history.state.tuitionSection || history.state.tuitionAppGuard || history.state.tuitionDetail)){
     history.back();
     return;
   }
-  // When a main card is open, Back always returns directly to Home.
-  goHome();
+  const previous=appSectionHistory.pop()||'homeSection';
+  showSection(previous,sectionNavId(previous),true);
 }
 
 function goHome(){
   if(currentSectionId==='homeSection') return;
-  if(currentSectionId==='feeDetailsSection'){
-    history.back();
-    return;
-  }
+  // The bottom Home tab is an explicit destination, not a one-step Back.
+  appSectionHistory=[];
   showSection('homeSection','homeNav',true);
+  history.pushState({tuitionAppGuard:true}, '', location.href);
 }
 
 function renderStudentsPage(){
@@ -2747,7 +2796,7 @@ function renderStudentsPage(){
       <input id="studentPhotoInput${index}" type="file" accept="image/*" style="display:none;" onchange="uploadStudentPhoto(event,${index})">
       <div class="studentMain"><b>${s.name}</b><div class="studentMeta">${s.active===false?'Inactive':'Active'} · ${s.attendance?.length||0} attendance records</div></div>
       <div class="studentActions">
-        <button class="miniBtn" onclick="openStudentProfile(${index})">View Profile</button>
+        <span class="studentViewProfileText" role="button" tabindex="0" onclick="openStudentProfile(${index})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openStudentProfile(${index});}">View Profile</span>
       </div>
     </div>`;
   }).join('');
@@ -3683,41 +3732,77 @@ function openStudentProfile(index){
 }
 function closeStudentProfile(){
   profileReportStudentIndex=null;
-  showSection('studentsSection','studentsNav',true);
+  if(currentSectionId==='studentProfileSection' && window.history.length>1) history.back();
+  else showSection('studentsSection','studentsNav',true);
 }
 function renderStudentProfile(){
   const st=students[selectedStudentProfile];
   const area=document.getElementById('studentProfileArea');
   if(!st||!area) return;
-  const photo=st.photo ? `<img src="${st.photo}" alt="Student photo" style="width:104px;height:104px;border-radius:50%;object-fit:cover;border:3px solid #dce5f5;">` : `<div style="width:104px;height:104px;border-radius:50%;background:#e9eef8;color:#53658a;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:800;">${escapeHtml((st.name||'?').trim().charAt(0).toUpperCase())}</div>`;
-  area.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:2px;"><button class="miniBtn iconOnly editIcon" type="button" onclick="editStudentProfile()" aria-label="Edit profile" title="Edit profile">✎</button></div>
-    <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin:0 0 22px;">${photo}<div style="font-size:21px;font-weight:900;line-height:1.3;">${escapeHtml(st.name||'')}</div></div>
-    <div style="display:grid;gap:15px;text-align:left;">
-      <div><b>Parent/Guardian Name</b><div style="margin-top:4px;">${escapeHtml(st.parentName||'')}</div></div>
-      <div><b>Parent/Guardian Mobile Number</b><div style="margin-top:4px;">${escapeHtml(st.parentMobile||'')}</div></div>
-      <div><b>Student Mobile Number</b><div style="margin-top:4px;">${escapeHtml(st.mobile||'')}</div></div>
-      <div><b>Address</b><div style="margin-top:4px;white-space:pre-wrap;">${escapeHtml(st.address||'')}</div></div>
+  const photo=st.photo
+    ? `<img src="${st.photo}" alt="Student photo" style="width:104px;height:104px;border-radius:50%;object-fit:cover;border:3px solid #dce5f5;">`
+    : `<div style="width:104px;height:104px;border-radius:50%;background:#e9eef8;color:#53658a;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:800;">${escapeHtml((st.name||'?').trim().charAt(0).toUpperCase())}</div>`;
+  const isActive=st.active!==false;
+  area.innerHTML=`<div class="profileEditTop"><button class="miniBtn iconOnly editIcon" type="button" onclick="editStudentProfile()" aria-label="Edit profile" title="Edit profile">✎</button></div>
+    <div class="profileIdentity">
+      <div class="profileAvatarWrap">${photo}</div>
+      <div class="profileStudentName">${escapeHtml(st.name||'')}</div>
+      <div class="profileStatus ${isActive?'isActive':'isInactive'}"><span></span>${isActive?'Active Student':'Inactive Student'}</div>
     </div>
-    <div style="display:grid;gap:11px;margin-top:24px;">
-      <button class="saveBtn" type="button" onclick="openProfileFeeStatus()">View Fee Status</button>
-      <button class="saveBtn" type="button" style="background:#3978c8;" onclick="openProfileAttendanceReport()">View Attendance Report</button>
-      <button class="saveBtn" type="button" style="background:#dc5353;" onclick="deleteStudent(${selectedStudentProfile})">Delete Student</button>
+    <div class="profileDetailsList">
+      <div><b>Parent/Guardian Name</b><div>${escapeHtml(st.parentName||'')}</div></div>
+      <div><b>Parent/Guardian Mobile Number</b><div>${escapeHtml(st.parentMobile||'')}</div></div>
+      <div><b>Student Mobile Number</b><div>${escapeHtml(st.mobile||'')}</div></div>
+      <div><b>Address</b><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
+    </div>
+    <div class="profileStatusAction">
+      <button type="button" class="profileToggleStatus ${isActive?'makeInactive':'makeActive'}" onclick="toggleStudentActiveFromProfile()">${isActive?'Mark as Inactive':'Activate Student'}</button>
+    </div>
+    <div class="profileActionRow">
+      <button class="profileActionBtn profileFeeBtn" type="button" onclick="openProfileFeeStatus()">Fees</button>
+      <button class="profileActionBtn profileAttendanceBtn" type="button" onclick="openProfileAttendanceReport()">Attendance</button>
+      <button class="profileActionBtn profileDeleteBtn" type="button" onclick="deleteStudent(${selectedStudentProfile})">Delete</button>
     </div>`;
 }
 function editStudentProfile(){
   const st=students[selectedStudentProfile]; if(!st) return;
   const area=document.getElementById('studentProfileArea');
-  area.innerHTML=`<div style="display:flex;justify-content:flex-end;"><button class="miniBtn" type="button" onclick="renderStudentProfile()">Cancel</button></div>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:9px;margin:8px 0 18px;">
-      ${st.photo?`<img src="${st.photo}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;">`:`<div style="width:100px;height:100px;border-radius:50%;background:#e9eef8;display:flex;align-items:center;justify-content:center;font-size:38px;">${escapeHtml((st.name||'?').charAt(0).toUpperCase())}</div>`}
-      <input id="profilePhotoInput" type="file" accept="image/*" style="max-width:100%;">
+  const photo=st.photo
+    ? `<img src="${st.photo}" alt="Student photo">`
+    : `<div class="profileEditAvatarFallback">${escapeHtml((st.name||'?').trim().charAt(0).toUpperCase())}</div>`;
+  area.innerHTML=`<div class="profileEditTop"><button class="miniBtn" type="button" onclick="renderStudentProfile()">Cancel</button></div>
+    <div class="profileEditPhotoBlock">
+      <div class="profileEditPhotoWrap" id="profileEditPhotoWrap" onclick="handleStudentPhotoBoxClick(${selectedStudentProfile})" role="button" tabindex="0" aria-label="Change or remove student photo">
+        ${photo}<span class="profilePhotoEditBadge">✎</span>
+      </div>
+      <div class="profilePhotoHint">Tap photo to change or remove</div>
     </div>
-    <label style="font-weight:700;display:block;margin-bottom:5px;">Student Name</label><input id="profileStudentName" value="${escapeHtml(st.name||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
-    <label style="font-weight:700;display:block;margin-bottom:5px;">Parent/Guardian Name</label><input id="profileParentName" value="${escapeHtml(st.parentName||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
-    <label style="font-weight:700;display:block;margin-bottom:5px;">Parent/Guardian Mobile Number</label><input id="profileParentMobile" type="tel" value="${escapeHtml(st.parentMobile||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
-    <label style="font-weight:700;display:block;margin-bottom:5px;">Student Mobile Number</label><input id="profileStudentMobile" type="tel" value="${escapeHtml(st.mobile||'').replace(/"/g,'&quot;')}" style="width:100%;box-sizing:border-box;margin-bottom:13px;">
-    <label style="font-weight:700;display:block;margin-bottom:5px;">Address</label><textarea id="profileStudentAddress" style="width:100%;box-sizing:border-box;min-height:80px;">${escapeHtml(st.address||'')}</textarea>
+    <label class="profileFormLabel">Student Name</label><input id="profileStudentName" value="${escapeHtml(st.name||'').replace(/"/g,'&quot;')}">
+    <label class="profileFormLabel">Parent/Guardian Name</label><input id="profileParentName" value="${escapeHtml(st.parentName||'').replace(/"/g,'&quot;')}">
+    <label class="profileFormLabel">Parent/Guardian Mobile Number</label><input id="profileParentMobile" type="tel" value="${escapeHtml(st.parentMobile||'').replace(/"/g,'&quot;')}">
+    <label class="profileFormLabel">Student Mobile Number</label><input id="profileStudentMobile" type="tel" value="${escapeHtml(st.mobile||'').replace(/"/g,'&quot;')}">
+    <label class="profileFormLabel">Address</label><textarea id="profileStudentAddress">${escapeHtml(st.address||'')}</textarea>
     <button class="popupSave" type="button" style="margin-top:16px;" onclick="saveStudentProfile()">Save Changes</button>`;
+}
+function refreshProfileEditPhoto(){
+  const st=students[selectedStudentProfile],wrap=document.getElementById('profileEditPhotoWrap');
+  if(!st||!wrap)return;
+  wrap.innerHTML=(st.photo
+    ? `<img src="${st.photo}" alt="Student photo">`
+    : `<div class="profileEditAvatarFallback">${escapeHtml((st.name||'?').trim().charAt(0).toUpperCase())}</div>`)
+    + '<span class="profilePhotoEditBadge">✎</span>';
+}
+function toggleStudentActiveFromProfile(){
+  const st=students[selectedStudentProfile]; if(!st)return;
+  const deactivate=st.active!==false;
+  const message=deactivate
+    ? `Mark ${st.name} as Inactive?\n\nThis student will stop appearing in Daily Attendance. Previous attendance and fee data will remain safe.`
+    : `Mark ${st.name} as Active?\n\nThis student will appear again in Daily Attendance.`;
+  if(!confirm(message))return;
+  st.active=!deactivate;
+  saveLocalData(true);
+  renderStudentProfile();
+  renderStudentsPage();
 }
 function saveStudentProfile(){
   const st=students[selectedStudentProfile]; if(!st) return;
@@ -3727,12 +3812,9 @@ function saveStudentProfile(){
   st.parentMobile=document.getElementById('profileParentMobile').value.trim();
   st.mobile=document.getElementById('profileStudentMobile').value.trim();
   st.address=document.getElementById('profileStudentAddress').value.trim();
-  const file=document.getElementById('profilePhotoInput').files?.[0];
-  const finish=()=>{saveLocalData(true);renderStudentProfile();renderStudentsPage();};
-  if(file){
-    if(!file.type.startsWith('image/')){alert('Please select an image.');return;}
-    const reader=new FileReader(); reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const max=500;const scale=Math.min(1,max/Math.max(img.width,img.height));canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);st.photo=canvas.toDataURL('image/jpeg',0.82);finish();};img.src=e.target.result;};reader.readAsDataURL(file);
-  }else finish();
+  saveLocalData(true);
+  renderStudentProfile();
+  renderStudentsPage();
 }
 function openProfileFeeStatus(){
   if(selectedStudentProfile===null)return;
@@ -3744,7 +3826,7 @@ function openProfileAttendanceReport(){
   profileReportStudentIndex=selectedStudentProfile;
   showPreviousReports=true;
   const back=document.querySelector('#reportsSection .pageHead .backHomeBtn');
-  if(back){back.textContent='← Back';back.onclick=()=>{profileReportStudentIndex=null;showSection('studentProfileSection','studentsNav',true);};}
+  if(back){back.textContent='← Back';back.onclick=()=>{profileReportStudentIndex=null;history.back();};}
   showSection('reportsSection','reportsNav');
 }
 
@@ -3878,6 +3960,7 @@ function removeStudentPhoto(){
   saveLocalData(true);
   closeStudentPhoto();
   renderStudentsPage();
+  if(selectedStudentProfile===index) refreshProfileEditPhoto();
 }
 
 function uploadStudentPhoto(event,index){
@@ -3919,6 +4002,7 @@ function uploadStudentPhoto(event,index){
       students[index].photo = canvas.toDataURL("image/jpeg",0.8);
       saveLocalData(true);
       renderStudentsPage();
+      if(selectedStudentProfile===index) refreshProfileEditPhoto();
 
       if(selectedPhotoStudent === index){
         const large=document.getElementById("studentPhotoLarge");
@@ -4325,19 +4409,20 @@ window.addEventListener("popstate", function(event){
   }
   if(closeTopOverlayFromBack()) return;
 
-  // Back from a detail page returns to its parent card.
-  if(currentSectionId==='feeDetailsSection'){
-    showSection('feesSection','feesNav',true);
-    return;
-  }
-
-  // Back from any main card/page goes straight to Home, never to
-  // whichever card happened to be opened previously.
-  if(currentSectionId!=='homeSection'){
-    showSection('homeSection','homeNav',true);
-    // Re-arm the Home guard because this Back press consumed the old one.
+  // Restore exactly one previous in-app section for Android/browser Back.
+  if(appSectionHistory.length){
+    const previous=appSectionHistory.pop();
+    if(previous==='reportsSection') profileReportStudentIndex=null;
+    if(currentSectionId==='feeDetailsSection') studentProfileReturn=false;
+    showSection(previous,sectionNavId(previous),true);
+    // Keep a guard above the restored page so the next Back is handled
+    // inside the app rather than unexpectedly leaving it.
     history.pushState({tuitionAppGuard:true}, '', location.href);
     return;
+  }
+  if(currentSectionId!=='homeSection'){
+    showSection('homeSection','homeNav',true);
+    history.pushState({tuitionAppGuard:true}, '', location.href);
   }
   return;
 });
@@ -4345,6 +4430,7 @@ window.addEventListener("popstate", function(event){
 window.addEventListener("load", function(){
   setupOverlayBackHandling();
   currentSectionId='homeSection';
+  appSectionHistory=[];
   renderHomeNotes();
   // One guard entry lets the first Back press be intercepted while the app is open.
   history.pushState({tuitionAppGuard:true}, "", location.href);
