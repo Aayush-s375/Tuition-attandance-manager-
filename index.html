@@ -2982,9 +2982,10 @@ function getCalendarFeeObligations(student,today){
     const monthStart=`${y}-${String(m).padStart(2,'0')}-01`;
     const monthEnd=`${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
     const start=joinDate>feeDateObj(monthStart)?join:monthStart;
-    const end=todayDate<feeDateObj(monthEnd)?today:monthEnd;
-    if(feeDateObj(end)>=feeDateObj(start)){
-      result.push({start,end,monthKey:monthKey(y,m)});
+    // A monthly fee becomes due only after that calendar month has ended.
+    // Do not create a pending obligation for the still-running current month.
+    if(feeDateObj(monthEnd)<=todayDate && feeDateObj(monthEnd)>=feeDateObj(start)){
+      result.push({start,end:monthEnd,monthKey:monthKey(y,m)});
     }
     cursor.setMonth(cursor.getMonth()+1);
   }
@@ -3048,6 +3049,12 @@ function getStudentTotalPending(student,today=getLocalFeeToday()){
   let total=0;
   const cursor=new Date(join.getFullYear(),join.getMonth(),1);
   while(cursor<=now){
+    const monthEnd=new Date(cursor.getFullYear(),cursor.getMonth()+1,0);
+    // Count only completed calendar months; the current month is not due yet.
+    if(monthEnd>now){
+      cursor.setMonth(cursor.getMonth()+1);
+      continue;
+    }
     const key=monthKey(cursor.getFullYear(),cursor.getMonth()+1);
     const rec=(student.fees||[]).find(f=>f.status==='credited' && f.type==='month' && f.monthKey===key);
     if(rec){
