@@ -815,10 +815,11 @@ body.darkMode .profileStudentName{color:#ffd978!important;text-shadow:0 0 12px r
 .profileStatus.isInactive{background:#fff0e8;color:#c45b27}
 body.darkMode .profileStatus.isActive{background:#173d31;color:#69e2a0}
 body.darkMode .profileStatus.isInactive{background:#493021;color:#ffb17b}
-.profileDetailsList{display:grid;gap:15px;text-align:left}
-.profileDetailsList b{display:block;margin-bottom:4px}
-.profileDetailsList>div>div{line-height:1.5;overflow-wrap:anywhere}
-.profileAddress{white-space:pre-wrap}
+.profileDetailsList{display:grid;gap:13px;text-align:left}
+.profileDetailsList>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);column-gap:10px;align-items:start}
+.profileDetailsList b{display:block;min-width:0;line-height:1.45;overflow-wrap:normal;word-break:normal;hyphens:none}
+.profileDetailsList>div>div{min-width:0;line-height:1.5;overflow-wrap:normal;word-break:normal;hyphens:none;white-space:pre-wrap}
+.profileAddress{white-space:pre-wrap;overflow-wrap:normal;word-break:normal}
 .profileStatusAction{margin-top:18px}
 .profileToggleStatus{width:100%;border:1px solid transparent;border-radius:11px;padding:10px 12px;font-size:13px;font-weight:800}
 .profileToggleStatus.makeInactive{background:#fff1d6;color:#936000;border-color:#f2d18c}
@@ -843,6 +844,7 @@ body.darkMode .profilePhotoEditBadge{border-color:#202633}
 #studentProfileArea #profileStudentAddress{min-height:80px}
 #studentProfileArea #profileStudentJoiningDate{width:100%;box-sizing:border-box;margin:0 0 13px;padding:10px;border-radius:9px}
 body.darkMode #studentProfileArea .profilePhotoHint{color:#b8c3d9}
+@media(max-width:380px){.profileDetailsList>div{grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);column-gap:7px}.profileDetailsList b,.profileDetailsList>div>div{font-size:13px}}
 @media(max-width:360px){.profileActionRow{gap:6px}.profileActionBtn{font-size:11px;padding:8px 3px;min-height:37px}}
 </style>
 
@@ -3779,13 +3781,13 @@ function renderStudentProfile(){
       <div><b>Address :</b><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
       <div><b>Date of Joining :</b><div>${escapeHtml(st.joiningDate?formatFeeShortDate(st.joiningDate):'Not added')}</div></div>
     </div>
-    <div class="profileStatusAction">
-      <button type="button" class="profileToggleStatus ${isActive?'makeInactive':'makeActive'}" onclick="toggleStudentActiveFromProfile()">${isActive?'Mark as Inactive':'Activate Student'}</button>
-    </div>
     <div class="profileActionRow">
       <button class="profileActionBtn profileFeeBtn" type="button" onclick="openProfileFeeStatus()">Fees</button>
       <button class="profileActionBtn profileAttendanceBtn" type="button" onclick="openProfileAttendanceReport()">Attendance</button>
       <button class="profileActionBtn profileDeleteBtn" type="button" onclick="deleteStudent(${selectedStudentProfile})">Delete</button>
+    </div>
+    <div class="profileStatusAction">
+      <button type="button" class="profileToggleStatus ${isActive?'makeInactive':'makeActive'}" onclick="toggleStudentActiveFromProfile()">${isActive?'Mark as Inactive':'Activate Student'}</button>
     </div>`;
 }
 function editStudentProfile(){
@@ -4438,23 +4440,37 @@ window.addEventListener("popstate", function(event){
     pendingDeveloperPopup = false;
     const popup=document.getElementById("developerPopup");
     if(popup) popup.style.display="flex";
+    history.pushState({tuitionAppGuard:true}, '', location.href);
     return;
   }
   if(closeTopOverlayFromBack()) return;
 
-  // Restore exactly one previous in-app section for Android/browser Back.
+  // IMPORTANT: once a detail page has returned to any main card, the next
+  // Android/browser Back must go Home, never leave the app or revisit a card.
+  // This check intentionally runs BEFORE the detail-page history stack.
+  if(isMainCardNavigation(currentSectionId)){
+    appSectionHistory=[];
+    profileReportStudentIndex=null;
+    studentProfileReturn=false;
+    showSection('homeSection','homeNav',true);
+    history.pushState({tuitionAppGuard:true}, '', location.href);
+    return;
+  }
+
+  // Detail pages (Profile, Fee Details, etc.) return exactly one level.
   if(appSectionHistory.length){
     const previous=appSectionHistory.pop();
     if(previous==='reportsSection') profileReportStudentIndex=null;
     if(currentSectionId==='feeDetailsSection') studentProfileReturn=false;
     showSection(previous,sectionNavId(previous),true);
-    // Keep a guard above the restored page so the next Back is handled
-    // inside the app rather than unexpectedly leaving it.
     history.pushState({tuitionAppGuard:true}, '', location.href);
     return;
   }
   if(currentSectionId!=='homeSection'){
     showSection('homeSection','homeNav',true);
+    history.pushState({tuitionAppGuard:true}, '', location.href);
+  }else{
+    // Keep one in-app guard so a subsequent Back is intercepted too.
     history.pushState({tuitionAppGuard:true}, '', location.href);
   }
   return;
