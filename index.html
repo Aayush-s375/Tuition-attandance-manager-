@@ -2732,9 +2732,18 @@ function showSection(sectionId, navId, fromHistory){
   if(!section) return;
   if(sectionId===currentSectionId) return;
 
-  // App pages use one internal stack only. Browser history is kept separate
-  // for Android Back guarding and popup overlays, preventing double-pop exits.
+  // Student Profile and Fee Details need their own browser Back layer.
+  // The main-card stack remains internal, so Students/Fees still return Home.
+  const detailSections=['studentProfileSection','feeDetailsSection'];
   if(!fromHistory){
+    if(detailSections.includes(sectionId)){
+      history.pushState({tuitionAppDetail:sectionId}, '', location.href);
+    }else if(detailSections.includes(currentSectionId) && isMainCardNavigation(sectionId) &&
+             history.state && history.state.tuitionAppDetail===currentSectionId){
+      // A direct switch to another main card must not leave a stale detail entry.
+      history.replaceState({tuitionAppGuard:true}, '', location.href);
+    }
+
     if(isMainCardNavigation(sectionId) || sectionId==='homeSection'){
       appSectionHistory=[];
     }else{
@@ -2761,11 +2770,16 @@ function showSection(sectionId, navId, fromHistory){
   renderHomeExtras();
 }
 
-function navigateBackSection(){
+function navigateBackSection(fromPopstate){
   if(currentSectionId==='homeSection') return;
-  // Use the app's own section stack for in-app Back. Do not call history.back()
-  // here: browser history is reserved for the single Android Back guard and
-  // overlays. Mixing both stacks caused the app to exit after returning once.
+  // For the two detail pages, consume their dedicated browser-history layer.
+  // Android Back has already consumed it before popstate runs; visible Back
+  // buttons must consume it here so both Back methods follow the same path.
+  if(!fromPopstate && (currentSectionId==='studentProfileSection' || currentSectionId==='feeDetailsSection') &&
+     history.state && history.state.tuitionAppDetail===currentSectionId){
+    history.back();
+    return;
+  }
   if(isMainCardNavigation(currentSectionId)){
     goHome();
     return;
@@ -4419,21 +4433,25 @@ document.addEventListener("click", handleOutsideTap);
 // navigateBackSection(), so section history is changed in one place only.
 function handleAppBackNavigation(){
   // An open modal/drawer always gets the first Back action.
-  if(closeTopOverlayFromBack()) return true;
+  if(closeTopOverlayFromBack()) return 'overlay';
 
   // At Home, allow the browser to perform its normal exit/back behavior.
   if(currentSectionId==='homeSection') return false;
 
-  // This uses the same internal stack as the visible Back buttons:
-  // detail -> its parent section -> Home.
-  navigateBackSection();
-  return true;
+  const wasDetailPage=currentSectionId==='studentProfileSection' || currentSectionId==='feeDetailsSection';
+  // popstate has already consumed any detail-page history entry.
+  navigateBackSection(true);
+  return wasDetailPage ? 'detail' : 'section';
 }
 
 window.addEventListener("popstate", function(event){
-  if(handleAppBackNavigation()){
-    // Restore the guard even when this action has just returned to Home.
-    // The following deliberate Back press at Home may then exit normally.
+  const backResult=handleAppBackNavigation();
+  if(backResult==='detail'){
+    // Reuse the now-current parent entry as the guard. This avoids leaving
+    // stale nested detail entries underneath Student Profile / Fee Details.
+    history.replaceState({tuitionAppGuard:true}, "", location.href);
+  }else if(backResult){
+    // Restore the guard after overlays and main-card navigation.
     history.pushState({tuitionAppGuard:true}, "", location.href);
   }
   // If already at Home, do not restore the guard: browser Back may exit.
