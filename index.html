@@ -381,6 +381,7 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .savedFeeIntervalDelete{width:38px;height:38px;border:0;border-radius:10px;background:#fff0f0;color:#d33;font-weight:800;}
 .feeDetailsName{font-size:20px;font-weight:800;color:#202638;margin-bottom:4px;}
 .feeDetailsJoining{font-size:13px;color:#606775;margin-bottom:14px;}
+.feeJoiningCompact{margin-bottom:4px;}
 .feeDetailsSectionTitle{font-size:15px;font-weight:800;margin:14px 0 8px;}
 .feeDetailRow{padding:9px 0;border-bottom:1px solid #edf0f4;}
 .feeDetailRow:last-child{border-bottom:0;}
@@ -3155,11 +3156,10 @@ function getCurrentFeeDisplayItems(student){
 function feeItemStatusText(item, student){
   const amount=Number(item.record?.amount || getKnownFeeAmount(student) || 0);
   if(item.record && item.record.status==='credited'){
-    const first=`${item.label} Fee Credited`;
     const second=`₹${amount}${item.record.date ? ` · ${formatFeeShortDate(item.record.date)}` : ''}${item.record.mode ? ` · ${item.record.mode}` : ''}`;
-    return `<span class="feeStatusLine feeCredited">${first}</span><span class="feeStatusMeta feeCredited">${second}</span>`;
+    return `<span class="feeStatusLine feeCredited">${item.label}</span><span class="feeStatusLine feeCredited">Fee Credited</span><span class="feeStatusMeta feeCredited">${second}</span>`;
   }
-  return `<span class="feeStatusLine feePending">${item.label} Fee Pending</span>`;
+  return `<span class="feeStatusLine">${item.label}</span><span class="feeStatusLine feePending">Fee Pending</span>`;
 }
 
 function feeItemKey(item){
@@ -3767,7 +3767,7 @@ function renderFeeDetails(st){
   },0);
 
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsJoining"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeSummaryBox" style="margin-top:12px;"><div style="color:#b02a37;font-weight:800;">Total Pending - ₹${getStudentTotalPending(st)}</div></div><div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining feeJoiningCompact"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsJoining feeJoiningCompact"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeSummaryBox" style="margin-top:12px;"><div style="font-weight:800;">Total Pending - <span style="color:#b02a37;">₹${getStudentTotalPending(st)}</span></div></div><div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
