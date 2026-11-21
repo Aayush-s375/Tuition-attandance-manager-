@@ -3005,15 +3005,19 @@ function getCalendarFeeObligations(student,today){
   const joinDate=feeDateObj(join), todayDate=feeDateObj(today);
   if(!joinDate || !todayDate || todayDate<joinDate) return result;
 
+  const customRanges=(student.fees||[]).filter(f=>f.status==='credited' && f.type==='period').map(f=>getCreditedRange(f,student)).filter(Boolean);
   let cursor=new Date(joinDate.getFullYear(),joinDate.getMonth(),1);
   while(cursor<=todayDate){
     const y=cursor.getFullYear(), m=cursor.getMonth()+1;
     const monthStart=`${y}-${String(m).padStart(2,'0')}-01`;
     const monthEnd=`${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
     const start=joinDate>feeDateObj(monthStart)?join:monthStart;
-    // A monthly fee becomes due only after that calendar month has ended.
-    // Do not create a pending obligation for the still-running current month.
-    if(feeDateObj(monthEnd)<=todayDate && feeDateObj(monthEnd)>=feeDateObj(start)){
+    // A month touched by a manually entered custom period belongs to that
+    // custom-period calculation. Never create a second calendar-month charge.
+    const hasCustomPeriod=customRanges.some(r=>feeDateObj(r.start)<=feeDateObj(monthEnd) && feeDateObj(r.end)>=feeDateObj(monthStart));
+    // Calendar-month fees begin from the 1st of an uncovered month and
+    // become due after that month ends. The running month is display-only.
+    if(!hasCustomPeriod && feeDateObj(monthEnd)<=todayDate && feeDateObj(monthEnd)>=feeDateObj(start)){
       result.push({start,end:monthEnd,monthKey:monthKey(y,m),amount:getFeeForMonth(student,monthKey(y,m))});
     }
     cursor.setMonth(cursor.getMonth()+1);
@@ -3082,19 +3086,19 @@ function getStudentPendingThroughDate(student,throughDate){
   }).filter(Boolean);
 
   let total=0;
-  // A custom interval is a single fee obligation. Count its saved Remaining
-  // only once, when the complete interval has ended by the requested date.
+  // A custom interval is manually priced by the user. Count only the
+  // explicitly entered Remaining amount, once the interval has ended.
+  // Never infer a discount or calculate a daily/monthly rate for custom dates.
   periodRecords.forEach(item=>{
     if(feeDateObj(item.end)>through) return;
-    const rec=item.record;
-    const fallback=Math.max(0,getKnownFeeAmount(student)-Number(rec.amount||0)-Number(rec.discount||0));
-    const remaining=rec.remainingAmount!==undefined && rec.remainingAmount!=='' ? Number(rec.remainingAmount) : fallback;
+    const raw=item.record.remainingAmount;
+    const remaining=raw!==undefined && raw!=='' ? Number(raw) : 0;
     if(Number.isFinite(remaining)) total+=Math.max(0,remaining);
   });
 
-  // For each completed calendar month, count only the days not already
-  // accounted for by a custom interval. This prevents interval + month
-  // calculations from charging the same dates twice.
+  // Calendar-month fees are calculated only for whole calendar months that
+  // do not intersect any saved custom period. This prevents duplicate and
+  // prorated charges around a custom-period/monthly-cycle transition.
   const cursor=new Date(join.getFullYear(),join.getMonth(),1);
   while(cursor<=through){
     const y=cursor.getFullYear(), m=cursor.getMonth()+1;
@@ -3105,21 +3109,12 @@ function getStudentPendingThroughDate(student,throughDate){
     const end=feeDateObj(monthEnd)<=through?monthEnd:throughDate;
     if(feeDateObj(end)>=feeDateObj(start)){
       const monthRec=monthRecords.find(f=>f.monthKey===key);
+      const intersectsCustom=periodRecords.some(period=>feeDateObj(period.end)>=feeDateObj(monthStart) && feeDateObj(period.start)<=feeDateObj(monthEnd));
       if(monthRec){
         total+=getMonthlyFeeRemaining(student,key,monthRec);
-      }else{
-        let uncovered=[{start,end}];
-        periodRecords.forEach(period=>{
-          const next=[];
-          uncovered.forEach(seg=>next.push(...subtractFeeRange(seg.start,seg.end,period.start,period.end)));
-          uncovered=next;
-        });
-        const monthDays=new Date(y,m,0).getDate();
-        const dailyRate=getFeeForMonth(student,key)/monthDays;
-        uncovered.forEach(seg=>{
-          const days=daysBetweenDates(seg.start,seg.end);
-          if(days>0) total+=(dailyRate*days);
-        });
+      }else if(!intersectsCustom && feeDateObj(monthEnd)<=through){
+        // Charge the full calendar-month rate, never a prorated fragment.
+        total+=getFeeForMonth(student,key);
       }
     }
     cursor.setMonth(cursor.getMonth()+1);
@@ -3165,9 +3160,14 @@ function getFeeStatusItems(student,today){
     const y=todayDate.getFullYear(), m=todayDate.getMonth()+1;
     const monthEnd=feeDateObj(`${y}-${String(m).padStart(2,'0')}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`);
     if(monthEnd && monthEnd>todayDate){
-      const monthStart=feeDateObj(`${y}-${String(m).padStart(2,'0')}-01`);
-      const start=joinDate>monthStart?student.joiningDate:`${y}-${String(m).padStart(2,'0')}-01`;
-      obligations.push({start,end:today,monthKey:monthKey(y,m),displayOnly:true});
+      const monthStartText=`${y}-${String(m).padStart(2,'0')}-01`;
+      const customRanges=(student.fees||[]).filter(f=>f.status==='credited' && f.type==='period').map(f=>getCreditedRange(f,student)).filter(Boolean);
+      const hasCustomPeriod=customRanges.some(r=>feeDateObj(r.start)<=monthEnd && feeDateObj(r.end)>=feeDateObj(monthStartText));
+      if(!hasCustomPeriod){
+        const monthStart=feeDateObj(monthStartText);
+        const start=joinDate>monthStart?student.joiningDate:monthStartText;
+        obligations.push({start,end:today,monthKey:monthKey(y,m),displayOnly:true});
+      }
     }
   }
 
@@ -3221,7 +3221,7 @@ function feeItemStatusText(item, student){
     const second=`₹${amount}${item.record.date ? ` · ${formatFeeShortDate(item.record.date)}` : ''}${item.record.mode ? ` · ${item.record.mode}` : ''}`;
     const remaining=item.record.type==='month' ? getMonthlyFeeRemaining(student,item.record.monthKey,item.record) : Number(item.record.remainingAmount||0);
     const discount=Number(item.record.discount||0);
-    return `<span class="feeStatusLine feeCredited">${item.label}</span><span class="feeStatusLine feeCredited">${status} · ₹${amount}</span><span class="feeStatusMeta">${second}</span>${discount>0?`<span class="feeStatusMeta">Discount - ₹${discount}</span>`:''}${remaining>0?`<span class="feeStatusLine feePending">Remaining - ₹${remaining}</span>`:''}`;
+    return `<span class="feeStatusLine feeCredited">${item.label}</span><span class="feeStatusLine feeCredited">${status} · ₹${amount}</span><span class="feeStatusMeta">${second}</span>${item.record.type==='month' && discount>0?`<span class="feeStatusMeta">Discount - ₹${discount}</span>`:''}${remaining>0?`<span class="feeStatusLine feePending">Remaining - ₹${remaining}</span>`:''}`;
   }
   return `<span class="feeStatusLine feePending">${item.label}</span><span class="feeStatusLine feePending">Fee Pending</span>`;
 }
@@ -3741,7 +3741,7 @@ function openFee(index){
   document.getElementById('feePeriodEnd').value=st.joiningDate ? addDaysToDate(st.joiningDate,30) : '';
   document.getElementById('feePeriodStart').onchange=updateFeePeriodDays;
   document.getElementById('feePeriodEnd').onchange=updateFeePeriodDays;
-  selectFeeUpdateMode(getFeeCycleMode(st));
+  selectFeeUpdateMode('month');
   updateFeePeriodDays();
   document.getElementById('feePopup').style.display='flex';
 }
@@ -3760,6 +3760,11 @@ function updateFeeRemainingAmount(){
   const received=Number(document.getElementById('feeAmount')?.value||0);
   const expected=getKnownFeeAmount(st);
   const mode=document.getElementById('feePopup')?.dataset.updateMode||'month';
+  if(mode==='period'){
+    const hint=document.getElementById('feeDiscountHint');
+    if(hint) hint.textContent='Custom Period: enter the fee and Remaining amount manually.';
+    return;
+  }
   let previousPending=0;
   if(mode==='month'){
     const selectedKey=document.getElementById('feeMonthSelect')?.value;
@@ -3821,7 +3826,7 @@ function renderFeeDetails(st){
       const monthEnd=rec.type==='month'&&rec.monthKey?feeDateObj(`${rec.monthKey}-${String(new Date(Number(rec.monthKey.slice(0,4)),Number(rec.monthKey.slice(5,7)),0).getDate()).padStart(2,'0')}`):null;
       const advance=!!(monthEnd&&monthEnd>feeDateObj(today));
       const dueRemaining=rec.type==='month'?getMonthlyFeeRemaining(st,rec.monthKey,rec):Number(rec.remainingAmount||0);
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:88px;"><b class="feeDetailPeriod">${item.label}</b><div class="feeDetailStatus feeCredited">${advance?'Advance':'Fee Credited'} · ₹${amount}</div>${Number(rec.discount)>0?`<div class="feeDetailExtra">Discount ₹${Number(rec.discount)}</div>`:''}<div class="feeDetailPayment">${paymentDate} · ${mode}</div>${dueRemaining>0?`<div class="feeDetailExtra feePending">Remaining - ₹${dueRemaining}</div>`:''}<button class="miniBtn iconOnly editIcon" aria-label="Edit fee record" title="Edit" style="position:absolute;right:36px;top:50%;transform:translateY(-50%);" onclick="editFeeRecord(${st.fees.indexOf(rec)})">✎</button><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:88px;"><b class="feeDetailPeriod">${item.label}</b><div class="feeDetailStatus feeCredited">${advance?'Advance':'Fee Credited'} · ₹${amount}</div>${rec.type==='month' && Number(rec.discount)>0?`<div class="feeDetailExtra">Discount ₹${Number(rec.discount)}</div>`:''}<div class="feeDetailPayment">${paymentDate} · ${mode}</div>${dueRemaining>0?`<div class="feeDetailExtra feePending">Remaining - ₹${dueRemaining}</div>`:''}<button class="miniBtn iconOnly editIcon" aria-label="Edit fee record" title="Edit" style="position:absolute;right:36px;top:50%;transform:translateY(-50%);" onclick="editFeeRecord(${st.fees.indexOf(rec)})">✎</button><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
     }else{
       rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><div class="feeDetailStatus feePending">Fee Pending</div></div>`;
     }
@@ -3905,7 +3910,7 @@ function saveFee(){
   const expectedFee=getKnownFeeAmount(st);
   let priorPending=0;
   if(updateMode==='month') priorPending=getPendingBeforeMonth(st,document.getElementById('feeMonthSelect').value);
-  const discount=Math.max(0,expectedFee-Number(amount)-Math.max(0,remaining-priorPending));
+  const discount=updateMode==='month' ? Math.max(0,expectedFee-Number(amount)-Math.max(0,remaining-priorPending)) : 0;
   const paymentFields={amount:String(amount),remainingAmount:String(remaining),discount:String(discount)};
   if(!st.fees) st.fees=[];
 
@@ -3944,7 +3949,7 @@ function saveFee(){
     record={type:'period',periodStart:start,periodEnd:end,days,status:'credited',...paymentFields,mode,date,updatedAt:Date.now()};
     if(editingIndex>=0 && st.fees[editingIndex]) Object.assign(st.fees[editingIndex],record);
     else st.fees.push(record);
-    st.feeCycle='period';
+    st.feeCycle='month';
 
   }
   saveLocalData(true);
