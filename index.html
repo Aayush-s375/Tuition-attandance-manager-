@@ -841,6 +841,7 @@ body.darkMode .profilePhotoEditBadge{border-color:#202633}
 .profileFormLabel{display:block;margin:0 0 5px;font-size:13px;font-weight:800}
 #studentProfileArea #profileStudentName,#studentProfileArea #profileParentName,#studentProfileArea #profileParentMobile,#studentProfileArea #profileStudentMobile,#studentProfileArea #profileStudentAddress{width:100%;box-sizing:border-box;margin:0 0 13px;padding:10px;border-radius:9px}
 #studentProfileArea #profileStudentAddress{min-height:80px}
+#studentProfileArea #profileStudentJoiningDate{width:100%;box-sizing:border-box;margin:0 0 13px;padding:10px;border-radius:9px}
 body.darkMode #studentProfileArea .profilePhotoHint{color:#b8c3d9}
 @media(max-width:360px){.profileActionRow{gap:6px}.profileActionBtn{font-size:11px;padding:8px 3px;min-height:37px}}
 </style>
@@ -2725,17 +2726,34 @@ function sectionNavId(sectionId){
 
 let appSectionHistory=[];
 
+function isMainCardSection(sectionId){
+  return ['studentsSection','attendanceSection','feesSection','reportsSection'].includes(sectionId);
+}
+
+function isMainCardNavigation(sectionId){
+  // Reports opened from a student's profile is a detail view, not the Reports tab.
+  return isMainCardSection(sectionId) && !(sectionId==='reportsSection' && profileReportStudentIndex!==null);
+}
+
 function showSection(sectionId, navId, fromHistory){
   const section=document.getElementById(sectionId);
   if(!section) return;
   if(sectionId===currentSectionId) return;
 
-  // Every in-app page transition is one Back step. This preserves the
-  // actual parent page (Students -> Profile -> Fees/Reports) instead of
-  // forcing Android/browser Back to Home.
+  // Main cards never create navigation history. Switching between any of
+  // the four cards resets the in-app Back path; Back from a card goes Home.
+  // Detail pages still create exactly one step back to their parent page.
   if(!fromHistory){
-    appSectionHistory.push(currentSectionId);
-    history.pushState({tuitionSection:sectionId}, '', location.href);
+    if(isMainCardNavigation(sectionId)){
+      appSectionHistory=[];
+      history.replaceState({tuitionAppGuard:true}, '', location.href);
+    }else if(sectionId==='homeSection'){
+      appSectionHistory=[];
+      history.replaceState({tuitionAppGuard:true}, '', location.href);
+    }else{
+      appSectionHistory.push(currentSectionId);
+      history.pushState({tuitionSection:sectionId}, '', location.href);
+    }
   }
 
   currentSectionId=sectionId;
@@ -2759,20 +2777,25 @@ function showSection(sectionId, navId, fromHistory){
 
 function navigateBackSection(){
   if(currentSectionId==='homeSection') return;
-  if(history.state && (history.state.tuitionSection || history.state.tuitionAppGuard || history.state.tuitionDetail)){
+  // A main card always returns to Home, never to the previously selected card.
+  if(isMainCardNavigation(currentSectionId)){
+    goHome();
+    return;
+  }
+  // Detail pages return one level to their actual parent (Profile -> Students,
+  // Fee Details -> Profile/Fees, etc.).
+  if(appSectionHistory.length){
     history.back();
     return;
   }
-  const previous=appSectionHistory.pop()||'homeSection';
-  showSection(previous,sectionNavId(previous),true);
+  goHome();
 }
 
 function goHome(){
   if(currentSectionId==='homeSection') return;
-  // The bottom Home tab is an explicit destination, not a one-step Back.
   appSectionHistory=[];
   showSection('homeSection','homeNav',true);
-  history.pushState({tuitionAppGuard:true}, '', location.href);
+  history.replaceState({tuitionAppGuard:true}, '', location.href);
 }
 
 function renderStudentsPage(){
@@ -3750,10 +3773,11 @@ function renderStudentProfile(){
       <div class="profileStatus ${isActive?'isActive':'isInactive'}"><span></span>${isActive?'Active Student':'Inactive Student'}</div>
     </div>
     <div class="profileDetailsList">
-      <div><b>Parent/Guardian Name</b><div>${escapeHtml(st.parentName||'')}</div></div>
-      <div><b>Parent/Guardian Mobile Number</b><div>${escapeHtml(st.parentMobile||'')}</div></div>
-      <div><b>Student Mobile Number</b><div>${escapeHtml(st.mobile||'')}</div></div>
-      <div><b>Address</b><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
+      <div><b>Parent/Guardian Name :</b><div>${escapeHtml(st.parentName||'')}</div></div>
+      <div><b>Parent/Guardian Mobile Number :</b><div>${escapeHtml(st.parentMobile||'')}</div></div>
+      <div><b>Student Mobile Number :</b><div>${escapeHtml(st.mobile||'')}</div></div>
+      <div><b>Address :</b><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
+      <div><b>Date of Joining :</b><div>${escapeHtml(st.joiningDate?formatFeeShortDate(st.joiningDate):'Not added')}</div></div>
     </div>
     <div class="profileStatusAction">
       <button type="button" class="profileToggleStatus ${isActive?'makeInactive':'makeActive'}" onclick="toggleStudentActiveFromProfile()">${isActive?'Mark as Inactive':'Activate Student'}</button>
@@ -3782,6 +3806,7 @@ function editStudentProfile(){
     <label class="profileFormLabel">Parent/Guardian Mobile Number</label><input id="profileParentMobile" type="tel" value="${escapeHtml(st.parentMobile||'').replace(/"/g,'&quot;')}">
     <label class="profileFormLabel">Student Mobile Number</label><input id="profileStudentMobile" type="tel" value="${escapeHtml(st.mobile||'').replace(/"/g,'&quot;')}">
     <label class="profileFormLabel">Address</label><textarea id="profileStudentAddress">${escapeHtml(st.address||'')}</textarea>
+    <label class="profileFormLabel">Date of Joining</label><input id="profileStudentJoiningDate" type="date" value="${escapeHtml(st.joiningDate||'')}">
     <button class="popupSave" type="button" style="margin-top:16px;" onclick="saveStudentProfile()">Save Changes</button>`;
 }
 function refreshProfileEditPhoto(){
@@ -3812,6 +3837,14 @@ function saveStudentProfile(){
   st.parentMobile=document.getElementById('profileParentMobile').value.trim();
   st.mobile=document.getElementById('profileStudentMobile').value.trim();
   st.address=document.getElementById('profileStudentAddress').value.trim();
+  const joiningDate=document.getElementById('profileStudentJoiningDate').value;
+  if(joiningDate){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(joiningDate) || !feeDateObj(joiningDate)){
+      alert('Please select a valid Date of Joining.');
+      return;
+    }
+    st.joiningDate=joiningDate;
+  }
   saveLocalData(true);
   renderStudentProfile();
   renderStudentsPage();
