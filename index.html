@@ -4415,47 +4415,38 @@ function handleOutsideTap(event){
 
 document.addEventListener("click", handleOutsideTap);
 
+// All Back sources (the page Back buttons and Android/browser Back) use
+// navigateBackSection(), so section history is changed in one place only.
+function handleAppBackNavigation(){
+  // An open modal/drawer always gets the first Back action.
+  if(closeTopOverlayFromBack()) return true;
+
+  // At Home, allow the browser to perform its normal exit/back behavior.
+  if(currentSectionId==='homeSection') return false;
+
+  // This uses the same internal stack as the visible Back buttons:
+  // detail -> its parent section -> Home.
+  navigateBackSection();
+  return true;
+}
+
 window.addEventListener("popstate", function(event){
-  // One Android/browser Back event performs exactly one app action.
-  // Popups are handled first, then detail pages, then main cards.
-  if(closeTopOverlayFromBack()){
+  if(handleAppBackNavigation()){
+    // Restore the guard even when this action has just returned to Home.
+    // The following deliberate Back press at Home may then exit normally.
     history.pushState({tuitionAppGuard:true}, "", location.href);
-    return;
   }
-
-  if(isMainCardNavigation(currentSectionId)){
-    appSectionHistory=[];
-    profileReportStudentIndex=null;
-    studentProfileReturn=false;
-    showSection('homeSection','homeNav',true);
-    history.pushState({tuitionAppGuard:true}, "", location.href);
-    return;
-  }
-
-  if(appSectionHistory.length){
-    const previous=appSectionHistory.pop();
-    if(currentSectionId==='reportsSection' && profileReportStudentIndex!==null) profileReportStudentIndex=null;
-    if(previous==='reportsSection') profileReportStudentIndex=null;
-    if(currentSectionId==='feeDetailsSection') studentProfileReturn=false;
-    showSection(previous,sectionNavId(previous),true);
-    history.pushState({tuitionAppGuard:true}, "", location.href);
-    return;
-  }
-
-  if(currentSectionId!=='homeSection'){
-    showSection('homeSection','homeNav',true);
-    history.pushState({tuitionAppGuard:true}, "", location.href);
-    return;
-  }
-  // At Home, do not restore the guard: the next Back exits normally.
+  // If already at Home, do not restore the guard: browser Back may exit.
 });
 
 function initializeBackNavigation(){
+  if(window.__tuitionBackNavigationInitialized) return;
+  window.__tuitionBackNavigationInitialized=true;
   setupOverlayBackHandling();
   currentSectionId='homeSection';
   appSectionHistory=[];
   renderHomeNotes();
-  // Keep exactly one sentinel above the page entry while the app is active.
+  // Establish one app-owned sentinel above this page entry.
   history.replaceState({tuitionBase:true}, "", location.href);
   history.pushState({tuitionAppGuard:true}, "", location.href);
 }
