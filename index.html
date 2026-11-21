@@ -3039,6 +3039,34 @@ function getEffectiveCreditedRanges(student){
   });
 }
 
+function getStudentTotalPending(student,today=getLocalFeeToday()){
+  if(!student) return 0;
+  const fee=getKnownFeeAmount(student);
+  if(!student.joiningDate || !fee) return 0;
+  const join=feeDateObj(student.joiningDate), now=feeDateObj(today);
+  if(!join || !now || now<join) return 0;
+  let total=0;
+  const cursor=new Date(join.getFullYear(),join.getMonth(),1);
+  while(cursor<=now){
+    const key=monthKey(cursor.getFullYear(),cursor.getMonth()+1);
+    const rec=(student.fees||[]).find(f=>f.status==='credited' && f.type==='month' && f.monthKey===key);
+    if(rec){
+      const remaining=rec.remainingAmount!==undefined ? Number(rec.remainingAmount) : Math.max(0,fee-Number(rec.amount||0)-Number(rec.discount||0));
+      total+=Number.isFinite(remaining)?Math.max(0,remaining):0;
+    }else{
+      // A current month is also counted as pending while it is in progress.
+      total+=fee;
+    }
+    cursor.setMonth(cursor.getMonth()+1);
+  }
+  // Include custom credited periods' explicit outstanding balance.
+  (student.fees||[]).filter(f=>f.status==='credited' && f.type==='period').forEach(f=>{
+    const remaining=f.remainingAmount!==undefined?Number(f.remainingAmount):Math.max(0,fee-Number(f.amount||0)-Number(f.discount||0));
+    if(Number.isFinite(remaining)) total+=Math.max(0,remaining);
+  });
+  return Math.round(total*100)/100;
+}
+
 function getFeeStatusItems(student,today){
   const obligations=getCalendarFeeObligations(student,today);
   const effectiveCredited=getEffectiveCreditedRanges(student);
@@ -3136,9 +3164,11 @@ function renderFeesPage(){
       feeLines='<div class="studentMeta">No completed fee period yet</div>';
     }else{
       feeLines=items.map(item=>`<div class="feeStatusBlock">${feeItemStatusText(item,s)}</div>`).join('');
+      const totalPending=getStudentTotalPending(s);
+      if(totalPending>0) feeLines+=`<div class="feeStatusMeta" style="color:#b02a37;font-weight:800;margin-top:4px;">Total Pending - ₹${totalPending}</div>`;
     }
     return `<div class="modernStudent" onclick="openFeeStatus(${index})" style="cursor:pointer;">
-      <div class="avatar" style="background:#fff4df;color:#e58b00;">₹</div>
+      <div class="avatar" style="background:#fff4df;color:#e58b00;">${s.photo?`<img src="${s.photo}" alt="">`:'₹'}</div>
       <div class="studentMain"><b>${s.name}</b>${feeLines}</div>
       <button class="miniBtn" onclick="event.stopPropagation();openFee(${index})">Update</button>
     </div>`;
@@ -3536,6 +3566,7 @@ function populateFeeMonthSelect(student){
   const startYear=Math.max(2025,join.getFullYear());
   const endYear=Math.max(2035,today.getFullYear()+1);
   select.innerHTML='';
+  select.onchange=updateFeeRemainingAmount;
   for(let y=startYear;y<=endYear;y++){
     for(let m=1;m<=12;m++){
       const opt=document.createElement('option');
@@ -3588,7 +3619,7 @@ function openFee(index){
   populateFeeMonthSelect(st);
   document.getElementById('feeMode').value='';
   document.getElementById('feeAmount').value='';
-  document.getElementById('feeRemainingAmount').value=String(getKnownFeeAmount(st));
+  document.getElementById('feeRemainingAmount').value=String(getStudentTotalPending(st));
   document.getElementById('feeDiscountHint').textContent='';
   document.getElementById('feeDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('feePopup').dataset.usedSavedInterval='false';
@@ -3601,11 +3632,46 @@ function openFee(index){
   document.getElementById('feePopup').style.display='flex';
 }
 
+function getPendingBeforeMonth(student,selectedKey){
+  if(!student || !selectedKey || !student.joiningDate) return 0;
+  const fee=getKnownFeeAmount(student);
+  if(!fee) return 0;
+  const [sy,sm]=selectedKey.split('-').map(Number);
+  const stop=new Date(sy,sm-1,1);
+  const join=feeDateObj(student.joiningDate);
+  if(!join) return 0;
+  let total=0;
+  const cursor=new Date(join.getFullYear(),join.getMonth(),1);
+  while(cursor<stop){
+    const key=monthKey(cursor.getFullYear(),cursor.getMonth()+1);
+    const rec=(student.fees||[]).find(f=>f.status==='credited'&&f.type==='month'&&f.monthKey===key);
+    if(rec){
+      const value=rec.remainingAmount!==undefined?Number(rec.remainingAmount):Math.max(0,fee-Number(rec.amount||0)-Number(rec.discount||0));
+      total+=Number.isFinite(value)?Math.max(0,value):0;
+    }else total+=fee;
+    cursor.setMonth(cursor.getMonth()+1);
+  }
+  (student.fees||[]).filter(f=>f.status==='credited'&&f.type==='period').forEach(f=>{
+    const range=getCreditedRange(f,student);
+    if(range && range.end<selectedKey+'-01'){
+      const value=f.remainingAmount!==undefined?Number(f.remainingAmount):Math.max(0,fee-Number(f.amount||0)-Number(f.discount||0));
+      if(Number.isFinite(value)) total+=Math.max(0,value);
+    }
+  });
+  return Math.round(total*100)/100;
+}
+
 function updateFeeRemainingAmount(){
   const st=students[currentStudent];
   const received=Number(document.getElementById('feeAmount')?.value||0);
   const expected=getKnownFeeAmount(st);
-  const remaining=Math.max(0,expected-received);
+  const mode=document.getElementById('feePopup')?.dataset.updateMode||'month';
+  let previousPending=0;
+  if(mode==='month'){
+    const selectedKey=document.getElementById('feeMonthSelect')?.value;
+    previousPending=getPendingBeforeMonth(st,selectedKey);
+  }
+  const remaining=Math.max(0,previousPending+expected-received);
   const field=document.getElementById('feeRemainingAmount');
   const hint=document.getElementById('feeDiscountHint');
   if(field) field.value=String(remaining);
@@ -3658,7 +3724,7 @@ function renderFeeDetails(st){
       hasCredited=true;
       const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
       const mode=rec.mode || 'Mode not set';
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}${rec.remainingAmount!==undefined?`<br><span style="font-size:13px;color:#606775;">Remaining ₹${Number(rec.remainingAmount)||0}${Number(rec.discount)>0?` · Discount ₹${Number(rec.discount)}`:''}</span>`:''}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span><button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feeCredited">Credited</span> · ₹${amount}${Number(rec.discount)>0?`<br><span style="font-size:13px;color:#606775;">Discount ₹${Number(rec.discount)}</span>`:''}<br><span style="color:#606775;font-size:13px;">${paymentDate} · ${mode}</span>${Number(rec.remainingAmount)>0?`<br><span class="feePending">Pending - ₹${Number(rec.remainingAmount)}</span>`:''}<button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
     }else{
       rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br><span class="feePending">Pending</span></div>`;
     }
@@ -3679,7 +3745,7 @@ function renderFeeDetails(st){
   },0);
 
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsJoining"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsJoining"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeSummaryBox" style="margin-top:12px;">${(()=>{const next=new Date();next.setMonth(next.getMonth()+1,1);const nextLabel=next.toLocaleDateString('en-US',{month:'long'});const currentKey=monthKey(new Date().getFullYear(),new Date().getMonth()+1);const nextKey=monthKey(next.getFullYear(),next.getMonth()+1);const nextRec=(st.fees||[]).find(f=>f.type==='month'&&f.monthKey===nextKey&&f.status==='credited');return !nextRec&&getKnownFeeAmount(st)>0?`<div>${nextLabel} Fee - <span class="feePending">Pending</span></div>`:'';})()}<div style="color:#b02a37;font-weight:800;">Total Pending - ₹${getStudentTotalPending(st)}</div></div><div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
@@ -3738,7 +3804,9 @@ function saveFee(){
   if(Number(amount)<=0){ alert('Received amount must be greater than 0'); return; }
   if(!Number.isFinite(remaining)||remaining<0){alert('Remaining amount cannot be negative');return;}
   const expectedFee=getKnownFeeAmount(st);
-  const discount=Math.max(0,expectedFee-Number(amount)-remaining);
+  let priorPending=0;
+  if(updateMode==='month') priorPending=getPendingBeforeMonth(st,document.getElementById('feeMonthSelect').value);
+  const discount=Math.max(0,expectedFee-Number(amount)-Math.max(0,remaining-priorPending));
   const paymentFields={amount:String(amount),remainingAmount:String(remaining),discount:String(discount)};
   if(!st.fees) st.fees=[];
 
@@ -3810,19 +3878,20 @@ function renderStudentProfile(){
       <div class="profileStatus ${isActive?'isActive':'isInactive'}"><span></span>${isActive?'Active Student':'Inactive Student'}</div>
     </div>
     <div class="profileDetailsList">
-      <div><b>Present Class</b><span class="profileColon">:</span><div>${escapeHtml(st.presentClass||'Not added')}</div></div>
-      ${(Array.isArray(st.otherStudents)&&st.otherStudents.length)?`<div><b>Other Students</b><span class="profileColon">:</span><div>${st.otherStudents.map((item,i)=>`${i+1}. ${escapeHtml(item.name||'')} — ${escapeHtml(item.className||'Class not added')}`).join('<br>')}</div></div>`:''}
-      <div><b>Parent/Guardian Name</b><span class="profileColon">:</span><div>${escapeHtml(st.parentName||'')}</div></div>
-      <div><b>Parent/Guardian Mobile Number</b><span class="profileColon">:</span><div>${escapeHtml(st.parentMobile||'')}</div></div>
-      <div><b>Address</b><span class="profileColon">:</span><div class="profileAddress">${escapeHtml(st.address||'')}</div></div>
-      <div><b>Date of Joining</b><span class="profileColon">:</span><div>${escapeHtml(st.joiningDate?formatFeeShortDate(st.joiningDate):'Not added')}</div></div>
+      <div><b>Present Class</b><span class="profileColon">:</span><div>${st.presentClass?escapeHtml(st.presentClass):'<i>Not added</i>'}</div></div>
+      <div><b>Monthly Fee</b><span class="profileColon">:</span><div>${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'<i>Not added</i>'}</div></div>
+      ${(Array.isArray(st.otherStudents)&&st.otherStudents.length)?`<div><b>Other Students</b><span class="profileColon">:</span><div>${st.otherStudents.map((item,i)=>`${i+1}. ${escapeHtml(item.name||'')} — ${item.className?escapeHtml(item.className):'<i>Not added</i>'}`).join('<br>')}</div></div>`:''}
+      <div><b>Parent/Guardian Name</b><span class="profileColon">:</span><div>${st.parentName?escapeHtml(st.parentName):'<i>Not added</i>'}</div></div>
+      <div><b>Parent/Guardian Mobile Number</b><span class="profileColon">:</span><div>${st.parentMobile?escapeHtml(st.parentMobile):'<i>Not added</i>'}</div></div>
+      <div><b>Address</b><span class="profileColon">:</span><div class="profileAddress">${st.address?escapeHtml(st.address):'<i>Not added</i>'}</div></div>
+      <div><b>Date of Joining</b><span class="profileColon">:</span><div>${st.joiningDate?escapeHtml(formatFeeShortDate(st.joiningDate)):'<i>Not added</i>'}</div></div>
     </div>
     <div class="profileActionRow">
       <button class="profileActionBtn profileFeeBtn" type="button" onclick="openProfileFeeStatus()">Fees</button>
       <button class="profileActionBtn profileAttendanceBtn" type="button" onclick="openProfileAttendanceReport()">Attendance</button>
       <button class="profileActionBtn profileDeleteBtn" type="button" onclick="deleteStudent(${selectedStudentProfile})">Delete</button>
     </div>
-    ${(()=>{const today=getLocalFeeToday();const pending=getFeeStatusItems(st,today).filter(item=>item.kind==='pending'&&item.end<today);return pending.length?`<div class="profilePendingFees" style="margin-top:16px;padding-top:12px;border-top:1px solid #e2e6ee;"><b style="display:block;margin-bottom:7px;">Previous Pending Fees</b>${pending.map(item=>`<div style="padding:4px 0;">${escapeHtml(item.label)} Fee - <span style="color:#e04444;font-weight:800;">Pending</span></div>`).join('')}</div>`:'';})()}
+    <div class="profilePendingFees" style="margin-top:16px;padding-top:12px;border-top:1px solid #e2e6ee;font-weight:800;color:#b02a37;">Total Fee Pending - ₹${getStudentTotalPending(st)}</div>
 `;
 }
 function profileOtherStudentRow(item={},index=0){
