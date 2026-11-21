@@ -388,6 +388,9 @@ body{background:#f5f7fb;padding:0 0 78px;color:#182230;}
 .feeDetailsPopupContent{max-height:calc(100vh - 24px)!important;overflow-y:auto!important;overflow-x:hidden;box-sizing:border-box;}
 .feeDetailsPopup{z-index:6000;}
 .feeDetailPeriod{display:block;white-space:nowrap;font-size:14px;line-height:1.25;}
+.feeDetailStatus{display:block;margin-top:2px;font-size:13px;line-height:1.25;}
+.feeDetailPayment{display:block;margin-top:2px;font-size:13px;color:#606775;line-height:1.25;}
+.feeDetailExtra{display:block;margin-top:2px;font-size:13px;color:#606775;line-height:1.25;}
 .feeCredited{color:#198754;font-weight:700;}
 .feePending{color:#b02a37;font-weight:700;}
 .feeStatusBlock{margin-top:5px;line-height:1.35;}
@@ -594,6 +597,7 @@ body.darkMode .feePending{color:#ff727d!important;font-weight:900;text-shadow:0 
 body.darkMode .feeDetailPeriod{color:#e8edff!important;}
 body.darkMode .feeDetailRow{border-bottom-color:#394253!important;}
 body.darkMode .feeDetailRow>span:not(.feeCredited):not(.feePending){color:#c5cee0!important;}
+body.darkMode .feeDetailPayment,body.darkMode .feeDetailExtra{color:#c5cee0!important;}
 body.darkMode .feeDetailsJoining,body.darkMode .feeDetailsJoining b{color:#c6d0e5!important;}
 body.darkMode .feeDetailsPopupContent select,body.darkMode input:not([type=checkbox]),body.darkMode select,body.darkMode textarea{background:#252d3b!important;color:#f4f6ff!important;border-color:#4a5872!important;}
 body.darkMode input::placeholder,body.darkMode textarea::placeholder{color:#aab6cc!important;}
@@ -3157,9 +3161,9 @@ function feeItemStatusText(item, student){
   const amount=Number(item.record?.amount || getKnownFeeAmount(student) || 0);
   if(item.record && item.record.status==='credited'){
     const second=`₹${amount}${item.record.date ? ` · ${formatFeeShortDate(item.record.date)}` : ''}${item.record.mode ? ` · ${item.record.mode}` : ''}`;
-    return `<span class="feeStatusLine feeCredited">${item.label}</span><span class="feeStatusLine feeCredited">Fee Credited</span><span class="feeStatusMeta feeCredited">${second}</span>`;
+    return `<span class="feeStatusLine feeCredited">${item.label}</span><span class="feeStatusLine feeCredited">Fee Credited</span><span class="feeStatusMeta">${second}</span>`;
   }
-  return `<span class="feeStatusLine">${item.label}</span><span class="feeStatusLine feePending">Fee Pending</span>`;
+  return `<span class="feeStatusLine feePending">${item.label}</span><span class="feeStatusLine feePending">Fee Pending</span>`;
 }
 
 function feeItemKey(item){
@@ -3746,9 +3750,9 @@ function renderFeeDetails(st){
       hasCredited=true;
       const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
       const mode=rec.mode || 'Mode not set';
-      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><div class="feeCredited"><b class="feeDetailPeriod">${item.label}</b><br>Fee Credited · ₹${amount}</div>${Number(rec.discount)>0?`<br><span style="font-size:13px;color:#606775;">Discount ₹${Number(rec.discount)}</span>`:''}<br><span class="feeCredited" style="font-size:13px;">${paymentDate} · ${mode}</span>${Number(rec.remainingAmount)>0?`<br><span class="feePending">Pending - ₹${Number(rec.remainingAmount)}</span>`:''}<button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><div class="feeDetailStatus feeCredited">Fee Credited · ₹${amount}</div>${Number(rec.discount)>0?`<div class="feeDetailExtra">Discount ₹${Number(rec.discount)}</div>`:''}<div class="feeDetailPayment">${paymentDate} · ${mode}</div>${Number(rec.remainingAmount)>0?`<div class="feeDetailExtra feePending">Pending - ₹${Number(rec.remainingAmount)}</div>`:''}<button class="miniBtn red iconOnly" aria-label="Delete fee record" title="Delete" style="position:absolute;right:0;top:50%;transform:translateY(-50%);" onclick="deleteFeeRecord(${st.fees.indexOf(rec)})"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></button></div>`;
     }else{
-      rows+=`<div class="feeDetailRow feePending" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><br>Fee Pending</div>`;
+      rows+=`<div class="feeDetailRow" style="position:relative;padding-right:52px;"><b class="feeDetailPeriod">${item.label}</b><div class="feeDetailStatus feePending">Fee Pending</div></div>`;
     }
   });
 
