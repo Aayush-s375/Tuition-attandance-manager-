@@ -1,6 +1,6 @@
 {
-  "name": "Tuition Attendance",
-  "short_name": "Tuition",
+  "name": "Tuition Manager",
+  "short_name": "Tuition Manager",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f3f5f7",
