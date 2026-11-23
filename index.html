@@ -306,8 +306,8 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
 }
 .modernMenuPopup .modernMenuItem:active{background:#f2f4ff;}
 .modernMenuProfile{min-height:58px;box-sizing:border-box;padding:10px 12px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;background:#fff;}
-.modernMenuProfileName{min-width:0;display:flex;align-items:center;gap:12px;font-size:15px;font-weight:700;color:#202638;}
-.modernMenuProfileAvatar{width:30px;height:30px;min-width:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;font-size:22px;line-height:1;cursor:pointer;background:transparent;}
+.modernMenuProfileName{min-width:0;display:flex;align-items:center;gap:12px;font-size:16px;font-weight:700;color:#202638;}
+.modernMenuProfileAvatar{width:36px;height:36px;min-width:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;font-size:24px;line-height:1;cursor:pointer;background:#e9eef8;}
 .modernMenuProfileAvatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
 #profilePhotoModal{position:fixed;inset:0;z-index:10050;background:rgba(5,9,18,.96);display:none;flex-direction:column;align-items:center;justify-content:center;padding:22px;box-sizing:border-box;color:#fff;}
 .profilePhotoTop{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:16px;right:16px;display:flex;justify-content:flex-start;}
@@ -526,6 +526,32 @@ body.darkMode .attendanceCountCode.countH{color:#fb923c!important;}
 #menuPopup .modernMenuItem:active{background:#E3E5F0!important;}
 #menuPopup.drawerClosing{animation:drawerOut .18s ease-in forwards!important;pointer-events:none!important;}
 @keyframes drawerOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:.75}}
+
+
+/* Full-page owner Settings and centered profile */
+.ownerSettingsPanel{padding:16px 14px!important;}
+.ownerSettingsProfile{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 8px 20px;margin-bottom:4px;border-bottom:1px solid #e2e5eb;}
+.ownerSettingsPhotoWrap{position:relative;width:116px;height:116px;border-radius:50%;overflow:visible;cursor:pointer;margin-bottom:10px;}
+.ownerSettingsPhotoWrap img,.ownerSettingsFallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;object-fit:cover;border-radius:50%;border:3px solid #dce5f5;box-sizing:border-box;}
+.ownerSettingsFallback{background:#e9eef8;color:#53658a;font-size:48px;font-weight:900;}
+.ownerSettingsPhotoEdit{position:absolute;right:0;bottom:1px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#3947a7;color:#fff;border:3px solid #fff;font-size:17px;font-weight:900;box-sizing:border-box;}
+.ownerSettingsNameRow{display:flex;align-items:center;justify-content:center;gap:8px;max-width:100%;font-size:19px;font-weight:900;color:#202638;}
+.ownerSettingsNameRow strong{overflow-wrap:anywhere;}
+.ownerSettingsNameEdit{width:30px;height:30px;border:0;border-radius:9px;background:#e9edff;color:#3947a7;font-size:17px;font-weight:900;}
+.ownerSettingsGroup{padding:13px 0;border-bottom:1px solid #e2e5eb;}
+.ownerSettingsGroup .menuSettingsTitle{font-size:14px;}
+.ownerSettingsPanel .menuThemeChoices button{flex:1;border:1px solid #d5dbea;border-radius:10px;padding:11px 6px;background:#fff;color:#344054;font-size:14px;font-weight:800;}
+.ownerSettingsPanel .menuThemeChoices button.active{background:#3947a7;color:#fff;border-color:#3947a7;}
+.ownerSettingsPanel .menuLanguageSelect{width:100%;padding:11px;border:1px solid #d5dbea;border-radius:10px;background:#fff;color:#202638;font-size:14px;}
+.ownerSettingsItem{background:transparent!important;color:inherit!important;padding:14px 4px!important;border-bottom:1px solid #e2e5eb!important;font-size:15px!important;}
+body.darkMode .ownerSettingsProfile,body.darkMode .ownerSettingsGroup,body.darkMode .ownerSettingsItem{border-color:#37445b!important;}
+body.darkMode .ownerSettingsNameRow{color:#f0f3ff!important;}
+body.darkMode .ownerSettingsFallback{background:#293348;color:#dce5ff;border-color:#52617e;}
+body.darkMode .ownerSettingsPhotoEdit{border-color:#1c2330;}
+body.darkMode .ownerSettingsNameEdit{background:#303b55;color:#f0f3ff;}
+body.darkMode .ownerSettingsPanel .menuThemeChoices button,body.darkMode .ownerSettingsPanel .menuLanguageSelect{background:#252d3b;color:#f4f6ff;border-color:#4a5872;}
+body.darkMode .ownerSettingsPanel .menuThemeChoices button.active{background:#5143b8;color:#fff;border-color:#5143b8;}
+body.darkMode .ownerSettingsItem{color:#f0f3ff!important;}
 
 /* Side-menu Settings subview */
 .menuSettingsHeading{display:flex;align-items:center;gap:12px;padding:5px 0 13px;font-size:16px;font-weight:900;color:#202638;border-bottom:1px solid #E2E5EB;margin-bottom:8px;}
@@ -1086,7 +1112,6 @@ Reset PIN
                 <span class="modernMenuProfileAvatar" id="ownerProfileAvatar" role="button" tabindex="0" onclick="openProfilePhoto()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProfilePhoto();}" title="View profile photo"><span id="ownerProfileFallback">👤</span><img id="ownerProfileThumb" alt="Profile photo" style="display:none"></span>
                 <span id="ownerNameDisplay">Set Your Name</span>
               </div>
-              <button class="ownerEditBtn" type="button" onclick="event.stopPropagation(); editOwnerName()" title="Edit Name" aria-label="Edit Name">✎</button>
             </div>
             <div id="menuMainList">
               <div class="modernMenuItem" onclick="showMenuNotice('Homework')">
@@ -1120,47 +1145,6 @@ Reset PIN
               <div class="modernMenuItem" onclick="openAboutAppFromMenu(event)">
                 <span class="modernMenuIcon" aria-hidden="true">ⓘ</span>
                 <span class="modernMenuLabel">About App</span>
-              </div>
-            </div>
-            <div id="menuSettingsView" style="display:none;">
-              <div class="menuSettingsHeading">
-                <button type="button" class="menuSettingsBack" onclick="closeMenuSettings()">←</button>
-                <span>Settings</span>
-              </div>
-              <div class="menuSettingsGroup">
-                <div class="menuSettingsTitle">App Theme</div>
-                <div class="menuThemeChoices">
-                  <button type="button" id="menuLightThemeBtn" onclick="setDarkMode(false)">☀ Light</button>
-                  <button type="button" id="menuDarkThemeBtn" onclick="setDarkMode(true)">☾ Dark</button>
-                </div>
-              </div>
-              <div class="menuSettingsGroup">
-                <label class="menuSettingsTitle" for="appLanguageSelect">App Language</label>
-                <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)">
-                  <option value="hinglish">Hinglish</option>
-                  <option value="hindi">Hindi</option>
-                  <option value="english">English</option>
-                </select>
-                <div class="menuSettingsHint">Language selection save ho jayega. Poore app ki translation alag implementation mein complete hogi.</div>
-              </div>
-              <div class="modernMenuItem menuLockItem" onclick="toggleLock()">
-                <span class="modernMenuLabel">App Lock</span>
-                <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
-                  <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
-                  <span class="slider"></span>
-                </label>
-              </div>
-              <div class="modernMenuItem" onclick="changePin()">
-                <span class="modernMenuIcon">🔑</span>
-                <span class="modernMenuLabel">Change PIN</span>
-              </div>
-              <div class="modernMenuItem" onclick="backupData()">
-                <span class="modernMenuIcon">💾</span>
-                <span class="modernMenuLabel">Backup</span>
-              </div>
-              <div class="modernMenuItem" onclick="restoreData()">
-                <span class="modernMenuIcon">♻️</span>
-                <span class="modernMenuLabel">Restore</span>
               </div>
             </div>
             <div class="modernMenuAccount">
@@ -1215,6 +1199,33 @@ Reset PIN
         <div id="homeMyNotesContent" class="thoughtText" style="font-size:15px;font-weight:600;white-space:pre-wrap;"></div>
       </div>
       <div id="teachingMottoHome" class="teachingMotto" aria-label="Home display text" style="display:none;">I ❤️ Teaching</div>
+    </section>
+
+    <section id="ownerSettingsSection" class="section">
+      <div class="pageHead"><div><h2>Settings</h2><p>Profile and app preferences</p></div><button class="backHomeBtn" type="button" onclick="navigateBackSection()">← Back</button></div>
+      <div class="ownerSettingsPanel modernPanel">
+        <div class="ownerSettingsProfile">
+          <div class="ownerSettingsPhotoWrap" role="button" tabindex="0" onclick="openProfilePhoto()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProfilePhoto();}" aria-label="View or change profile photo">
+            <span id="settingsOwnerFallback" class="ownerSettingsFallback">A</span>
+            <img id="settingsOwnerPhoto" alt="Profile photo" style="display:none">
+            <span class="ownerSettingsPhotoEdit" aria-hidden="true">✎</span>
+          </div>
+          <div class="ownerSettingsNameRow"><strong id="settingsOwnerName">Set Your Name</strong><button type="button" class="ownerSettingsNameEdit" onclick="editOwnerName()" aria-label="Edit name" title="Edit name">✎</button></div>
+        </div>
+        <div class="ownerSettingsGroup">
+          <div class="menuSettingsTitle">App Theme</div>
+          <div class="menuThemeChoices"><button type="button" id="menuLightThemeBtn" onclick="setDarkMode(false)">☀ Light</button><button type="button" id="menuDarkThemeBtn" onclick="setDarkMode(true)">☾ Dark</button></div>
+        </div>
+        <div class="ownerSettingsGroup">
+          <label class="menuSettingsTitle" for="appLanguageSelect">App Language</label>
+          <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)"><option value="hinglish">Hinglish</option><option value="hindi">Hindi</option><option value="english">English</option></select>
+          <div class="menuSettingsHint">Language selection save ho jayega. Poore app ki translation alag implementation mein complete hogi.</div>
+        </div>
+        <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
+        <div class="modernMenuItem ownerSettingsItem" onclick="changePin()"><span class="modernMenuIcon">🔑</span><span class="modernMenuLabel">Change PIN</span></div>
+        <div class="modernMenuItem ownerSettingsItem" onclick="backupData()"><span class="modernMenuIcon">💾</span><span class="modernMenuLabel">Backup</span></div>
+        <div class="modernMenuItem ownerSettingsItem" onclick="restoreData()"><span class="modernMenuIcon">♻️</span><span class="modernMenuLabel">Restore</span></div>
+      </div>
     </section>
 
     <section id="thoughtsSection" class="section">
@@ -1497,15 +1508,22 @@ function getOwnerProfilePhoto() {
 }
 function updateProfilePhotoDisplay() {
   const photo=getOwnerProfilePhoto();
+  const initial=(getOwnerName()||"A").trim().charAt(0).toUpperCase()||"A";
   const thumb=document.getElementById("ownerProfileThumb");
   const fallback=document.getElementById("ownerProfileFallback");
   const large=document.getElementById("profilePhotoLarge");
   const empty=document.getElementById("profilePhotoEmpty");
+  const settingsPhoto=document.getElementById("settingsOwnerPhoto");
+  const settingsFallback=document.getElementById("settingsOwnerFallback");
+  const settingsName=document.getElementById("settingsOwnerName");
   const remove=document.getElementById("removeProfilePhotoBtn");
   if(thumb){thumb.src=photo;thumb.style.display=photo?"block":"none";}
-  if(fallback)fallback.style.display=photo?"none":"inline";
+  if(fallback){fallback.textContent=initial;fallback.style.display=photo?"none":"inline";}
   if(large){large.src=photo;large.style.display=photo?"block":"none";}
-  if(empty)empty.style.display=photo?"none":"flex";
+  if(empty){empty.textContent=initial;empty.style.display=photo?"none":"flex";}
+  if(settingsPhoto){settingsPhoto.src=photo;settingsPhoto.style.display=photo?"block":"none";}
+  if(settingsFallback){settingsFallback.textContent=initial;settingsFallback.style.display=photo?"none":"flex";}
+  if(settingsName)settingsName.textContent=getOwnerName()||"Set Your Name";
   if(remove)remove.style.display=photo?"inline-block":"none";
 }
 function openProfilePhoto(){
@@ -2162,6 +2180,8 @@ function updateOwnerNameDisplay() {
   const welcomeName = document.getElementById("welcomeName");
 
   if (nameDisplay) nameDisplay.textContent = name || "Set Your Name";
+  const settingsName=document.getElementById("settingsOwnerName");
+  if(settingsName) settingsName.textContent=name||"Set Your Name";
   updateProfilePhotoDisplay();
   if (welcomeName) { welcomeName.textContent = name || "Welcome"; welcomeName.style.overflowWrap = "anywhere"; welcomeName.style.wordBreak = "normal"; }
 }
@@ -2906,6 +2926,7 @@ function sectionNavId(sectionId){
     puzzleFactsSection:'homeNav',
     trashSection:'homeNav',
     aboutAppSection:'homeNav',
+    ownerSettingsSection:'homeNav',
     myNotesSection:'homeNav'
   };
   return map[sectionId] || 'homeNav';
@@ -2957,6 +2978,7 @@ function showSection(sectionId, navId, fromHistory){
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='feeDetailsSection' && students[currentStudent]) renderFeeDetails(students[currentStudent]);
   if(sectionId==='aboutAppSection') renderTeachingMottoSetting();
+  if(sectionId==='ownerSettingsSection') updateMenuSettingsControls();
   if(sectionId==='reportsSection') renderReports();
   if(sectionId==='thoughtsSection') renderThoughtsLibrary();
   if(sectionId==='puzzleFactsSection') renderPuzzleFactsPage();
@@ -2967,6 +2989,13 @@ function showSection(sectionId, navId, fromHistory){
 
 function navigateBackSection(fromPopstate){
   if(currentSectionId==='homeSection') return;
+  // Settings is opened from the side menu; Back returns to that menu list.
+  if(currentSectionId==='ownerSettingsSection'){
+    const previous=appSectionHistory.length?appSectionHistory.pop():'homeSection';
+    showSection(previous,sectionNavId(previous),true);
+    setTimeout(()=>{const menu=document.getElementById('menuPopup');if(menu&&menu.style.display!=='block')toggleMenu();},30);
+    return;
+  }
   // For the two detail pages, consume their dedicated browser-history layer.
   // Android Back has already consumed it before popstate runs; visible Back
   // buttons must consume it here so both Back methods follow the same path.
@@ -4915,19 +4944,15 @@ function toggleMenu(){
 }
 
 function openMenuSettings(){
-  const main=document.getElementById('menuMainList');
-  const settings=document.getElementById('menuSettingsView');
-  if(main)main.style.display='none';
-  if(settings)settings.style.display='block';
+  const menu=document.getElementById('menuPopup');
+  if(menu){menu.style.display='none';menu.classList.remove('drawerClosing');}
+  overlayHistoryStack=overlayHistoryStack.filter(id=>id!=='menuPopup');
   updateMenuSettingsControls();
-  const menu=document.getElementById('menuPopup');if(menu)menu.scrollTop=0;
+  updateProfilePhotoDisplay();
+  showSection('ownerSettingsSection','homeNav');
 }
 function closeMenuSettings(){
-  const main=document.getElementById('menuMainList');
-  const settings=document.getElementById('menuSettingsView');
-  if(settings)settings.style.display='none';
-  if(main)main.style.display='block';
-  const menu=document.getElementById('menuPopup');if(menu)menu.scrollTop=0;
+  navigateBackSection();
 }
 function updateMenuSettingsControls(){
   const dark=document.body.classList.contains('darkMode');
@@ -4937,6 +4962,8 @@ function updateMenuSettingsControls(){
   if(darkBtn)darkBtn.classList.toggle('active',dark);
   const language=document.getElementById('appLanguageSelect');
   if(language){try{language.value=localStorage.getItem('tuitionManagerAppLanguage_v1')||'hinglish';}catch(e){language.value='hinglish';}}
+  const lock=document.getElementById('lockSwitch');
+  if(lock){try{lock.checked=localStorage.getItem(getPinKey())!==null;}catch(e){lock.checked=false;}}
 }
 function saveAppLanguage(value){
   if(!['hindi','english','hinglish'].includes(value))return;
@@ -4948,8 +4975,6 @@ function showMenuNotice(feature){
 }
 
 function changePin(){
-  document.getElementById("menuPopup").style.display="none";
-
   const savedPin = localStorage.getItem(getPinKey());
   if(!savedPin){
     alert("App Lock is not enabled. Please enable App Lock first.");
