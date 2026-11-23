@@ -1123,6 +1123,7 @@ Reset PIN
             <div class="modernMenuAccount">
               <span id="googleEmailDisplay"></span>
               <span id="driveSyncStatus">Drive sync: checking…</span>
+              <button type="button" id="connectDriveBtn" onclick="connectGoogleDrive()" style="display:none;align-self:flex-start;margin-top:7px;padding:7px 10px;border:0;border-radius:8px;background-color:#3947a7!important;color:#fff!important;font-size:12px;font-weight:800;cursor:pointer;">Connect Drive / Grant Permission</button>
             </div>
           </div>
         </div>
@@ -1411,6 +1412,7 @@ let driveAccessToken = null;
 let driveAuthPromise = null;
 let syncTimer = null;
 let syncInProgress = false;
+let driveNeedsUserAction = false;
 let currentAccountKey = null;
 let currentAccountSub = null;
 
@@ -2186,12 +2188,35 @@ function setSyncMeta(meta) {
 
 function setDriveSyncStatus(text, type) {
   const el = document.getElementById("driveSyncStatus");
-  if (!el) return;
-  el.textContent = text;
-  el.style.color =
-    type === "error" ? "#dc3545" :
-    type === "ok" ? "#198754" :
-    "#666";
+  const button = document.getElementById("connectDriveBtn");
+  if (el) {
+    el.textContent = text;
+    el.style.color =
+      type === "error" ? "#dc3545" :
+      type === "ok" ? "#198754" :
+      "#666";
+  }
+  if (button) {
+    const needsConnect = type === "auth" || type === "error";
+    button.style.display = needsConnect && !!currentAccountKey ? "inline-flex" : "none";
+    button.textContent = type === "auth" ? "Connect Drive / Grant Permission" : "Retry Drive Connection";
+  }
+}
+
+function getDriveErrorMessage(error) {
+  if (!error) return "Unknown Google Drive error.";
+  const status = Number(error.status || 0);
+  const code = error.code ? String(error.code) : "";
+  const message = String(error.message || error.error_description || error.error || "Google Drive request failed.");
+  if (status) return `Google Drive API error ${status}${code ? " (" + code + ")" : ""}: ${message}`;
+  return message;
+}
+
+function isDriveAuthorizationError(error) {
+  const code = String(error?.code || error?.error || "").toLowerCase();
+  const message = String(error?.message || "").toLowerCase();
+  return !!(error?.isAuthorizationError || ["access_denied", "interaction_required", "consent_required", "login_required", "invalid_grant", "unauthorized_client"].includes(code) ||
+    message.includes("permission") || message.includes("authorization") || message.includes("consent") || Number(error?.status) === 401 || Number(error?.status) === 403);
 }
 
 function saveLocalData(markPending = true) {
@@ -2277,10 +2302,15 @@ function handleGoogleLogin(response) {
     document.getElementById("googleLogin").style.display = "none";
     render();
 
-    // Drive permission is requested once, then future syncs are automatic.
-    initDriveAuthorization(true).catch(error => {
-      console.warn("Initial Google Drive permission was not completed:", error);
-      // The automatic sync retry will request permission again when needed.
+    // Try only previously granted Drive access here. If consent is new or missing,
+    // the user can grant it with the visible Connect Drive button.
+    initDriveAuthorization(false).then(() => {
+      driveNeedsUserAction = false;
+      syncWithGoogleDrive();
+    }).catch(error => {
+      driveNeedsUserAction = true;
+      console.warn("Google Drive needs user authorization:", error);
+      setDriveSyncStatus("Drive permission needed — tap Connect Drive", "auth");
     });
   } catch (error) {
     console.error("Google login error:", error);
@@ -2317,13 +2347,14 @@ function initGoogleLogin() {
 
 function initDriveAuthorization(forceConsent = false) {
   if (!window.google || !google.accounts || !google.accounts.oauth2 || !currentAccountKey) {
-    return Promise.reject(new Error("Google services are not ready."));
+    const error = new Error("Google Identity Services are not ready. Reload the page and try again.");
+    error.isAuthorizationError = true;
+    return Promise.reject(error);
   }
 
   if (driveAccessToken) return Promise.resolve(driveAccessToken);
   if (driveAuthPromise) return driveAuthPromise;
 
-  // Do not let a missing Google OAuth callback leave Syncing stuck forever.
   let authTimer = null;
   let settled = false;
   let authResolve;
@@ -2342,18 +2373,23 @@ function initDriveAuthorization(forceConsent = false) {
 
     if (token) {
       driveAccessToken = token;
+      driveNeedsUserAction = false;
       localStorage.setItem("driveAuthorized", "true");
-      setDriveSyncStatus("Drive sync active", "ok");
+      setDriveSyncStatus("Drive permission granted", "working");
       authResolve(token);
     } else {
-      setDriveSyncStatus("Drive permission needed", "error");
-      authReject(error || new Error("Google Drive authorization failed."));
+      const authError = error instanceof Error ? error : new Error(String(error || "Google Drive authorization failed."));
+      authError.isAuthorizationError = true;
+      driveNeedsUserAction = true;
+      localStorage.removeItem("driveAuthorized");
+      setDriveSyncStatus("Drive permission needed — tap Connect Drive", "auth");
+      authReject(authError);
     }
   };
 
   authTimer = setTimeout(() => {
-    finishAuth(new Error("Google Drive authorization timed out. Please check internet and try again."));
-  }, 20000);
+    finishAuth(new Error("Google Drive authorization timed out. Tap Connect Drive and allow the permission window."));
+  }, 45000);
 
   try {
     driveTokenClient = google.accounts.oauth2.initTokenClient({
@@ -2361,26 +2397,61 @@ function initDriveAuthorization(forceConsent = false) {
       scope: DRIVE_SCOPE,
       callback: response => {
         if (response && response.access_token) {
+          if (google.accounts.oauth2.hasGrantedAllScopes &&
+              !google.accounts.oauth2.hasGrantedAllScopes(response, DRIVE_SCOPE)) {
+            finishAuth(new Error("Google did not grant the required Drive app-data permission."));
+            return;
+          }
           finishAuth(null, response.access_token);
         } else {
-          finishAuth(new Error(response?.error || "Google Drive authorization failed."));
+          const code = response?.error || "authorization_failed";
+          const detail = response?.error_description || response?.error_subtype || "";
+          const error = new Error("Google OAuth error: " + code + (detail ? " — " + detail : ""));
+          error.code = code;
+          finishAuth(error);
         }
+      },
+      error_callback: error => {
+        const code = error?.type || "oauth_popup_error";
+        const authError = new Error("Google authorization window error: " + code);
+        authError.code = code;
+        finishAuth(authError);
       }
     });
 
-    // Reuse the Google account already selected for this app.
-    // This prevents the Drive authorization step from asking the user
-    // to choose an email again on every app reopen.
     const savedEmail = localStorage.getItem("googleEmail");
     const tokenRequest = forceConsent
-      ? {prompt:"consent", login_hint: savedEmail || undefined}
-      : {prompt:"none", login_hint: savedEmail || undefined};
+      ? {prompt:"consent", login_hint:savedEmail || undefined}
+      : {prompt:"none", login_hint:savedEmail || undefined};
     driveTokenClient.requestAccessToken(tokenRequest);
   } catch (error) {
     finishAuth(error);
   }
 
   return authPromise;
+}
+
+async function connectGoogleDrive() {
+  if (!currentAccountKey) {
+    alert("Please sign in with your Google account first.");
+    return;
+  }
+  const button = document.getElementById("connectDriveBtn");
+  if (button) { button.disabled = true; button.textContent = "Connecting…"; }
+  driveNeedsUserAction = false;
+  driveAccessToken = null;
+  try {
+    await initDriveAuthorization(true);
+    setDriveSyncStatus("Drive permission granted — syncing…", "working");
+    await syncWithGoogleDrive();
+  } catch (error) {
+    console.error("Connect Google Drive failed:", error);
+    driveNeedsUserAction = true;
+    setDriveSyncStatus("Drive connection failed: " + getDriveErrorMessage(error), "auth");
+    alert("Google Drive connection failed.\n\n" + getDriveErrorMessage(error));
+  } finally {
+    if (button) { button.disabled = false; }
+  }
 }
 
 function getDriveToken(force = false) {
@@ -2426,6 +2497,22 @@ async function driveFetch(url, options = {}, retry = true) {
   return response;
 }
 
+async function throwDriveApiError(response, action) {
+  let detail = "";
+  let code = "";
+  try {
+    const body = await response.clone().json();
+    detail = body?.error?.message || body?.message || "";
+    code = body?.error?.status || body?.error?.errors?.[0]?.reason || "";
+  } catch (e) {
+    try { detail = (await response.clone().text()).slice(0, 300); } catch (ignored) {}
+  }
+  const error = new Error(`${action} failed${detail ? ": " + detail : ""}`);
+  error.status = response.status;
+  error.code = code;
+  throw error;
+}
+
 async function findDriveDataFile() {
   const q = encodeURIComponent(
     `'appDataFolder' in parents and name = '${DRIVE_FILE_NAME}' and trashed = false`
@@ -2436,7 +2523,7 @@ async function findDriveDataFile() {
     "&spaces=appDataFolder&fields=files(id,name,modifiedTime,size)&pageSize=10"
   );
 
-  if (!response.ok) throw new Error("Could not search Google Drive.");
+  if (!response.ok) await throwDriveApiError(response, "Google Drive file search");
   const data = await response.json();
   return data.files && data.files.length ? data.files[0] : null;
 }
@@ -2445,7 +2532,7 @@ async function readDriveData(fileId) {
   const response = await driveFetch(
     "https://www.googleapis.com/drive/v3/files/" + encodeURIComponent(fileId) + "?alt=media"
   );
-  if (!response.ok) throw new Error("Could not download Google Drive data.");
+  if (!response.ok) await throwDriveApiError(response, "Google Drive download");
   return response.json();
 }
 
@@ -2463,7 +2550,7 @@ async function uploadDriveData(backup, fileId = null) {
       }
     );
 
-    if (!response.ok) throw new Error("Google Drive update failed.");
+    if (!response.ok) await throwDriveApiError(response, "Google Drive file update");
     return response.json();
   }
 
@@ -2486,7 +2573,7 @@ async function uploadDriveData(backup, fileId = null) {
     {method: "POST", body: form}
   );
 
-  if (!response.ok) throw new Error("Google Drive upload failed.");
+  if (!response.ok) await throwDriveApiError(response, "Google Drive upload");
   return response.json();
 }
 
@@ -2603,11 +2690,16 @@ async function syncWithGoogleDrive() {
     }
   } catch (error) {
     console.error("Drive sync failed:", error);
-    setDriveSyncStatus("Offline / sync pending", "error");
-    // Keep local data and the pending flag. The next online event/retry will sync it.
     const meta = getSyncMeta();
     meta.pending = true;
     setSyncMeta(meta);
+
+    if (isDriveAuthorizationError(error)) {
+      driveNeedsUserAction = true;
+      setDriveSyncStatus("Drive authorization/API permission error: " + getDriveErrorMessage(error), "auth");
+    } else {
+      setDriveSyncStatus("Drive sync failed: " + getDriveErrorMessage(error), "error");
+    }
   } finally {
     syncInProgress = false;
   }
@@ -2615,7 +2707,7 @@ async function syncWithGoogleDrive() {
 
 function scheduleDriveSync() {
   clearTimeout(syncTimer);
-  if (!currentAccountKey || !navigator.onLine) return;
+  if (!currentAccountKey || !navigator.onLine || driveNeedsUserAction) return;
 
   syncTimer = setTimeout(() => {
     syncWithGoogleDrive();
@@ -2635,7 +2727,7 @@ function startAutomaticSync() {
   // Retry periodically only while there are pending changes.
   setInterval(() => {
     const meta = getSyncMeta();
-    if (navigator.onLine && meta.pending) scheduleDriveSync();
+    if (navigator.onLine && meta.pending && !driveNeedsUserAction) scheduleDriveSync();
   }, 15000);
 }
 
@@ -4833,6 +4925,7 @@ function changeGoogleAccount(){
   clearTimeout(syncTimer);
   driveAccessToken = null;
   driveTokenClient = null;
+  driveNeedsUserAction = false;
   googleUser = null;
   currentAccountKey = null;
   currentAccountSub = null;
@@ -5140,8 +5233,9 @@ async function initializeApp(){
       initDriveAuthorization(false)
         .then(() => syncWithGoogleDrive())
         .catch(error => {
+          driveNeedsUserAction = true;
           console.warn("Drive authorization pending:", error);
-          setDriveSyncStatus("Drive permission needed", "error");
+          setDriveSyncStatus("Drive permission needed — tap Connect Drive", "auth");
         });
     } else {
       setDriveSyncStatus("Offline — changes saved locally", "error");
