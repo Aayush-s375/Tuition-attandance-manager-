@@ -1231,9 +1231,9 @@ Reset PIN
         <div class="ownerSettingsGroup">
           <label class="menuSettingsTitle" for="appLanguageSelect">App Language</label>
           <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)"><option value="hinglish">Hinglish</option><option value="hindi">Hindi</option><option value="english">English</option></select>
-          <div class="menuSettingsHint">Language selection save ho jayega. Poore app ki translation alag implementation mein complete hogi.</div>
+          
         </div>
-        <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuIcon">🛡️</span><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
+        <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="changePin()"><span class="modernMenuIcon">🔑</span><span class="modernMenuLabel">Change PIN</span></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="backupData()"><span class="modernMenuIcon">💾</span><span class="modernMenuLabel">Backup</span></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="restoreData()"><span class="modernMenuIcon">♻️</span><span class="modernMenuLabel">Restore</span></div>
