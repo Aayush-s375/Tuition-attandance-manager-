@@ -740,7 +740,9 @@ body.darkMode .miniBtn.iconOnly.editIcon{color:#67d8ff!important;background:#293
 .menuThemeSwitch input:checked + .themeSlider{background:#219b63;}
 .menuThemeSwitch input:checked + .themeSlider:before{content:'☾';transform:translateX(18px);background:#fff;color:#5143b8;}
 .menuLockItem .modernMenuLabel{margin-left:0;}
-.menuLockItem .modernMenuIcon{display:none!important;}
+/* Keep the security shield visible before the App Lock label. */
+.ownerSettingsItem.menuLockItem .modernMenuIcon{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 30px!important;width:30px!important;min-width:30px!important;color:inherit!important;}
+.ownerSettingsItem.menuLockItem .modernMenuIcon svg{display:block!important;width:22px;height:22px;}
 
 
 /* Light mode refinements: warm white-to-yellow page background and readable fee totals. */
