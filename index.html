@@ -2373,13 +2373,22 @@ function handleGoogleLogin(response) {
       localStorage.setItem(accountPinKey, legacyPin);
     }
 
-    loadAccountData();
-    updateGoogleEmailDisplay();
-    updateOwnerNameDisplay();
-    animateWelcomeWave();
+    // Reveal the app immediately after identity is verified. Do not leave
+    // the whole page hidden if local-data initialization encounters an error.
     document.body.classList.add("googleLoggedIn");
-    document.getElementById("googleLogin").style.display = "none";
-    render();
+    const loginPanel = document.getElementById("googleLogin");
+    if (loginPanel) loginPanel.style.display = "none";
+
+    updateGoogleEmailDisplay();
+    try {
+      loadAccountData();
+    } catch (dataError) {
+      console.error("Account data initialization failed:", dataError);
+      if (!Array.isArray(students)) students = [];
+    }
+    try { updateOwnerNameDisplay(); } catch (nameError) { console.warn("Owner name display failed:", nameError); }
+    try { render(); } catch (renderError) { console.error("Initial app render failed:", renderError); }
+    try { animateWelcomeWave(); } catch (waveError) { console.warn("Welcome animation failed:", waveError); }
 
     // Try only previously granted Drive access here. If consent is new or missing,
     // the user can grant it with the visible Connect Drive button.
@@ -5345,10 +5354,16 @@ async function initializeApp(){
     currentAccountKey = accountKeyFromSub(savedSub);
 
     document.body.classList.add("googleLoggedIn");
-    document.getElementById("googleLogin").style.display = "none";
+    const loginPanel = document.getElementById("googleLogin");
+    if (loginPanel) loginPanel.style.display = "none";
 
-    loadAccountData();
-    updateOwnerNameDisplay();
+    try {
+      loadAccountData();
+    } catch (dataError) {
+      console.error("Account data initialization failed:", dataError);
+      if (!Array.isArray(students)) students = [];
+    }
+    try { updateOwnerNameDisplay(); } catch (nameError) { console.warn("Owner name display failed:", nameError); }
   } else {
     document.body.classList.remove("googleLoggedIn");
     document.getElementById("googleLogin").style.display = "flex";
@@ -5399,10 +5414,10 @@ async function initializeApp(){
     } else {
       updateOwnerNameDisplay();
     }
-    render();
-    renderHomeExtras();
-    checkLock();
-    if(!localStorage.getItem(getPinKey())) animateWelcomeWave();
+    try { render(); } catch (renderError) { console.error("Initial app render failed:", renderError); }
+    try { renderHomeExtras(); } catch (extrasError) { console.error("Home extras render failed:", extrasError); }
+    try { checkLock(); } catch (lockError) { console.error("App lock initialization failed:", lockError); }
+    if(!localStorage.getItem(getPinKey())) { try { animateWelcomeWave(); } catch (waveError) { console.warn("Welcome animation failed:", waveError); } }
 
     // Re-obtain a short-lived Drive token after every page load.
     // No manual backup action is required.
