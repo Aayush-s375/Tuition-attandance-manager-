@@ -305,7 +305,7 @@ body:not(.googleLoggedIn) > *:not(#googleLogin):not(script):not(#lockScreen){
   text-align:left;
 }
 .modernMenuPopup .modernMenuItem:active{background:#f2f4ff;}
-.modernMenuProfile{min-height:58px;box-sizing:border-box;padding:10px 12px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #eee;background:#fff;}
+.modernMenuProfile{min-height:58px;box-sizing:border-box;padding:10px 12px 10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:2px solid #D5DAE4!important;background:#fff;}
 .modernMenuProfileName{min-width:0;display:flex;align-items:center;gap:12px;font-size:16px;font-weight:700;color:#202638;}
 .modernMenuProfileAvatar{width:36px;height:36px;min-width:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;font-size:24px;line-height:1;cursor:pointer;background:#e9eef8;}
 .modernMenuProfileAvatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
@@ -520,7 +520,7 @@ body.darkMode .attendanceCountCode.countH{color:#fb923c!important;}
 #menuPopup .modernMenuItem{color:#202638!important;}
 #menuPopup .modernMenuItem *, #menuPopup .modernMenuProfile *{color:inherit;}
 #menuPopup .modernMenuItem{border-bottom:1px solid #E2E5EB!important;gap:8px!important;padding-left:10px!important;padding-right:9px!important;font-size:14px!important;line-height:1.35!important;white-space:normal!important;overflow-wrap:anywhere!important;}
-#menuPopup .modernMenuProfile{padding-left:10px!important;padding-right:9px!important;}
+#menuPopup .modernMenuProfile{padding-left:10px!important;padding-right:9px!important;border-bottom:2px solid #D5DAE4!important;}
 #menuPopup .modernMenuIcon{width:25px!important;min-width:25px!important;font-size:19px!important;}
 #menuPopup .modernMenuAccount{font-size:10px!important;padding-left:10px!important;padding-right:9px!important;}
 #menuPopup .modernMenuItem:active{background:#E3E5F0!important;}
@@ -543,8 +543,19 @@ body.darkMode .attendanceCountCode.countH{color:#fb923c!important;}
 .ownerSettingsPanel .menuThemeChoices button{flex:1;border:1px solid #d5dbea;border-radius:10px;padding:11px 6px;background:#fff;color:#344054;font-size:14px;font-weight:800;}
 .ownerSettingsPanel .menuThemeChoices button.active{background:#3947a7;color:#fff;border-color:#3947a7;}
 .ownerSettingsPanel .menuLanguageSelect{width:100%;padding:11px;border:1px solid #d5dbea;border-radius:10px;background:#fff;color:#202638;font-size:14px;}
-.ownerSettingsItem{background:transparent!important;color:inherit!important;padding:14px 4px!important;border-bottom:1px solid #e2e5eb!important;font-size:15px!important;}
+.ownerSettingsItem{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;gap:10px!important;min-height:52px!important;box-sizing:border-box!important;background:transparent!important;color:inherit!important;padding:9px 8px!important;border-bottom:1px solid #e2e5eb!important;font-size:15px!important;white-space:normal!important;}
+.ownerSettingsItem .modernMenuIcon{display:inline-flex!important;align-items:center!important;justify-content:center!important;flex:0 0 30px!important;width:30px!important;min-width:30px!important;font-size:21px!important;}
+.ownerSettingsItem .modernMenuLabel{display:inline-block!important;flex:1 1 auto!important;min-width:0!important;color:#202638!important;font-size:15px!important;line-height:1.3!important;}
+.ownerSettingsItem .menuLockSwitch{margin-left:auto!important;flex:0 0 46px!important;}
 body.darkMode .ownerSettingsProfile,body.darkMode .ownerSettingsGroup,body.darkMode .ownerSettingsItem{border-color:#37445b!important;}
+body.darkMode .ownerSettingsItem .modernMenuLabel{color:#f0f3ff!important;}
+body.darkMode .ownerSettingsItem .modernMenuIcon{color:#f0f3ff!important;}
+.ownerSettingsAccount{margin-top:18px;padding:13px 8px 4px;border-top:1px solid #e2e5eb;color:#687386;font-size:12px;line-height:1.5;overflow-wrap:anywhere;}
+.ownerSettingsAccountCaption{font-size:11px;font-weight:800;margin-bottom:4px;color:#7a8495;}
+#ownerSettingsAccountEmail{font-weight:700;color:#344054;overflow-wrap:anywhere;}
+body.darkMode .ownerSettingsAccount{border-color:#37445b;color:#b8c3d9;}
+body.darkMode .ownerSettingsAccountCaption{color:#aab6cc;}
+body.darkMode #ownerSettingsAccountEmail{color:#f0f3ff;}
 body.darkMode .ownerSettingsNameRow{color:#f0f3ff!important;}
 body.darkMode .ownerSettingsFallback{background:#293348;color:#dce5ff;border-color:#52617e;}
 body.darkMode .ownerSettingsPhotoEdit{border-color:#1c2330;}
@@ -682,6 +693,7 @@ body.darkMode .backHomeBtn,body.darkMode .quickBtn,body.darkMode .reportSlideBtn
 body.darkMode .emptyState{color:#c2cbe0!important;}
 body.darkMode #menuPopup,body.darkMode #menuPopup>div,body.darkMode #menuPopup .modernMenuProfile,body.darkMode #menuPopup .modernMenuItem,body.darkMode #menuPopup .modernMenuAccount{background:#1c2330!important;color:#f0f3ff!important;}
 body.darkMode #menuPopup .modernMenuItem{border-bottom-color:#37445b!important;color:#f0f3ff!important;}
+body.darkMode #menuPopup .modernMenuProfile{border-bottom:2px solid #46536A!important;}
 body.darkMode #menuPopup .modernMenuLabel,body.darkMode #menuPopup .modernMenuProfileName,body.darkMode #menuPopup .modernMenuAccount #googleEmailDisplay{color:#f0f3ff!important;}
 body.darkMode #menuPopup .modernMenuItem:active{background:#303b55!important;}
 body.darkMode .featureCard{transform:translateY(0);border:1px solid rgba(255,255,255,.22);box-shadow:0 10px 0 rgba(0,0,0,.24),0 15px 24px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.3)!important;}
@@ -1221,10 +1233,11 @@ Reset PIN
           <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)"><option value="hinglish">Hinglish</option><option value="hindi">Hindi</option><option value="english">English</option></select>
           <div class="menuSettingsHint">Language selection save ho jayega. Poore app ki translation alag implementation mein complete hogi.</div>
         </div>
-        <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
+        <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuIcon">🔒</span><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="changePin()"><span class="modernMenuIcon">🔑</span><span class="modernMenuLabel">Change PIN</span></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="backupData()"><span class="modernMenuIcon">💾</span><span class="modernMenuLabel">Backup</span></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="restoreData()"><span class="modernMenuIcon">♻️</span><span class="modernMenuLabel">Restore</span></div>
+        <div class="ownerSettingsAccount"><div class="ownerSettingsAccountCaption">Google account</div><div id="ownerSettingsAccountEmail">Account not connected</div></div>
       </div>
     </section>
 
@@ -2382,9 +2395,11 @@ function handleGoogleLogin(response) {
 }
 
 function updateGoogleEmailDisplay() {
-  const email = localStorage.getItem("googleEmail");
+  const email = localStorage.getItem("googleEmail") || "";
   const display = document.getElementById("googleEmailDisplay");
-  if (display && email) display.textContent = email;
+  const settingsDisplay = document.getElementById("ownerSettingsAccountEmail");
+  if (display) display.textContent = email || "Google account not connected";
+  if (settingsDisplay) settingsDisplay.textContent = email || "Google account not connected";
 }
 
 function initGoogleLogin() {
@@ -2978,7 +2993,7 @@ function showSection(sectionId, navId, fromHistory){
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='feeDetailsSection' && students[currentStudent]) renderFeeDetails(students[currentStudent]);
   if(sectionId==='aboutAppSection') renderTeachingMottoSetting();
-  if(sectionId==='ownerSettingsSection') updateMenuSettingsControls();
+  if(sectionId==='ownerSettingsSection'){updateMenuSettingsControls();updateGoogleEmailDisplay();}
   if(sectionId==='reportsSection') renderReports();
   if(sectionId==='thoughtsSection') renderThoughtsLibrary();
   if(sectionId==='puzzleFactsSection') renderPuzzleFactsPage();
@@ -4892,7 +4907,17 @@ document.addEventListener("click", handleOutsideTap);
 // All Back sources (the page Back buttons and Android/browser Back) use
 // navigateBackSection(), so section history is changed in one place only.
 function handleAppBackNavigation(){
-  // An open modal/drawer always gets the first Back action.
+  // The side menu must always consume Back first, revealing the Home cards.
+  // Check it directly as well as through the generic overlay stack so a
+  // delayed MutationObserver update cannot let Android exit the app.
+  const menu=document.getElementById("menuPopup");
+  if(menu && getComputedStyle(menu).display!=="none"){
+    hideOverlay("menuPopup");
+    overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");
+    return 'overlay';
+  }
+
+  // Other open modals get the next Back action.
   if(closeTopOverlayFromBack()) return 'overlay';
 
   // At Home, allow the browser to perform its normal exit/back behavior.
