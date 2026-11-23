@@ -5014,7 +5014,7 @@ function updateMenuSettingsControls(){
 function saveAppLanguage(value){
   if(!['hindi','english','hinglish'].includes(value))return;
   try{localStorage.setItem('tuitionManagerAppLanguage_v1',value);}catch(e){}
-  alert('Language preference saved. Full app translation will be added separately.');
+  if(typeof window.applyTuitionLanguage==='function') window.applyTuitionLanguage(value);
 }
 function showMenuNotice(feature){
   alert(feature+' section abhi is version mein available nahi hai. Iska feature alag se add kiya jayega.');
@@ -5465,5 +5465,178 @@ if ("serviceWorker" in navigator) {
   else init();
 })();
 </script>
+
+<script>
+/* Tution Manager: offline, local UI translation system. User-created content,
+   Puzzle & Facts questions/answers, brand names and Reports are intentionally kept unchanged. */
+(function(){
+  'use strict';
+  const STORAGE_KEY='tuitionManagerAppLanguage_v1';
+  const WORDS={
+    'Sign in to continue':['जारी रखने के लिए साइन इन करें','Sign in to continue','Aage badhne ke liye sign in karein'],
+    'App Locked':['ऐप लॉक है','App Locked','App lock hai'],
+    'Enter PIN or use fingerprint':['PIN डालें या फिंगरप्रिंट का उपयोग करें','Enter PIN or use fingerprint','PIN daalein ya fingerprint use karein'],
+    'Unlock with PIN':['PIN से अनलॉक करें','Unlock with PIN','PIN se unlock karein'],
+    'Forgot PIN?':['PIN भूल गए?','Forgot PIN?','PIN bhool gaye?'],
+    'Reset PIN':['PIN रीसेट करें','Reset PIN','PIN reset karein'],
+    'Warning!':['चेतावनी!','Warning!','Chetavani!'],
+    'This action cannot be undone.':['यह कार्रवाई वापस नहीं की जा सकती।','This action cannot be undone.','Yeh action undo nahi kiya ja sakta.'],
+    'Cancel':['रद्द करें','Cancel','Cancel'], 'Close':['बंद करें','Close','Band karein'],
+    'Students':['विद्यार्थी','Students','Students'], 'Attendance':['उपस्थिति','Attendance','Attendance'],
+    'Fees':['फीस','Fees','Fees'], 'Reports':['रिपोर्ट','Reports','Reports'], 'Home':['होम','Home','Home'],
+    'Homework':['होमवर्क','Homework','Homework'], 'Test Record':['टेस्ट रिकॉर्ड','Test Record','Test Record'],
+    'Deleted Students':['हटाए गए विद्यार्थी','Deleted Students','Deleted Students'],
+    'Settings':['सेटिंग्स','Settings','Settings'], 'About App':['ऐप के बारे में','About App','App ke baare mein'],
+    'My Notes':['मेरे नोट्स','My Notes','My Notes'], 'Puzzle & Facts':['पहेलियाँ और रोचक तथ्य','Puzzle & Facts','Puzzle & Facts'],
+    'Welcome back,':['वापसी पर स्वागत है,','Welcome back,','Welcome back,'], 'Welcome':['स्वागत है','Welcome','Welcome'],
+    'Choose what you want to manage today.':['आज आप क्या मैनेज करना चाहते हैं, चुनें।','Choose what you want to manage today.','Aaj aap kya manage karna chahte hain, chunein.'],
+    'Manage your students':['अपने विद्यार्थियों को मैनेज करें','Manage your students','Apne students manage karein'],
+    "Mark today's attendance":['आज की उपस्थिति दर्ज करें',"Mark today's attendance",'Aaj ki attendance mark karein'],
+    'Record & manage fees':['फीस दर्ज और मैनेज करें','Record & manage fees','Fees record aur manage karein'],
+    'View monthly reports':['मासिक रिपोर्ट देखें','View monthly reports','Monthly reports dekhein'],
+    'Settings':['सेटिंग्स','Settings','Settings'], 'Profile and app preferences':['प्रोफ़ाइल और ऐप की प्राथमिकताएँ','Profile and app preferences','Profile aur app preferences'],
+    '← Back':['← वापस','← Back','← Back'], 'App Theme':['ऐप थीम','App Theme','App Theme'],
+    '☀ Light':['☀ लाइट','☀ Light','☀ Light'], '☾ Dark':['☾ डार्क','☾ Dark','☾ Dark'],
+    'App Language':['ऐप की भाषा','App Language','App Language'], 'Hinglish':['हिंग्लिश','Hinglish','Hinglish'],
+    'Hindi':['हिंदी','Hindi','Hindi'], 'English':['अंग्रेज़ी','English','English'],
+    'App Lock':['ऐप लॉक','App Lock','App Lock'], 'Change PIN':['PIN बदलें','Change PIN','PIN change karein'],
+    'Backup':['बैकअप','Backup','Backup'], 'Restore':['रिस्टोर','Restore','Restore'],
+    'Google account':['गूगल अकाउंट','Google account','Google account'], 'Account not connected':['अकाउंट कनेक्ट नहीं है','Account not connected','Account connect nahi hai'],
+    'हिंदी विचार':['Hindi Thoughts','Hindi Thoughts','Hindi Vichar'],
+    'तैयार विचार चुनें या अपने विचार लिखें':['Choose a ready thought or write your own','Choose a ready thought or write your own','Ready thought chunein ya apna thought likhein'],
+    'Loop:':['सूची:','List:','List:'], '250 तैयार':['250 ready','250 ready','250 ready'],
+    '250 तैयार विचार':['250 तैयार विचार','250 ready thoughts','250 ready thoughts'], 'मेरे विचार':['My Thoughts','My Thoughts','Mere Thoughts'],
+    '＋ नया विचार लिखें':['＋ नया विचार लिखें','＋ Write a New Thought','＋ Naya thought likhein'],
+    'अपना विचार लिखें':['Write your thought','Write your thought','Apna thought likhein'],
+    'लिखते ही ड्राफ्ट अपने आप सेव होगा।':['Your draft will be saved automatically as you type.','Your draft will be saved automatically as you type.','Type karte hi draft automatically save hoga.'],
+    'विचार सेव करें':['Save Thought','Save Thought','Thought save karein'], 'आज के लिए सेट करें':['Set for Today','Set for Today','Aaj ke liye set karein'],
+    'बंद करें':['Close','Close','Band karein'], 'Paheliyan aur rochak jaankari':['Puzzles and interesting facts','Puzzles and interesting facts','Paheliyan aur interesting facts'],
+    'Show on Display':['डिस्प्ले पर दिखाएँ','Show on Display','Display par dikhayein'],
+    '🧩 Puzzles':['🧩 पहेलियाँ','🧩 Puzzles','🧩 Puzzles'], '💡 Facts':['💡 तथ्य','💡 Facts','💡 Facts'], '👁 Seen':['👁 देखे गए','👁 Seen','👁 Seen'],
+    'अपने काम और याद रखने वाली बातें लिखें':['Write your tasks and things to remember','Write your tasks and things to remember','Apne kaam aur yaad rakhne wali baatein likhein'],
+    '＋ Add Note':['＋ नोट जोड़ें','＋ Add Note','＋ Note add karein'], 'Save Note':['नोट सेव करें','Save Note','Note save karein'],
+    '30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ':['Restore students and their complete records within 30 days','Restore students and their complete records within 30 days','30 din ke andar students aur unka poora record restore karein'],
+    'Application information and developer contact':['ऐप की जानकारी और डेवलपर से संपर्क','Application information and developer contact','App ki jankari aur developer contact'],
+    'Development by':['निर्माणकर्ता','Development by','Development by'], 'Online Cyber Cafe':['ऑनलाइन साइबर कैफे','Online Cyber Cafe','Online Cyber Cafe'],
+    '& Web Services':['और वेब सेवाएँ','& Web Services','& Web Services'], 'Contact Developer':['डेवलपर से संपर्क करें','Contact Developer','Developer se contact karein'],
+    'Email':['ईमेल','Email','Email'], 'Show this text on Home Display':['यह टेक्स्ट होम स्क्रीन पर दिखाएँ','Show this text on Home Display','Yeh text Home Display par dikhayein'],
+    'Yes':['हाँ','Yes','Haan'], 'View and manage all your students':['अपने सभी विद्यार्थियों को देखें और मैनेज करें','View and manage all your students','Apne sabhi students dekhein aur manage karein'],
+    'Student Profile':['विद्यार्थी प्रोफ़ाइल','Student Profile','Student Profile'], 'Complete student information':['विद्यार्थी की पूरी जानकारी','Complete student information','Student ki poori jankari'],
+    'Daily Attendance':['दैनिक उपस्थिति','Daily Attendance','Daily Attendance'], 'Mark attendance for all active students':['सभी सक्रिय विद्यार्थियों की उपस्थिति दर्ज करें','Mark attendance for all active students','Sabhi active students ki attendance mark karein'],
+    'Attendance Date':['उपस्थिति की तारीख','Attendance Date','Attendance Date'], 'Mark All Sunday':['सभी की रविवार उपस्थिति दर्ज करें','Mark All Sunday','Sabhi ko Sunday mark karein'],
+    '= Present':['= उपस्थित','= Present','= Present'], '= Absent':['= अनुपस्थित','= Absent','= Absent'], '= Leave':['= छुट्टी','= Leave','= Leave'],
+    '= Sunday':['= रविवार','= Sunday','= Sunday'], '= Sunday Manage':['= रविवार प्रबंधन','= Sunday Manage','= Sunday Manage'], '= Custom':['= कस्टम','= Custom','= Custom'],
+    'Record and manage student payments':['विद्यार्थियों के भुगतान दर्ज और मैनेज करें','Record and manage student payments','Students ke payments record aur manage karein'],
+    'Monthly Fee Details':['मासिक फीस विवरण','Monthly Fee Details','Monthly Fee Details'], 'Student payment history and fee status':['विद्यार्थी के भुगतान का इतिहास और फीस स्थिति','Student payment history and fee status','Student payment history aur fee status'],
+    'Monthly attendance & fee records':['मासिक उपस्थिति और फीस रिकॉर्ड','Monthly attendance & fee records','Monthly attendance aur fee records'],
+    '📝 Add Note':['📝 नोट जोड़ें','📝 Add Note','📝 Note add karein'], 'Select Fee Month':['फीस का महीना चुनें','Select Fee Month','Fee month chunein'],
+    'Select Fee Period':['फीस अवधि चुनें','Select Fee Period','Fee period chunein'], 'Fee Month':['फीस का महीना','Fee Month','Fee Month'],
+    'Fee Period':['फीस अवधि','Fee Period','Fee Period'], 'Remaining Amount (Editable)':['बाकी राशि (बदल सकते हैं)','Remaining Amount (Editable)','Remaining amount (edit kar sakte hain)'],
+    'Select Payment Mode':['भुगतान का तरीका चुनें','Select Payment Mode','Payment mode chunein'], 'Cash':['नकद','Cash','Cash'], 'UPI':['UPI','UPI','UPI'],
+    'Save Fee':['फीस सेव करें','Save Fee','Fee save karein'], 'Attendance Status':['उपस्थिति स्थिति','Attendance Status','Attendance status'],
+    'Delete Attendance':['उपस्थिति हटाएँ','Delete Attendance','Attendance delete karein'], 'Mobile Number':['मोबाइल नंबर','Mobile Number','Mobile Number'],
+    'Address':['पता','Address','Address'], 'Save Details':['जानकारी सेव करें','Save Details','Details save karein'], 'Edit Details':['जानकारी एडिट करें','Edit Details','Details edit karein'],
+    '📷 Change Photo':['📷 फोटो बदलें','📷 Change Photo','📷 Photo change karein'], '🗑 Remove Photo':['🗑 फोटो हटाएँ','🗑 Remove Photo','🗑 Photo remove karein'],
+    'Change Photo':['फोटो बदलें','Change Photo','Photo change karein'], 'Remove Photo':['फोटो हटाएँ','Remove Photo','Photo remove karein']
+  };
+  const originals=new WeakMap();
+  const attrOriginals=new WeakMap();
+  function lang(){try{return localStorage.getItem(STORAGE_KEY)||'hinglish';}catch(e){return 'hinglish';}}
+  function languageIndex(language){return language==='hindi'?0:language==='english'?1:2;}
+  function translateValue(key,language){
+    const entry=WORDS[String(key||'').trim()];
+    return entry ? entry[languageIndex(language)] : String(key??'');
+  }
+  function inReports(node){const el=node.nodeType===1?node:node.parentElement;return !!(el&&el.closest('#reportsSection'));}
+  function translateTextNode(node,language){
+    if(!node||node.nodeType!==3||inReports(node))return;
+    const parent=node.parentElement;if(!parent||/^(SCRIPT|STYLE|TEXTAREA|INPUT|OPTION)$/.test(parent.tagName))return;
+    if(parent.closest('[data-no-translate],.pfQuestion,.pfAnswer,#homePuzzleQuestion,#homePuzzleAnswer,#homeThoughtText,#homeMyNotesContent,#personalThoughtsList,#settingsOwnerName,.studentName,.studentMain,.attendanceName,.feeDetailsName,.trashStudentName,.reportStudentName'))return;
+    if(!originals.has(node))originals.set(node,node.nodeValue);
+    const original=originals.get(node),trimmed=original.trim();
+    if(!trimmed)return;
+    const entry=WORDS[trimmed];
+    if(!entry){node.nodeValue=original;return;}
+    node.nodeValue=original.replace(trimmed,entry[languageIndex(language)]);
+  }
+  function translateAttributes(root,language){
+    const nodes=[];if(root.nodeType===1)nodes.push(root);
+    if(root.querySelectorAll)nodes.push(...root.querySelectorAll('[placeholder],[title],[aria-label],[data-i18n-placeholder],[data-i18n-title],[data-i18n-aria-label]'));
+    nodes.forEach(el=>{
+      if(inReports(el)||el.closest('[data-no-translate]'))return;
+      ['placeholder','title','aria-label'].forEach(attr=>{
+        const keyAttr='data-i18n-'+attr;
+        const key=el.getAttribute(keyAttr);
+        let map=attrOriginals.get(el);if(!map){map={};attrOriginals.set(el,map);}
+        if(key!==null){el.setAttribute(attr,translateValue(key,language));return;}
+        if(!el.hasAttribute(attr))return;
+        if(!(attr in map))map[attr]=el.getAttribute(attr);
+        const v=map[attr],entry=WORDS[v];if(entry)el.setAttribute(attr,entry[languageIndex(language)]);
+      });
+    });
+  }
+  function translateMarkedElements(root,language){
+    const nodes=[];if(root.nodeType===1&&root.hasAttribute('data-i18n'))nodes.push(root);
+    if(root.querySelectorAll)nodes.push(...root.querySelectorAll('[data-i18n]'));
+    nodes.forEach(el=>{
+      if(inReports(el)||el.closest('[data-no-translate]'))return;
+      const key=el.getAttribute('data-i18n');
+      if(!el.children.length)el.textContent=translateValue(key,language);
+    });
+  }
+  function walk(root,language){
+    if(!root)return;
+    translateMarkedElements(root,language);
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+    const list=[];while(walker.nextNode())list.push(walker.currentNode);
+    list.forEach(n=>translateTextNode(n,language));
+    translateAttributes(root,language);
+  }
+  function apply(language){
+    if(!['hindi','english','hinglish'].includes(language))language='hinglish';
+    try{localStorage.setItem(STORAGE_KEY,language);}catch(e){}
+    document.documentElement.lang=language==='hindi'?'hi':language==='english'?'en':'hi-Latn';
+    walk(document.body,language);
+    const select=document.getElementById('appLanguageSelect');if(select&&select.value!==language)select.value=language;
+    return language;
+  }
+  /* Public extension API for every future feature. New UI strings should be
+     registered once with [Hindi, English, Hinglish], then used with tuitionT()
+     or data-i18n. This keeps future modules connected to the same language setting. */
+  window.tuitionT=function(key){return translateValue(key,lang());};
+  window.registerTuitionTranslations=function(entries){
+    if(!entries||typeof entries!=='object')return false;
+    Object.keys(entries).forEach(key=>{
+      const value=entries[key];
+      if(Array.isArray(value)&&value.length>=3)WORDS[key]=[String(value[0]),String(value[1]),String(value[2])];
+      else if(value&&typeof value==='object'&&'hindi' in value&&'english' in value&&'hinglish' in value)
+        WORDS[key]=[String(value.hindi),String(value.english),String(value.hinglish)];
+    });
+    apply(lang());
+    return true;
+  };
+  window.applyTuitionLanguage=apply;
+  window.TutionManagerI18n={
+    t:window.tuitionT,
+    register:window.registerTuitionTranslations,
+    apply:apply,
+    getLanguage:lang
+  };
+  function init(){
+    let language=lang();
+    const select=document.getElementById('appLanguageSelect');if(select)select.value=language;
+    apply(language);
+    const observer=new MutationObserver(records=>{
+      const current=lang();records.forEach(record=>{
+        record.addedNodes.forEach(node=>{if(node.nodeType===3)translateTextNode(node,current);else if(node.nodeType===1)walk(node,current);});
+        if(record.type==='characterData')translateTextNode(record.target,current);
+      });
+    });
+    observer.observe(document.body,{childList:true,subtree:true,characterData:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
 </body>  
 </html>
