@@ -1233,7 +1233,7 @@ Reset PIN
           <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)"><option value="hinglish">Hinglish</option><option value="hindi">Hindi</option><option value="english">English</option></select>
           <div class="menuSettingsHint">Language selection save ho jayega. Poore app ki translation alag implementation mein complete hogi.</div>
         </div>
-        <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuIcon">🔒</span><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
+        <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuIcon">🛡️</span><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="changePin()"><span class="modernMenuIcon">🔑</span><span class="modernMenuLabel">Change PIN</span></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="backupData()"><span class="modernMenuIcon">💾</span><span class="modernMenuLabel">Backup</span></div>
         <div class="modernMenuItem ownerSettingsItem" onclick="restoreData()"><span class="modernMenuIcon">♻️</span><span class="modernMenuLabel">Restore</span></div>
@@ -3006,9 +3006,11 @@ function navigateBackSection(fromPopstate){
   if(currentSectionId==='homeSection') return;
   // Settings is opened from the side menu; Back returns to that menu list.
   if(currentSectionId==='ownerSettingsSection'){
+    if(!fromPopstate && history.state && history.state.tuitionSettings){history.back();return;}
     const previous=appSectionHistory.length?appSectionHistory.pop():'homeSection';
     showSection(previous,sectionNavId(previous),true);
-    setTimeout(()=>{const menu=document.getElementById('menuPopup');if(menu&&menu.style.display!=='block')toggleMenu();},30);
+    const menu=document.getElementById('menuPopup');
+    if(menu){menu.classList.remove('drawerClosing');menu.style.display='block';menu.scrollTop=0;}
     return;
   }
   // For the two detail pages, consume their dedicated browser-history layer.
@@ -4906,15 +4908,24 @@ document.addEventListener("click", handleOutsideTap);
 
 // All Back sources (the page Back buttons and Android/browser Back) use
 // navigateBackSection(), so section history is changed in one place only.
-function handleAppBackNavigation(){
-  // The side menu must always consume Back first, revealing the Home cards.
-  // Check it directly as well as through the generic overlay stack so a
-  // delayed MutationObserver update cannot let Android exit the app.
+function handleAppBackNavigation(poppedState){
   const menu=document.getElementById("menuPopup");
+
+  // Settings has two explicit browser-history layers: Settings, then its
+  // originating menu list. The next Back closes that menu and leaves the
+  // app guard underneath, so it cannot exit the app prematurely.
+  if(currentSectionId==='ownerSettingsSection' && poppedState && poppedState.tuitionMenu){
+    showSection('homeSection','homeNav',true);
+    if(menu){menu.classList.remove('drawerClosing');menu.style.display='block';menu.scrollTop=0;}
+    return 'menuFromSettings';
+  }
+
+  // The side menu consumes Back before the app guard, returning to Home.
   if(menu && getComputedStyle(menu).display!=="none"){
-    hideOverlay("menuPopup");
+    menu.classList.remove('drawerClosing');
+    menu.style.display='none';
     overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");
-    return 'overlay';
+    return 'menuClose';
   }
 
   // Other open modals get the next Back action.
@@ -4930,8 +4941,11 @@ function handleAppBackNavigation(){
 }
 
 window.addEventListener("popstate", function(event){
-  const backResult=handleAppBackNavigation();
-  if(backResult==='detail'){
+  const backResult=handleAppBackNavigation(event.state);
+  if(backResult==='menuFromSettings' || backResult==='menuClose'){
+    // The popped menu/settings entry has exposed the existing app guard.
+    // Do not push another entry here; the next Back must close the menu.
+  }else if(backResult==='detail'){
     // Reuse the now-current parent entry as the guard. This avoids leaving
     // stale nested detail entries underneath Student Profile / Fee Details.
     history.replaceState({tuitionAppGuard:true}, "", location.href);
@@ -4970,6 +4984,10 @@ function toggleMenu(){
 
 function openMenuSettings(){
   const menu=document.getElementById('menuPopup');
+  // Keep separate Back entries for the Settings page and the menu list.
+  // The existing app guard remains underneath both entries.
+  history.pushState({tuitionMenu:true}, '', location.href);
+  history.pushState({tuitionSettings:true}, '', location.href);
   if(menu){menu.style.display='none';menu.classList.remove('drawerClosing');}
   overlayHistoryStack=overlayHistoryStack.filter(id=>id!=='menuPopup');
   updateMenuSettingsControls();
@@ -4977,6 +4995,7 @@ function openMenuSettings(){
   showSection('ownerSettingsSection','homeNav');
 }
 function closeMenuSettings(){
+  if(history.state && history.state.tuitionSettings){history.back();return;}
   navigateBackSection();
 }
 function updateMenuSettingsControls(){
