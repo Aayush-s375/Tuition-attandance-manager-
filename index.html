@@ -2278,7 +2278,10 @@ function handleGoogleLogin(response) {
     render();
 
     // Drive permission is requested once, then future syncs are automatic.
-    initDriveAuthorization(true);
+    initDriveAuthorization(true).catch(error => {
+      console.warn("Initial Google Drive permission was not completed:", error);
+      // The automatic sync retry will request permission again when needed.
+    });
   } catch (error) {
     console.error("Google login error:", error);
     alert("Google Login failed. Please try again.");
@@ -2320,42 +2323,64 @@ function initDriveAuthorization(forceConsent = false) {
   if (driveAccessToken) return Promise.resolve(driveAccessToken);
   if (driveAuthPromise) return driveAuthPromise;
 
-  driveAuthPromise = new Promise((resolve, reject) => {
+  // Do not let a missing Google OAuth callback leave Syncing stuck forever.
+  let authTimer = null;
+  let settled = false;
+  let authResolve;
+  let authReject;
+  const authPromise = new Promise((resolve, reject) => {
+    authResolve = resolve;
+    authReject = reject;
+  });
+  driveAuthPromise = authPromise;
+
+  const finishAuth = (error, token) => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(authTimer);
+    if (driveAuthPromise === authPromise) driveAuthPromise = null;
+
+    if (token) {
+      driveAccessToken = token;
+      localStorage.setItem("driveAuthorized", "true");
+      setDriveSyncStatus("Drive sync active", "ok");
+      authResolve(token);
+    } else {
+      setDriveSyncStatus("Drive permission needed", "error");
+      authReject(error || new Error("Google Drive authorization failed."));
+    }
+  };
+
+  authTimer = setTimeout(() => {
+    finishAuth(new Error("Google Drive authorization timed out. Please check internet and try again."));
+  }, 20000);
+
+  try {
     driveTokenClient = google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
       scope: DRIVE_SCOPE,
       callback: response => {
-        driveAuthPromise = null;
-
         if (response && response.access_token) {
-          driveAccessToken = response.access_token;
-          localStorage.setItem("driveAuthorized", "true");
-          setDriveSyncStatus("Drive sync active", "ok");
-          resolve(driveAccessToken);
+          finishAuth(null, response.access_token);
         } else {
-          const err = new Error(response?.error || "Google Drive authorization failed.");
-          setDriveSyncStatus("Drive permission needed", "error");
-          reject(err);
+          finishAuth(new Error(response?.error || "Google Drive authorization failed."));
         }
       }
     });
 
-    try {
-      // Reuse the Google account already selected for this app.
-      // This prevents the Drive authorization step from asking the user
-      // to choose an email again on every app reopen.
-      const savedEmail = localStorage.getItem("googleEmail");
-      const tokenRequest = forceConsent
-        ? {prompt:"consent", login_hint: savedEmail || undefined}
-        : {prompt:"none", login_hint: savedEmail || undefined};
-      driveTokenClient.requestAccessToken(tokenRequest);
-    } catch (error) {
-      driveAuthPromise = null;
-      reject(error);
-    }
-  });
+    // Reuse the Google account already selected for this app.
+    // This prevents the Drive authorization step from asking the user
+    // to choose an email again on every app reopen.
+    const savedEmail = localStorage.getItem("googleEmail");
+    const tokenRequest = forceConsent
+      ? {prompt:"consent", login_hint: savedEmail || undefined}
+      : {prompt:"none", login_hint: savedEmail || undefined};
+    driveTokenClient.requestAccessToken(tokenRequest);
+  } catch (error) {
+    finishAuth(error);
+  }
 
-  return driveAuthPromise;
+  return authPromise;
 }
 
 function getDriveToken(force = false) {
@@ -2373,13 +2398,29 @@ async function driveFetch(url, options = {}, retry = true) {
   const headers = new Headers(options.headers || {});
   headers.set("Authorization", "Bearer " + token);
 
-  const response = await fetch(url, {...options, headers});
+  // A stalled network request must not hold the sync lock indefinitely.
+  const fetchWithTimeout = async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+    try {
+      return await fetch(url, {...options, headers, signal: controller.signal});
+    } catch (error) {
+      if (error && error.name === "AbortError") {
+        throw new Error("Google Drive request timed out. Please check your internet connection.");
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
+
+  const response = await fetchWithTimeout();
 
   if (response.status === 401 && retry) {
     driveAccessToken = null;
     const newToken = await getDriveToken(true);
     headers.set("Authorization", "Bearer " + newToken);
-    return fetch(url, {...options, headers});
+    return fetchWithTimeout();
   }
 
   return response;
