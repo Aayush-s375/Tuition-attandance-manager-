@@ -4,7 +4,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">  
 <title>Tuition Attendance Manager</title> <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d6efd">
-  <script src="https://accounts.google.com/gsi/client" async defer></script><style>  
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>window.addEventListener("load",function(){if(typeof initGoogleLogin==="function")initGoogleLogin();});</script><style>  
   
 
 
@@ -2404,17 +2405,33 @@ function updateGoogleEmailDisplay() {
   if (settingsDisplay) settingsDisplay.textContent = email || "Google account not connected";
 }
 
+let googleLoginButtonRendered = false;
+let googleLoginRetryCount = 0;
+let googleLoginRetryTimer = null;
+
 function initGoogleLogin() {
-  if (!window.google || !google.accounts || !google.accounts.id) return;
-
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: handleGoogleLogin,
-    auto_select: true
-  });
-
   const button = document.getElementById("googleButton");
-  if (button) {
+  if (!button || googleLoginButtonRendered) return;
+
+  // Google Identity Services is loaded asynchronously. Retry until its script
+  // becomes available instead of leaving the sign-in screen with an empty box.
+  if (!window.google || !google.accounts || !google.accounts.id) {
+    googleLoginRetryCount++;
+    if (googleLoginRetryTimer) clearTimeout(googleLoginRetryTimer);
+    if (googleLoginRetryCount <= 30) {
+      googleLoginRetryTimer = setTimeout(initGoogleLogin, 500);
+    } else {
+      button.innerHTML = '<button type="button" id="googleLoginRetryBtn" style="border:0;border-radius:10px;padding:12px 18px;background:#1769d2;color:#fff;font-weight:700;font-size:15px;" onclick="retryGoogleLogin()">Retry Google Sign-In</button><p style="margin:12px 0 0;color:#b42318;font-size:13px;">Google sign-in could not load. Check your internet connection and tap Retry.</p>';
+    }
+    return;
+  }
+
+  try {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleLogin,
+      auto_select: true
+    });
     button.innerHTML = "";
     google.accounts.id.renderButton(button, {
       theme: "outline",
@@ -2422,7 +2439,20 @@ function initGoogleLogin() {
       text: "signin_with",
       shape: "rectangular"
     });
+    googleLoginButtonRendered = true;
+    googleLoginRetryCount = 0;
+  } catch (error) {
+    console.error("Google sign-in button error:", error);
+    button.innerHTML = '<button type="button" style="border:0;border-radius:10px;padding:12px 18px;background:#1769d2;color:#fff;font-weight:700;font-size:15px;" onclick="retryGoogleLogin()">Retry Google Sign-In</button>';
   }
+}
+
+function retryGoogleLogin() {
+  googleLoginButtonRendered = false;
+  googleLoginRetryCount = 0;
+  const button = document.getElementById("googleButton");
+  if (button) button.innerHTML = '<span style="color:#667085;font-size:13px;">Loading Google sign-in…</span>';
+  initGoogleLogin();
 }
 
 function initDriveAuthorization(forceConsent = false) {
