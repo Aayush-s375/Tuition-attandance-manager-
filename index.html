@@ -527,6 +527,25 @@ body.darkMode .attendanceCountCode.countH{color:#fb923c!important;}
 #menuPopup.drawerClosing{animation:drawerOut .18s ease-in forwards!important;pointer-events:none!important;}
 @keyframes drawerOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:.75}}
 
+/* Side-menu Settings subview */
+.menuSettingsHeading{display:flex;align-items:center;gap:12px;padding:5px 0 13px;font-size:16px;font-weight:900;color:#202638;border-bottom:1px solid #E2E5EB;margin-bottom:8px;}
+#menuPopup .menuSettingsBack{width:34px;height:34px;border:0;border-radius:9px;background:#e4e8f2!important;color:#344054!important;font-size:22px;font-weight:800;}
+.menuSettingsGroup{padding:11px 0;border-bottom:1px solid #E2E5EB;}
+.menuSettingsTitle{display:block;font-size:13px;font-weight:900;color:#344054;margin-bottom:8px;}
+.menuThemeChoices{display:flex;gap:8px;}
+#menuPopup .menuThemeChoices button{flex:1;border:1px solid #d5dbea;border-radius:9px;padding:9px 5px;background:#fff!important;color:#344054!important;font-size:13px;font-weight:800;}
+#menuPopup .menuThemeChoices button.active{background:#3947a7!important;border-color:#3947a7;color:#fff!important;}
+#menuPopup .menuLanguageSelect{width:100%;margin:0!important;padding:9px;border:1px solid #d5dbea;border-radius:9px;background:#fff!important;color:#202638!important;font-size:13px;}
+.menuSettingsHint{font-size:10px;line-height:1.45;color:#697386;margin-top:7px;}
+body.darkMode .menuSettingsHeading,body.darkMode .menuSettingsTitle{color:#f0f3ff!important;}
+body.darkMode .menuSettingsHeading,body.darkMode .menuSettingsGroup{border-color:#37445b!important;}
+body.darkMode #menuPopup .menuSettingsBack{background:#303b55!important;color:#f0f3ff!important;}
+body.darkMode #menuPopup .menuThemeChoices button{background:#293348!important;border-color:#52617e!important;color:#f0f3ff!important;}
+body.darkMode #menuPopup .menuThemeChoices button.active{background:#5143b8!important;color:#fff!important;}
+body.darkMode #menuPopup .menuLanguageSelect{background:#252d3b!important;color:#f4f6ff!important;border-color:#4a5872!important;}
+body.darkMode .menuSettingsHint{color:#b8c3d9!important;}
+
+
 /* Thought library tabs, editor and personal thoughts */
 .thoughtTabs{display:flex;gap:8px;margin:0 0 12px;padding:4px;background:#E9ECF3;border-radius:13px;}
 .thoughtTab{flex:1;min-width:0;border:0;border-radius:10px;padding:10px 8px;background:transparent;color:#4B5563;font-weight:800;font-size:13px;line-height:1.35;cursor:pointer;overflow-wrap:anywhere;}
@@ -1069,56 +1088,80 @@ Reset PIN
               </div>
               <button class="ownerEditBtn" type="button" onclick="event.stopPropagation(); editOwnerName()" title="Edit Name" aria-label="Edit Name">✎</button>
             </div>
-            <div class="modernMenuItem menuLockItem" onclick="toggleLock()">
-              <span class="modernMenuLabel">App Lock</span>
-              <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
-                <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
-                <span class="slider"></span>
-              </label>
+            <div id="menuMainList">
+              <div class="modernMenuItem" onclick="showMenuNotice('Homework')">
+                <span class="modernMenuIcon">📚</span>
+                <span class="modernMenuLabel">Homework</span>
+              </div>
+              <div class="modernMenuItem" onclick="showMenuNotice('Test Record')">
+                <span class="modernMenuIcon">📊</span>
+                <span class="modernMenuLabel">Test Record</span>
+              </div>
+              <div class="modernMenuItem" onclick="openThoughtsLibraryFromMenu(event)">
+                <span class="modernMenuIcon">🌱</span>
+                <span class="modernMenuLabel">सभी विचार</span>
+              </div>
+              <div class="modernMenuItem" onclick="openPuzzleFactsFromMenu(event)">
+                <span class="modernMenuIcon">🧩</span>
+                <span class="modernMenuLabel">Puzzle &amp; Facts</span>
+              </div>
+              <div class="modernMenuItem" onclick="openMyNotesFromMenu(event)">
+                <span class="modernMenuIcon">📝</span>
+                <span class="modernMenuLabel">My Notes</span>
+              </div>
+              <div class="modernMenuItem" onclick="openTrashFromMenu(event)">
+                <span class="modernMenuIcon"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></span>
+                <span class="modernMenuLabel">Deleted Students</span>
+              </div>
+              <div class="modernMenuItem" onclick="openMenuSettings()">
+                <span class="modernMenuIcon">⚙️</span>
+                <span class="modernMenuLabel">Settings</span>
+              </div>
+              <div class="modernMenuItem" onclick="openAboutAppFromMenu(event)">
+                <span class="modernMenuIcon" aria-hidden="true">ⓘ</span>
+                <span class="modernMenuLabel">About App</span>
+              </div>
             </div>
-            <div class="modernMenuItem menuThemeItem" onclick="toggleDarkModeFromRow()">
-              <span class="themeMenuGlyph" id="themeMenuGlyph">☾</span>
-              <span class="modernMenuLabel" id="themeMenuLabel">Dark Mode</span>
-              <label class="switch menuThemeSwitch" onclick="event.stopPropagation();">
-                <input type="checkbox" id="darkModeSwitch" onchange="setDarkMode(this.checked)">
-                <span class="themeSlider"></span>
-              </label>
-            </div>
-            <div class="modernMenuItem" onclick="backupData()">
-              <span class="modernMenuIcon">💾</span>
-              <span class="modernMenuLabel">Backup</span>
-            </div>
-            <div class="modernMenuItem" onclick="restoreData()">
-              <span class="modernMenuIcon">♻️</span>
-              <span class="modernMenuLabel">Restore</span>
-            </div>
-            <div class="modernMenuItem" onclick="changePin()">
-              <span class="modernMenuIcon">🔑</span>
-              <span class="modernMenuLabel">Change PIN</span>
-            </div>
-            <div class="modernMenuItem" onclick="changeGoogleAccount()">
-              <span class="modernMenuIcon">🔄</span>
-              <span class="modernMenuLabel">Change Account</span>
-            </div>
-            <div class="modernMenuItem" onclick="openThoughtsLibraryFromMenu(event)">
-              <span class="modernMenuIcon">🌱</span>
-              <span class="modernMenuLabel">सभी विचार</span>
-            </div>
-            <div class="modernMenuItem" onclick="openPuzzleFactsFromMenu(event)">
-              <span class="modernMenuIcon">🧩</span>
-              <span class="modernMenuLabel">Puzzle &amp; Facts</span>
-            </div>
-            <div class="modernMenuItem" onclick="openMyNotesFromMenu(event)">
-              <span class="modernMenuIcon">📝</span>
-              <span class="modernMenuLabel">My Notes</span>
-            </div>
-            <div class="modernMenuItem" onclick="openTrashFromMenu(event)">
-              <span class="modernMenuIcon"><svg class="deleteOutlineIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v7m4-7v7"/></svg></span>
-              <span class="modernMenuLabel">Deleted Students</span>
-            </div>
-            <div class="modernMenuItem" onclick="openAboutAppFromMenu(event)">
-              <span class="modernMenuIcon" aria-hidden="true">ⓘ</span>
-              <span class="modernMenuLabel">About App</span>
+            <div id="menuSettingsView" style="display:none;">
+              <div class="menuSettingsHeading">
+                <button type="button" class="menuSettingsBack" onclick="closeMenuSettings()">←</button>
+                <span>Settings</span>
+              </div>
+              <div class="menuSettingsGroup">
+                <div class="menuSettingsTitle">App Theme</div>
+                <div class="menuThemeChoices">
+                  <button type="button" id="menuLightThemeBtn" onclick="setDarkMode(false)">☀ Light</button>
+                  <button type="button" id="menuDarkThemeBtn" onclick="setDarkMode(true)">☾ Dark</button>
+                </div>
+              </div>
+              <div class="menuSettingsGroup">
+                <label class="menuSettingsTitle" for="appLanguageSelect">App Language</label>
+                <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)">
+                  <option value="hinglish">Hinglish</option>
+                  <option value="hindi">Hindi</option>
+                  <option value="english">English</option>
+                </select>
+                <div class="menuSettingsHint">Language selection save ho jayega. Poore app ki translation alag implementation mein complete hogi.</div>
+              </div>
+              <div class="modernMenuItem menuLockItem" onclick="toggleLock()">
+                <span class="modernMenuLabel">App Lock</span>
+                <label class="switch menuLockSwitch" onclick="event.stopPropagation();">
+                  <input type="checkbox" id="lockSwitch" onchange="toggleLock()">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="modernMenuItem" onclick="changePin()">
+                <span class="modernMenuIcon">🔑</span>
+                <span class="modernMenuLabel">Change PIN</span>
+              </div>
+              <div class="modernMenuItem" onclick="backupData()">
+                <span class="modernMenuIcon">💾</span>
+                <span class="modernMenuLabel">Backup</span>
+              </div>
+              <div class="modernMenuItem" onclick="restoreData()">
+                <span class="modernMenuIcon">♻️</span>
+                <span class="modernMenuLabel">Restore</span>
+              </div>
             </div>
             <div class="modernMenuAccount">
               <span id="googleEmailDisplay"></span>
@@ -4871,6 +4914,39 @@ function toggleMenu(){
   else{clearTimeout(menuCloseTimer);menuCloseTimer=null;menu.classList.remove("drawerClosing");menu.style.display="block";menu.scrollTop=0;}
 }
 
+function openMenuSettings(){
+  const main=document.getElementById('menuMainList');
+  const settings=document.getElementById('menuSettingsView');
+  if(main)main.style.display='none';
+  if(settings)settings.style.display='block';
+  updateMenuSettingsControls();
+  const menu=document.getElementById('menuPopup');if(menu)menu.scrollTop=0;
+}
+function closeMenuSettings(){
+  const main=document.getElementById('menuMainList');
+  const settings=document.getElementById('menuSettingsView');
+  if(settings)settings.style.display='none';
+  if(main)main.style.display='block';
+  const menu=document.getElementById('menuPopup');if(menu)menu.scrollTop=0;
+}
+function updateMenuSettingsControls(){
+  const dark=document.body.classList.contains('darkMode');
+  const lightBtn=document.getElementById('menuLightThemeBtn');
+  const darkBtn=document.getElementById('menuDarkThemeBtn');
+  if(lightBtn)lightBtn.classList.toggle('active',!dark);
+  if(darkBtn)darkBtn.classList.toggle('active',dark);
+  const language=document.getElementById('appLanguageSelect');
+  if(language){try{language.value=localStorage.getItem('tuitionManagerAppLanguage_v1')||'hinglish';}catch(e){language.value='hinglish';}}
+}
+function saveAppLanguage(value){
+  if(!['hindi','english','hinglish'].includes(value))return;
+  try{localStorage.setItem('tuitionManagerAppLanguage_v1',value);}catch(e){}
+  alert('Language preference saved. Full app translation will be added separately.');
+}
+function showMenuNotice(feature){
+  alert(feature+' section abhi is version mein available nahi hai. Iska feature alag se add kiya jayega.');
+}
+
 function changePin(){
   document.getElementById("menuPopup").style.display="none";
 
@@ -5299,6 +5375,7 @@ if ("serviceWorker" in navigator) {
     if(label) label.textContent=enabled?'Dark Mode':'Light Mode';
     const meta=document.querySelector('meta[name="theme-color"]');
     if(meta) meta.setAttribute('content',enabled?'#0d1018':'#263b8f');
+    if(typeof window.updateMenuSettingsControls==='function') window.updateMenuSettingsControls();
   }
   window.setDarkMode=function(enabled){
     try{localStorage.setItem(KEY,enabled?'1':'0');}catch(e){}
