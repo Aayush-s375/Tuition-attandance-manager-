@@ -2027,8 +2027,8 @@ function renderHomeExtras(){
       const missed=[];
       while(cursor<todayDate){
         const key=localDateKey(cursor);
-        // Sundays are not treated as missed attendance days.
-        if(cursor.getDay()!==0&&!(Array.isArray(st.attendance)&&st.attendance.some(a=>a&&a.date===key))){missed.push(key);}
+        // Every past date without an attendance record is included, including Sundays.
+        if(!(Array.isArray(st.attendance)&&st.attendance.some(a=>a&&a.date===key))){missed.push(key);}
         cursor.setDate(cursor.getDate()+1);
       }
       if(missed.length){
@@ -3816,7 +3816,7 @@ function renderReports(){
     slidesHtml += `
     <div class="student reportSlide ${slideIndex===reportSlideIndex?'active':''}" data-report-slide="${slideIndex}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
-        <h3 class="reportStudentName" style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
+        <h3 class="reportStudentName" style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;">${s.name}</h3>
         <button class="feeBtn" onclick="downloadPDF(${index})" style="padding:7px 10px;min-width:0;white-space:nowrap;">Print Report</button>
       </div>
 
@@ -4057,9 +4057,9 @@ function renderFeeDetails(st){
 
   if(!st.joiningDate){
     content.innerHTML=`<div class="feeDetailsName">${st.name}</div>
-      <div class="feeDetailsSectionTitle">Tuition Joining Date</div>
+      <div class="feeDetailsSectionTitle">${typeof window.t==="function"?window.t("Tuition Joining Date"):"Tuition Joining Date"}</div>
       <div style="font-size:13px;color:#606775;margin-bottom:8px;">Joining date is not set yet.</div>
-      <div class="feeDetailsJoining"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div>
+      <div class="feeDetailsJoining"><b>${typeof window.t==="function"?window.t("Monthly Fee"):"Monthly Fee"}:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div>
       <button class="popupSave" onclick="editJoiningDate()">Set Joining Date</button>`;
     return;
   }
@@ -4105,7 +4105,7 @@ function renderFeeDetails(st){
   },0);
 
   const cycleText=getFeeCycleMode(st)==='month'?'Calendar Month':'Fee Period';
-  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining feeJoiningCompact"><b>Tuition Joining Date:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsJoining feeJoiningCompact"><b>Monthly Fee:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeSummaryBox" style="margin-top:12px;"><div style="font-weight:800;">Total Pending - <span style="color:#b02a37;">₹${getStudentTotalPending(st)}</span></div></div><div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
+  content.innerHTML=`<div class="feeDetailsName">${st.name}</div><div class="feeDetailsJoining feeJoiningCompact"><b>${typeof window.t==="function"?window.t("Tuition Joining Date"):"Tuition Joining Date"}:</b> ${formatFeeShortDate(st.joiningDate)} <button class="miniBtn iconOnly editIcon" aria-label="Edit joining date" title="Edit" style="margin-left:6px;" onclick="editJoiningDate()">✎</button></div><div class="feeDetailsJoining feeJoiningCompact"><b>${typeof window.t==="function"?window.t("Monthly Fee"):"Monthly Fee"}:</b> ${getKnownFeeAmount(st)?`₹${getKnownFeeAmount(st)}`:'Not added'}</div><div class="feeDetailsSectionTitle">Monthly Details</div><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;"><select id="feeDetailsYear" onchange="renderFeeDetails(students[currentStudent])" style="margin:0;flex:1;"></select><span style="font-size:12px;color:#606775;">${cycleText}</span></div>${rows}<div class="feeSummaryBox" style="margin-top:12px;"><div style="font-weight:800;">Total Pending - <span style="color:#b02a37;">₹${getStudentTotalPending(st)}</span></div></div><div class="feeTotalCollections" style="border-top:1px solid #dfe3eb;margin-top:12px;padding-top:12px;text-align:center;font-size:15px;font-weight:800;">${year} • Total Collections - ₹${totalCollections}</div>`;
 
   const ys=document.getElementById('feeDetailsYear');
   if(ys){
@@ -4256,7 +4256,7 @@ function renderStudentProfile(){
       <button class="profileActionBtn profileAttendanceBtn" type="button" onclick="openProfileAttendanceReport()">Attendance</button>
       <button class="profileActionBtn profileDeleteBtn" type="button" onclick="deleteStudent(${selectedStudentProfile})">Delete</button>
     </div>
-    <div class="profilePendingFees" style="margin-top:16px;padding-top:12px;border-top:1px solid #e2e6ee;font-weight:800;color:#b02a37;">Total Fee Pending - ₹${getStudentTotalPending(st)}</div>
+    <div class="profilePendingFees" style="margin-top:16px;padding-top:12px;border-top:1px solid #e2e6ee;font-weight:800;color:#b02a37;">${typeof window.t==="function"?window.t("Total Fee Pending -"):"Total Fee Pending -"} ₹${getStudentTotalPending(st)}</div>
 `;
 }
 function profileOtherStudentRow(item={},index=0){
@@ -4681,7 +4681,7 @@ function downloadPDF(index){
     ${reportHtml}
 
     <div class="card" style="text-align:center;">
-      <div style="font-weight:700;font-size:18px;">Tuition Attendance Manager</div>
+      <div style="font-weight:700;font-size:18px;">Tuition Manager</div>
     </div>
 
 </body></html>`);
