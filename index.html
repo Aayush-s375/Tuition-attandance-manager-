@@ -594,15 +594,15 @@ body.darkMode .menuSettingsHint{color:#b8c3d9!important;}
 
 
 /* Thought library tabs, editor and personal thoughts */
-.thoughtTabs{display:flex;gap:8px;margin:0 0 12px;padding:4px;background:#E9ECF3;border-radius:13px;}
-.thoughtTab{flex:1;min-width:0;border:0;border-radius:10px;padding:10px 8px;background:transparent;color:#4B5563;font-weight:800;font-size:13px;line-height:1.35;cursor:pointer;overflow-wrap:anywhere;}
+.thoughtTabs{display:flex;flex-wrap:nowrap;gap:5px;margin:0 0 12px;padding:4px;background:#E9ECF3;border-radius:13px;}
+.thoughtTab{flex:1 1 0;min-width:0;white-space:normal;overflow-wrap:anywhere;text-align:center;border:0;border-radius:10px;padding:9px 3px;background:transparent;color:#4B5563;font-weight:800;font-size:13px;line-height:1.35;cursor:pointer;overflow-wrap:anywhere;}
 .thoughtTab.active{background:#5143B8;color:#fff;box-shadow:0 2px 7px rgba(35,40,90,.12);}
 .thoughtSourcePanel{background:#F3F4F6;border:1px solid #E2E6EF;border-radius:13px;padding:12px;margin-bottom:12px;}
 .thoughtSourceTitle{font-size:13px;color:#344054;font-weight:700;line-height:1.5;margin-bottom:9px;}
 .thoughtSourceButtons{display:flex;gap:7px;}
 .thoughtSourceButtons .thoughtBtn{flex:1;min-width:0;padding:8px 6px;font-size:12px;line-height:1.3;}
 .thoughtSourceButtons .activeSource{background:#18794E!important;color:#fff!important;}
-.thoughtSourceCompact{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px;padding:7px 9px;background:#EEF0F6;border:1px solid #E0E4EE;border-radius:11px;font-size:12px;color:#596174}.thoughtSourceCompact span{font-weight:800;margin-right:2px}.thoughtSourceChip{border:1px solid #D7DCE8;border-radius:8px;padding:6px 9px;background:#fff;color:#5143A8;font-size:12px;font-weight:800;cursor:pointer}.thoughtSourceChip.activeSource{background:#5143B8;border-color:#5143B8;color:#fff}.thoughtSourceStatus{font-size:11px;color:#667085;line-height:1.45;margin-top:8px;}
+.thoughtSourceCompact{display:flex;align-items:stretch;gap:5px;flex-wrap:nowrap;margin:0 0 10px;padding:7px 6px;background:#EEF0F6;border:1px solid #E0E4EE;border-radius:11px;font-size:12px;color:#596174}.thoughtSourceCompact span{font-weight:800;margin-right:2px}.thoughtSourceChip{flex:1 1 0;min-width:0;white-space:normal;overflow-wrap:anywhere;text-align:center;display:flex;align-items:center;justify-content:center;border:1px solid #D7DCE8;border-radius:8px;padding:7px 3px;min-height:42px;line-height:1.2;background:#fff;color:#5143A8;font-size:11px;font-weight:800;cursor:pointer}.thoughtSourceChip.activeSource{background:#5143B8;border-color:#5143B8;color:#fff}.thoughtSourceStatus{font-size:11px;color:#667085;line-height:1.45;margin-top:8px;}
 .newThoughtBtn{width:100%;border:0;border-radius:11px;padding:11px 12px;background:#5143B8;color:#fff;font-weight:800;font-size:14px;margin-bottom:10px;cursor:pointer;}
 .personalThoughtEditor{background:#F8F9FC;border:1px solid #DDE2EC;border-radius:14px;padding:12px;margin-bottom:12px;}
 .personalThoughtEditor label{display:block;font-size:13px;font-weight:800;color:#344054;margin-bottom:8px;}
@@ -620,8 +620,9 @@ body.darkMode .menuSettingsHint{color:#b8c3d9!important;}
 #personalThoughtsList .thoughtItemText{white-space:pre-wrap;}
 @media(max-width:390px){
   #menuPopup{width:min(260px,58vw)!important;max-width:58vw!important;}
-  .thoughtTab{font-size:12px;padding:9px 5px;}
-  .thoughtSourceButtons{flex-direction:column;}
+  .thoughtTab{font-size:11px;padding:9px 3px;line-height:1.2;}
+  .thoughtSourceCompact{gap:4px;padding:6px 4px;}
+  .thoughtSourceChip{font-size:10px;padding:7px 2px;min-height:48px;}
   .personalThoughtActions button{padding:7px 8px;}
 }
 
@@ -1260,14 +1261,15 @@ Reset PIN
     </section>
 
     <section id="thoughtsSection" class="section">
-      <div class="pageHead"><div><h2>हिंदी विचार</h2><p>तैयार विचार चुनें या अपने विचार लिखें</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
-      <div class="thoughtSourceCompact" aria-label="सामान्य विचार का स्रोत"><span>Loop:</span><button id="thoughtSourceReady" class="thoughtSourceChip" type="button" onclick="setThoughtSource('ready')">250 तैयार</button><button id="thoughtSourceMine" class="thoughtSourceChip" type="button" onclick="setThoughtSource('mine')">मेरे विचार</button></div>
-      <div class="thoughtTabs" role="tablist" aria-label="विचारों के प्रकार">
-        <button id="thoughtTabReady" class="thoughtTab active" role="tab" aria-selected="true" onclick="switchThoughtTab('ready')">250 तैयार विचार</button>
-        <button id="thoughtTabMine" class="thoughtTab" role="tab" aria-selected="false" onclick="switchThoughtTab('mine')">मेरे विचार</button>
+      <div class="pageHead"><div><h2 id="thoughtsPageTitle">हिंदी विचार</h2><p>तैयार विचार चुनें या अपने विचार लिखें</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
+      <div class="thoughtSourceCompact" data-no-translate aria-label="Thought loop source"><span id="thoughtLoopLabel">Loop:</span><button id="thoughtSourceHindi" class="thoughtSourceChip" type="button" onclick="setThoughtSource('hindi')">250 ready - Hindi</button><button id="thoughtSourceEnglish" class="thoughtSourceChip" type="button" onclick="setThoughtSource('english')">250 ready - English</button><button id="thoughtSourceApp" class="thoughtSourceChip" type="button" onclick="setThoughtSource('app')">Thoughts in - App language</button><button id="thoughtSourceMine" class="thoughtSourceChip" type="button" onclick="setThoughtSource('mine')">My Thoughts</button></div>
+      <div class="thoughtTabs" role="tablist" aria-label="Thought library">
+        <button id="thoughtTabHindi" class="thoughtTab active" role="tab" aria-selected="true" onclick="switchThoughtTab('hindi')">250 ready thoughts - Hindi</button>
+        <button id="thoughtTabEnglish" class="thoughtTab" role="tab" aria-selected="false" onclick="switchThoughtTab('english')">250 ready thoughts - English</button>
+        <button id="thoughtTabMine" class="thoughtTab" role="tab" aria-selected="false" onclick="switchThoughtTab('mine')">My Thoughts</button>
       </div>
       <div id="readyThoughtsPanel" class="modernPanel">
-        <input id="thoughtSearchInput" class="thoughtSearch" type="search" placeholder="250 विचारों में खोजें..." oninput="renderThoughtsLibrary()" autocomplete="off">
+        <input id="thoughtSearchInput" data-no-translate class="thoughtSearch" type="search" placeholder="250 विचारों में खोजें..." oninput="renderThoughtsLibrary()" autocomplete="off">
         <div id="thoughtsLibraryArea" aria-live="polite"></div>
       </div>
       <div id="myThoughtsPanel" class="modernPanel" style="display:none;">
@@ -1659,14 +1661,14 @@ function toggleMyNoteHome(id){const notes=readMyNotes();const note=notes.find(n=
 function deleteMyNote(id){if(!confirm("इस Note को Delete करना चाहते हैं?"))return;writeMyNotes(readMyNotes().filter(n=>n.id!==id));}
 function closeMyNoteEditor(){const modal=document.getElementById("myNoteEditorPopup");if(modal)modal.style.display="none";editingMyNoteId=null;myNoteOriginalText="";myNoteBackPending=false;}
 function cancelMyNote(){const input=document.getElementById("myNoteEditorInput");if(input&&String(input.value||"")!==myNoteOriginalText){if(!confirm("आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।"))return;}closeMyNoteEditor();}
-function getThoughtSource(){return localStorage.getItem(getThoughtSourceKey())==="mine"?"mine":"ready";}
+function getThoughtSource(){const value=localStorage.getItem(getThoughtSourceKey());return ['hindi','english','app','mine'].includes(value)?value:(value==='mine'?'mine':'app');}
 function getThoughtBackupData(){return {myThoughts:readMyThoughts(),myNotes:readMyNotes(),thoughtSource:getThoughtSource(),thoughtOfDay:localStorage.getItem(getThoughtPreferenceKey()),thoughtRotation:localStorage.getItem(getThoughtRotationKey())};}
 function getPuzzleFactsBackupData(){return {puzzleFactsState:pfReadState()};}
 function applyThoughtBackupData(data){
   if(!data||typeof data!=="object")return;
   if(Array.isArray(data.myThoughts))writeMyThoughts(data.myThoughts);
   if(Array.isArray(data.myNotes))localStorage.setItem(getMyNotesKey(),JSON.stringify(data.myNotes));
-  if(data.thoughtSource==="mine"||data.thoughtSource==="ready")localStorage.setItem(getThoughtSourceKey(),data.thoughtSource);
+  if(["mine","ready","hindi","english","app"].includes(data.thoughtSource))localStorage.setItem(getThoughtSourceKey(),data.thoughtSource==="ready"?"app":data.thoughtSource);
   if(Object.prototype.hasOwnProperty.call(data,"thoughtRotation")){
     if(data.thoughtRotation)localStorage.setItem(getThoughtRotationKey(),typeof data.thoughtRotation==="string"?data.thoughtRotation:JSON.stringify(data.thoughtRotation));
     else localStorage.removeItem(getThoughtRotationKey());
@@ -1940,53 +1942,284 @@ const HINDI_THOUGHTS = [
 {c:"विद्यार्थी",t:"आज की छोटी तैयारी कल की चिंता कम करती है।"},
 {c:"मेहनत",t:"निरंतर प्रयास को सही दिशा देना जरूरी है।"},
 {c:"अनुशासन",t:"अपने लक्ष्य के लिए रोज थोड़ी जगह बनाएं।"}];
-let activeThoughtTab='ready';
+const ENGLISH_THOUGHTS = [
+{c:'Education',t:'Education is not just about passing exams; it is about learning how to think.'},
+{c:'Education',t:'A good question can open the door to a lifetime of learning.'},
+{c:'Education',t:'True learning begins when curiosity becomes stronger than fear.'},
+{c:'Education',t:'Knowledge becomes powerful when you put it into practice.'},
+{c:'Education',t:'A teacher plants ideas that may grow for a lifetime.'},
+{c:'Education',t:'Every learner deserves patience, respect, and a chance to improve.'},
+{c:'Education',t:'Understanding one idea deeply is better than memorizing ten without meaning.'},
+{c:'Education',t:'The purpose of education is to make the mind independent.'},
+{c:'Education',t:'A classroom becomes brighter when students feel safe to ask questions.'},
+{c:'Education',t:'Learning is a journey, not a race against other people.'},
+{c:'Education',t:'A good teacher does not simply give answers; a good teacher builds thinkers.'},
+{c:'Education',t:'Books introduce us to ideas; practice teaches us to use them.'},
+{c:'Education',t:'The best lesson is one that changes the way we see the world.'},
+{c:'Education',t:'A mistake can become a lesson when we take time to understand it.'},
+{c:'Education',t:'Education grows when knowledge is joined with kindness.'},
+{c:'Education',t:'Teach a child how to think, not merely what to repeat.'},
+{c:'Education',t:'Every small discovery can make learning exciting again.'},
+{c:'Education',t:"A student's progress deserves appreciation, not constant comparison."},
+{c:'Education',t:'The habit of learning is more valuable than a single result.'},
+{c:'Education',t:'Good education gives people the courage to question and the wisdom to listen.'},
+{c:'Education',t:'A patient explanation can turn confusion into confidence.'},
+{c:'Education',t:'Learning becomes meaningful when it connects with everyday life.'},
+{c:'Education',t:'Never make someone feel small for asking how something works.'},
+{c:'Education',t:'The strongest classrooms are built on trust and curiosity.'},
+{c:'Education',t:"A teacher's encouragement can become a student's inner voice."},
+{c:'Student',t:'Your future is shaped by what you practise today.'},
+{c:'Student',t:'Do not fear a difficult subject; give it a little time every day.'},
+{c:'Student',t:'One honest hour of study is worth more than hours of distraction.'},
+{c:'Student',t:'Write your goal clearly, then turn it into small daily actions.'},
+{c:'Student',t:'You do not have to know everything; you only have to keep learning.'},
+{c:'Student',t:'Revision turns forgotten information into lasting understanding.'},
+{c:'Student',t:'Ask for help before confusion becomes discouragement.'},
+{c:'Student',t:'Your pace is your own; keep moving with consistency.'},
+{c:'Student',t:'A wrong answer is useful when it shows you what to practise next.'},
+{c:'Student',t:'Study to understand the idea, not only to remember the page.'},
+{c:'Student',t:'Small daily efforts can achieve what occasional pressure cannot.'},
+{c:'Student',t:'Take breaks with purpose, then return with fresh attention.'},
+{c:'Student',t:'The courage to begin is often the hardest part of studying.'},
+{c:'Student',t:"Compare your progress with yesterday, not with someone else's journey."},
+{c:'Student',t:'Keep your doubts in a notebook and work through them one by one.'},
+{c:'Student',t:'A calm mind and a clear plan make preparation easier.'},
+{c:'Student',t:'Do not let one disappointing result define your ability.'},
+{c:'Student',t:'Practise the questions you get wrong; they show where growth is possible.'},
+{c:'Student',t:'Learning to explain an idea is proof that you are beginning to understand it.'},
+{c:'Student',t:'Your attention is valuable; give it to what helps you grow.'},
+{c:'Student',t:'A little progress every day is still real progress.'},
+{c:'Student',t:'Prepare with honesty so that confidence has a strong foundation.'},
+{c:'Student',t:'Read carefully, think clearly, and answer with confidence.'},
+{c:'Student',t:'Do not wait for motivation; begin, and motivation may follow.'},
+{c:'Student',t:'The best time to correct a mistake is when you notice it.'},
+{c:'Student',t:'Your effort matters even before anyone notices the result.'},
+{c:'Effort',t:'Consistency turns ordinary effort into remarkable progress.'},
+{c:'Effort',t:'Begin with what you have and improve as you go.'},
+{c:'Effort',t:'A small step forward is better than a perfect plan that never starts.'},
+{c:'Effort',t:'Hard work becomes meaningful when it is guided by a clear purpose.'},
+{c:'Effort',t:"Do today's work with care; tomorrow will bring its own task."},
+{c:'Effort',t:'Progress often happens quietly before it becomes visible.'},
+{c:'Effort',t:'When a method fails, improve the method instead of abandoning the goal.'},
+{c:'Effort',t:'Great results are usually built from many ordinary days.'},
+{c:'Effort',t:'Finish one important task before collecting ten new ones.'},
+{c:'Effort',t:'Patience gives effort the time it needs to grow.'},
+{c:'Effort',t:'Do not measure your work only by speed; measure it by quality.'},
+{c:'Effort',t:'The work you do when nobody is watching builds your character.'},
+{c:'Effort',t:'Every attempt teaches you something that the previous attempt could not.'},
+{c:'Effort',t:'A difficult beginning does not predict a difficult ending.'},
+{c:'Effort',t:'Keep your promise to yourself, especially on ordinary days.'},
+{c:'Effort',t:'Use failure as feedback, not as a final judgement.'},
+{c:'Effort',t:'A clear next step can make a huge goal feel possible.'},
+{c:'Effort',t:'Do not confuse being busy with making meaningful progress.'},
+{c:'Effort',t:'The quality of your habits quietly shapes the quality of your future.'},
+{c:'Effort',t:'Success is strengthened by preparation long before the opportunity arrives.'},
+{c:'Effort',t:'Choose steady improvement over the pressure to be perfect.'},
+{c:'Effort',t:'A focused effort can achieve more than a distracted afternoon.'},
+{c:'Effort',t:'Respect the process while working toward the result.'},
+{c:'Effort',t:'Keep going, but stay willing to learn a better way.'},
+{c:'Effort',t:'The next right action is more useful than worrying about every outcome.'},
+{c:'Discipline',t:'Discipline is choosing what matters over what feels easy right now.'},
+{c:'Discipline',t:'A simple routine can protect your most important goals.'},
+{c:'Discipline',t:'Start your day by deciding what deserves your attention.'},
+{c:'Discipline',t:'Time becomes valuable when you use it with intention.'},
+{c:'Discipline',t:'Put distractions away before they take your focus away.'},
+{c:'Discipline',t:'A promise becomes meaningful when your actions support it.'},
+{c:'Discipline',t:'Make good habits easy to begin and easier to repeat.'},
+{c:'Discipline',t:'Rest is part of a healthy routine, not a reward for exhaustion.'},
+{c:'Discipline',t:'Do the important task before the convenient task.'},
+{c:'Discipline',t:'A planned hour is useful only when you give it your attention.'},
+{c:'Discipline',t:'Consistency is built by returning to the task after interruptions.'},
+{c:'Discipline',t:'Keep your goals visible and your next action simple.'},
+{c:'Discipline',t:'A tidy workspace can make it easier to begin with a clear mind.'},
+{c:'Discipline',t:'Do not let a missed day become a reason to quit.'},
+{c:'Discipline',t:'Self-control grows stronger each time you practise it.'},
+{c:'Discipline',t:'Use a timetable as a guide, not as a reason to feel guilty.'},
+{c:'Discipline',t:'Protect the time you have set aside for learning.'},
+{c:'Discipline',t:'Good routines reduce the number of decisions you must make.'},
+{c:'Discipline',t:'Complete small responsibilities before they become large problems.'},
+{c:'Discipline',t:'Your daily choices are votes for the person you want to become.'},
+{c:'Discipline',t:'A focused beginning makes the rest of the work easier.'},
+{c:'Discipline',t:'Be firm with your priorities and kind to yourself while learning.'},
+{c:'Discipline',t:'Spend less time announcing your plans and more time practising them.'},
+{c:'Discipline',t:'The ability to begin again is an important part of discipline.'},
+{c:'Discipline',t:'Make room for what matters before the day becomes crowded.'},
+{c:'Character',t:'Character is revealed by what you do when no reward is promised.'},
+{c:'Character',t:'Honesty may be difficult in the moment, but it builds lasting trust.'},
+{c:'Character',t:'Treat people with respect, especially when you disagree.'},
+{c:'Character',t:'Kindness is strength expressed through thoughtful action.'},
+{c:'Character',t:'Listen to understand before preparing your reply.'},
+{c:'Character',t:'Admitting a mistake is the beginning of making it right.'},
+{c:'Character',t:'Keep your words gentle and your principles strong.'},
+{c:'Character',t:'The way you treat those who cannot help you says a lot about you.'},
+{c:'Character',t:'Be fair even when being unfair would be easier.'},
+{c:'Character',t:'A sincere apology is followed by a sincere change in behaviour.'},
+{c:'Character',t:'Respect is earned through consistent actions, not loud claims.'},
+{c:'Character',t:"Do not use someone else's weakness to feel stronger."},
+{c:'Character',t:'Courage includes standing up for what is right with wisdom.'},
+{c:'Character',t:'A generous heart makes success more meaningful.'},
+{c:'Character',t:'Speak truthfully without using truth as a weapon.'},
+{c:'Character',t:'Be grateful for help and remember to offer help when you can.'},
+{c:'Character',t:'Humility leaves room for learning and improvement.'},
+{c:'Character',t:'Trust grows when actions and words agree.'},
+{c:'Character',t:'Choose fairness even when nobody is checking.'},
+{c:'Character',t:'The strongest response is sometimes a calm and thoughtful one.'},
+{c:'Character',t:'Never make fun of someone who is trying to learn.'},
+{c:'Character',t:'Good manners are small acts that make shared spaces better.'},
+{c:'Character',t:"Respect another person's time as carefully as your own."},
+{c:'Character',t:'Be confident without making others feel inferior.'},
+{c:'Character',t:'A good reputation is built one honest choice at a time.'},
+{c:'Life',t:'A peaceful life begins with clear priorities and thoughtful choices.'},
+{c:'Life',t:'You cannot control every event, but you can choose your response.'},
+{c:'Life',t:'Gratitude helps you notice what is good without ignoring what needs change.'},
+{c:'Life',t:'Do not rush a decision that deserves careful thought.'},
+{c:'Life',t:'A meaningful life is made from meaningful everyday actions.'},
+{c:'Life',t:'Make time for people who bring honesty and kindness into your life.'},
+{c:'Life',t:'A quiet mind can see options that noise often hides.'},
+{c:'Life',t:'Every new day gives you another chance to choose wisely.'},
+{c:'Life',t:"Do not carry yesterday's mistake into every decision today."},
+{c:'Life',t:'Simple living can leave more room for what truly matters.'},
+{c:'Life',t:'The value of a moment is often understood after it has passed.'},
+{c:'Life',t:'A good conversation can teach you something a book cannot.'},
+{c:'Life',t:'Make decisions with facts, values, and a little patience.'},
+{c:'Life',t:'Your attitude cannot solve everything, but it can shape your next step.'},
+{c:'Life',t:'Spend your energy on solutions rather than endless blame.'},
+{c:'Life',t:'Peace grows when expectations are balanced with understanding.'},
+{c:'Life',t:'Do not let comparison steal the joy of your own progress.'},
+{c:'Life',t:'A thoughtful pause can prevent a careless reaction.'},
+{c:'Life',t:'Be present for the people and tasks in front of you.'},
+{c:'Life',t:'A strong life is built with health, purpose, relationships, and learning.'},
+{c:'Life',t:'Accept what you cannot change and work wisely on what you can.'},
+{c:'Life',t:'Small acts of care can make an ordinary day memorable.'},
+{c:'Life',t:'Choose experiences that help you grow, not only things that impress others.'},
+{c:'Life',t:'A problem understood clearly is easier to approach calmly.'},
+{c:'Life',t:'Leave people and places a little better than you found them.'},
+{c:'Growth',t:'Personal growth begins with the courage to look honestly at yourself.'},
+{c:'Growth',t:'You can change your direction without denying your past.'},
+{c:'Growth',t:'Feedback is useful when you examine it without losing your self-respect.'},
+{c:'Growth',t:'Stay curious enough to change your mind when you learn more.'},
+{c:'Growth',t:'Confidence grows when you keep promises to yourself.'},
+{c:'Growth',t:'Learn from people who challenge your thinking with kindness.'},
+{c:'Growth',t:'Your abilities can improve when practice meets patience.'},
+{c:'Growth',t:'Do not hide your weaknesses; make a plan to strengthen them.'},
+{c:'Growth',t:'A new skill begins with being willing to look like a beginner.'},
+{c:'Growth',t:'Reflect on your choices so that experience becomes wisdom.'},
+{c:'Growth',t:'You are allowed to outgrow habits that no longer help you.'},
+{c:'Growth',t:'A flexible mind can find a new path when the old one closes.'},
+{c:'Growth',t:'Learn to disagree without closing the door to understanding.'},
+{c:'Growth',t:'The ability to ask for help is part of being capable.'},
+{c:'Growth',t:'Take responsibility for your choices without being cruel to yourself.'},
+{c:'Growth',t:'Do not let pride stop you from learning something simple.'},
+{c:'Growth',t:'A better question can lead to a better decision.'},
+{c:'Growth',t:'Make room for new ideas while keeping your values clear.'},
+{c:'Growth',t:'The person you become is shaped by what you practise repeatedly.'},
+{c:'Growth',t:'Give yourself time to improve, but do not give up on improvement.'},
+{c:'Growth',t:'A thoughtful person keeps learning from both success and failure.'},
+{c:'Growth',t:'Change becomes easier when you begin with one manageable action.'},
+{c:'Growth',t:'Notice your progress, even when it is not yet complete.'},
+{c:'Growth',t:'Being willing to learn is more useful than pretending to know.'},
+{c:'Growth',t:'Grow at your own pace while staying honest about your effort.'},
+{c:'Teaching',t:"A teacher's greatest success is a student who learns to think independently."},
+{c:'Teaching',t:'Encouragement can help a child attempt what once seemed impossible.'},
+{c:'Teaching',t:"Correct the mistake without hurting the learner's dignity."},
+{c:'Teaching',t:'A good lesson connects knowledge with a reason to care.'},
+{c:'Teaching',t:'Patience is not wasted when it helps someone understand.'},
+{c:'Teaching',t:'Every child brings a different strength into the classroom.'},
+{c:'Teaching',t:'Teach with clarity, correct with kindness, and lead by example.'},
+{c:'Teaching',t:"A student's question is an invitation to make learning deeper."},
+{c:'Teaching',t:'Celebrate honest effort as well as correct answers.'},
+{c:'Teaching',t:'The best teachers remain students of their own craft.'},
+{c:'Teaching',t:'A safe classroom allows mistakes to become learning opportunities.'},
+{c:'Teaching',t:'A little encouragement today can build courage for tomorrow.'},
+{c:'Teaching',t:'Teach the reason behind a rule, not only the rule itself.'},
+{c:'Teaching',t:"Listen to a learner's confusion before deciding how to explain."},
+{c:'Teaching',t:"A child's confidence deserves as much care as a child's marks."},
+{c:'Teaching',t:'Teaching is not filling a notebook; it is opening a mind.'},
+{c:'Teaching',t:'Fairness means giving each learner the support they need to progress.'},
+{c:'Teaching',t:'A thoughtful teacher makes difficult ideas feel approachable.'},
+{c:'Teaching',t:'The example you set may be remembered longer than your words.'},
+{c:'Teaching',t:'Good teaching turns curiosity into the habit of discovery.'},
+{c:'Teaching',t:'Never confuse a slow learner with an incapable learner.'},
+{c:'Teaching',t:'A calm correction can protect both learning and confidence.'},
+{c:'Teaching',t:'The goal is not to create dependence on the teacher, but confidence in learning.'},
+{c:'Teaching',t:'When students feel respected, they are more willing to participate.'},
+{c:'Teaching',t:'Teach every lesson as an opportunity to build understanding and character.'},
+{c:'Hope',t:'A hard season does not mean that every season will be hard.'},
+{c:'Hope',t:'Keep a little hope, then give it a practical plan to follow.'},
+{c:'Hope',t:'Even slow progress can lead you somewhere meaningful.'},
+{c:'Hope',t:'One setback cannot erase all the effort you have already made.'},
+{c:'Hope',t:'Tomorrow is not guaranteed, but today is still full of possibilities.'},
+{c:'Hope',t:'When the path feels long, focus on the next safe step.'},
+{c:'Hope',t:'You may begin again without starting from zero; you carry your lessons with you.'},
+{c:'Hope',t:'A difficult moment is part of your story, not the whole story.'},
+{c:'Hope',t:'Keep doing good work even when the results take time to arrive.'},
+{c:'Hope',t:'A hopeful mind looks for possibilities and prepares to act.'},
+{c:'Hope',t:'Do not mistake a delay for the end of your opportunity.'},
+{c:'Hope',t:'There is strength in asking for support and trying once more.'},
+{c:'Hope',t:'Let your past teach you, not imprison you.'},
+{c:'Hope',t:'A small light is still useful in a dark place.'},
+{c:'Hope',t:'Give your best to the present and leave room for a better tomorrow.'},
+{c:'Hope',t:'You do not need a perfect day to make a meaningful beginning.'},
+{c:'Hope',t:'Keep your expectations realistic and your willingness to try alive.'},
+{c:'Hope',t:'A fresh start can begin with one honest decision.'},
+{c:'Hope',t:'The next chapter can be different because you can choose a different action.'},
+{c:'Hope',t:'When you feel behind, remember that progress has no single timetable.'},
+{c:'Hope',t:'Let patience steady you and purpose guide you.'},
+{c:'Hope',t:'A setback can teach resilience when you give yourself time to recover.'},
+{c:'Hope',t:'Keep moving toward what matters, even if the steps are small.'},
+{c:'Hope',t:'There is always something useful you can learn from today.'},
+{c:'Hope',t:'Believe in the value of your effort, and keep improving its direction.'},
+{c:'Wisdom',t:'Choose words that help solve the problem, not words that make it bigger.'},
+{c:'Wisdom',t:'Knowing when to listen is as important as knowing when to speak.'},
+{c:'Wisdom',t:"A wise choice considers both today's comfort and tomorrow's consequences."},
+{c:'Wisdom',t:'Do not judge a whole person by one difficult moment.'},
+{c:'Wisdom',t:'Ask whether a thought is true, useful, and kind before sharing it.'},
+{c:'Wisdom',t:'The ability to pause is a quiet form of strength.'},
+{c:'Wisdom',t:'Learn the difference between what is urgent and what is important.'},
+{c:'Wisdom',t:'A peaceful answer can be stronger than a loud argument.'},
+{c:'Wisdom',t:'Do not let a small disagreement destroy a valuable relationship.'},
+{c:'Wisdom',t:'Good judgement grows when knowledge is balanced with experience.'},
+{c:'Wisdom',t:'Be open to advice, but take responsibility for your final choice.'},
+{c:'Wisdom',t:'A clear conscience is worth more than temporary approval.'},
+{c:'Wisdom',t:'Think carefully before reacting to something you have not verified.'},
+{c:'Wisdom',t:'A meaningful success should not require you to lose your values.'},
+{c:'Wisdom',t:'The best answer sometimes begins with an honest question.'},
+{c:'Wisdom',t:'Choose progress that you can sustain, not pressure you cannot carry.'},
+{c:'Wisdom',t:'Let evidence guide your opinions and empathy guide your behaviour.'},
+{c:'Wisdom',t:'A good decision can be difficult and still be the right one.'},
+{c:'Wisdom',t:'Use your strength to support others, not to silence them.'},
+{c:'Wisdom',t:'The more you learn, the more carefully you should speak.'},
+{c:'Wisdom',t:'Do not mistake popularity for truth or confidence for knowledge.'},
+{c:'Wisdom',t:'Make space for silence; it can help you understand your own thoughts.'},
+{c:'Wisdom',t:'A thoughtful life is built by choices made with care.'},
+{c:'Wisdom',t:'Leave room in your plans for learning, kindness, and unexpected change.'}
+];
+let activeThoughtTab='hindi';
 let activePersonalThoughtId=null;
 let thoughtSyncTimer=null;
 let normalThoughtCache=null;
+function getAppThoughtLanguage(){const language=window.getAppLanguage?window.getAppLanguage():'hinglish';return language==='english'?'english':language==='hindi'?'hindi':'hinglish';}
+function romanizeHindi(value){
+  const consonants={'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'ng','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'ny','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','क़':'q','ख़':'kh','ग़':'gh','ज़':'z','ड़':'r','ढ़':'rh','फ़':'f'};
+  const vowels={'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au'};
+  const marks={'ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ं':'n','ँ':'n','ः':'h','़':'','्':''};
+  const chars=Array.from(String(value||''));let out='';
+  for(let i=0;i<chars.length;i++){const ch=chars[i];if(consonants[ch]){out+=consonants[ch];if(chars[i+1] in marks){const m=chars[++i];if(m!=='्')out+=marks[m];}else out+='a';}else if(vowels[ch])out+=vowels[ch];else if(ch in marks)out+=marks[ch];else out+=ch;}
+  return out.replace(/aa(?=[mnrlvys])/g,'a').replace(/\s+/g,' ').trim();
+}
+function getThoughtList(type){if(type==='english')return ENGLISH_THOUGHTS;if(type==='hindi')return HINDI_THOUGHTS;const language=getAppThoughtLanguage();if(language==='english')return ENGLISH_THOUGHTS;if(language==='hinglish')return HINDI_THOUGHTS.map(x=>({c:romanizeHindi(x.c),t:romanizeHindi(x.t)}));return HINDI_THOUGHTS;}
 function getNormalThought(){
   if(normalThoughtCache)return normalThoughtCache;
-  const source=getThoughtSource();
-  let previous=null;try{previous=JSON.parse(localStorage.getItem(getThoughtRotationKey())||"null");}catch(e){}
+  const source=getThoughtSource();const previous=(()=>{try{return JSON.parse(localStorage.getItem(getThoughtRotationKey())||'null');}catch(e){return null;}})();
   const personal=source==='mine'?readMyThoughts().filter(x=>x.status==='saved'&&x.t.trim()):[];
-  if(source==='mine'&&personal.length){
-    let options=personal.filter(x=>!(previous&&previous.source==='mine'&&previous.id===x.id));
-    if(!options.length)options=personal;
-    const chosen=options[Math.floor(Math.random()*options.length)];
-    normalThoughtCache={c:'मेरे विचार',t:chosen.t};
-    localStorage.setItem(getThoughtRotationKey(),JSON.stringify({source:'mine',id:chosen.id}));
-  }else{
-    let options=HINDI_THOUGHTS.map((thought,index)=>({thought,index})).filter(x=>!(previous&&previous.source==='ready'&&Number(previous.index)===x.index));
-    if(!options.length)options=HINDI_THOUGHTS.map((thought,index)=>({thought,index}));
-    const chosen=options[Math.floor(Math.random()*options.length)];
-    normalThoughtCache=chosen?chosen.thought:{c:'विचार',t:'हर दिन कुछ नया सीखने का अवसर है।'};
-    if(chosen)localStorage.setItem(getThoughtRotationKey(),JSON.stringify({source:'ready',index:chosen.index}));
-  }
-  return normalThoughtCache;
+  if(source==='mine'&&personal.length){let options=personal.filter(x=>!(previous&&previous.source==='mine'&&previous.id===x.id));if(!options.length)options=personal;const chosen=options[Math.floor(Math.random()*options.length)];normalThoughtCache={c:'My Thoughts',t:chosen.t};localStorage.setItem(getThoughtRotationKey(),JSON.stringify({source:'mine',id:chosen.id}));return normalThoughtCache;}
+  const type=source==='mine'?'app':source;const thoughts=getThoughtList(type);let options=thoughts.map((thought,index)=>({thought,index})).filter(x=>!(previous&&previous.source===type&&Number(previous.index)===x.index));if(!options.length)options=thoughts.map((thought,index)=>({thought,index}));const chosen=options[Math.floor(Math.random()*options.length)];normalThoughtCache=chosen?chosen.thought:{c:'Thought',t:'Every day is a new opportunity to learn.'};if(chosen)localStorage.setItem(getThoughtRotationKey(),JSON.stringify({source:type,index:chosen.index}));return normalThoughtCache;
 }
-function getTodaysThought(){
-  const key=getThoughtPreferenceKey();
-  try{
-    const saved=JSON.parse(localStorage.getItem(key)||"null");
-    if(saved&&saved.date===localDateKey()){
-      if(saved.source==='personal'&&saved.id){const own=readMyThoughts().find(x=>x.id===saved.id&&x.t.trim());if(own)return {c:'मेरे विचार',t:own.t};}
-      const index=Number.isInteger(saved.index)?saved.index:Number(saved.index);
-      if((saved.source==='ready'||saved.source===undefined)&&Number.isInteger(index)&&HINDI_THOUGHTS[index])return HINDI_THOUGHTS[index];
-    }
-  }catch(e){}
-  return getNormalThought();
-}
-function setTodayThought(index){
-  if(!Number.isInteger(index)||!HINDI_THOUGHTS[index])return;
-  let saved=null;try{saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");}catch(e){}
-  if(saved&&saved.date===localDateKey()&&saved.source==='ready'&&Number(saved.index)===index){
-    resetTodayThought();renderThoughtsLibrary();if(activeThoughtTab==='mine')renderMyThoughtsList();
-    alert("आज के लिए चुना गया विचार हट गया है। सामान्य Loop फिर से चालू है।");return;
-  }
-  localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),source:'ready',index:index}));
-  markThoughtChangeForSync();renderHomeExtras();renderThoughtsLibrary();
-  alert("यह विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।");
-}
+function getTodaysThought(){const key=getThoughtPreferenceKey();try{const saved=JSON.parse(localStorage.getItem(key)||'null');if(saved&&saved.date===localDateKey()){
+  if(saved.source==='personal'&&saved.id){const own=readMyThoughts().find(x=>x.id===saved.id&&x.t.trim());if(own)return {c:'My Thoughts',t:own.t};}
+  const type=saved.type||(saved.source==='english'?'english':saved.source==='hindi'?'hindi':saved.source==='ready'?'hindi':null);const list=getThoughtList(type||'app');const index=Number(saved.index);if((saved.source==='ready'||saved.source==='hindi'||saved.source==='english')&&Number.isInteger(index)&&list[index])return list[index];
+ }}catch(e){}return getNormalThought();}
+function setTodayThought(type,index){if(typeof type==='number'){index=type;type=activeThoughtTab==='english'?'english':'hindi';}const list=getThoughtList(type);if(!Number.isInteger(index)||!list[index])return;let saved=null;try{saved=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||'null');}catch(e){}if(saved&&saved.date===localDateKey()&&saved.source===type&&Number(saved.index)===index){resetTodayThought();renderThoughtsLibrary();alert(getAppThoughtLanguage()==='hindi'?'आज का विचार हट गया है। सामान्य लूप फिर से चालू है।':getAppThoughtLanguage()==='english'?'Thought cleared. The normal loop is active again.':'Aaj ka thought hat gaya hai. Normal loop phir se chalu hai.');return;}localStorage.setItem(getThoughtPreferenceKey(),JSON.stringify({date:localDateKey(),source:type,type:type,index:index}));markThoughtChangeForSync();renderHomeExtras();renderThoughtsLibrary();alert(getAppThoughtLanguage()==='hindi'?'यह विचार आज के लिए Home Page पर सेट हो गया है। सामान्य Loop चालू करने के लिए दोबारा दबाएँ।':getAppThoughtLanguage()==='english'?'This thought is set for today on the Home page. Tap again to return to the normal loop.':'Yeh thought aaj ke liye Home Page par set ho gaya hai. Normal Loop ke liye dobara dabayein.');}
 function setPersonalThoughtForToday(id){
   const item=readMyThoughts().find(x=>x.id===String(id));
   if(!item||!item.t.trim()){alert('पहले विचार लिखें।');return;}
@@ -2067,10 +2300,10 @@ function renderHomeExtras(){
   renderTeachingMotto();
 }
 function openThoughtsLibrary(){
-  activeThoughtTab='ready';
+  activeThoughtTab='hindi';
   const search=document.getElementById("thoughtSearchInput");if(search)search.value="";
   showSection("thoughtsSection","homeNav");
-  switchThoughtTab('ready');
+  switchThoughtTab('hindi');
   renderThoughtsLibrary();
   requestAnimationFrame(()=>renderThoughtsLibrary());
   setTimeout(()=>{if(document.getElementById('thoughtsSection')?.classList.contains('active'))renderThoughtsLibrary();},120);
@@ -2081,44 +2314,12 @@ function openThoughtsLibraryFromMenu(event){
   overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");
   openThoughtsLibrary();setTimeout(()=>{menuNavigationInProgress=false;},300);
 }
-function switchThoughtTab(tab){
-  activeThoughtTab=tab==='mine'?'mine':'ready';
-  const ready=document.getElementById('readyThoughtsPanel'),mine=document.getElementById('myThoughtsPanel');
-  if(ready)ready.style.display=activeThoughtTab==='ready'?'block':'none';
-  if(mine)mine.style.display=activeThoughtTab==='mine'?'block':'none';
-  const readyBtn=document.getElementById('thoughtTabReady'),mineBtn=document.getElementById('thoughtTabMine');
-  if(readyBtn){readyBtn.classList.toggle('active',activeThoughtTab==='ready');readyBtn.setAttribute('aria-selected',String(activeThoughtTab==='ready'));}
-  if(mineBtn){mineBtn.classList.toggle('active',activeThoughtTab==='mine');mineBtn.setAttribute('aria-selected',String(activeThoughtTab==='mine'));}
-  renderThoughtSourceSettings();
-  // Render only the newly visible panel; avoid rebuilding the hidden 250-item list.
-  if(activeThoughtTab==='mine')renderMyThoughtsList();
-  else if(!document.getElementById('thoughtsLibraryArea')?.dataset.rendered)renderThoughtsLibrary();
-  const panel=document.getElementById(activeThoughtTab==='ready'?'readyThoughtsPanel':'myThoughtsPanel');
-  if(panel) panel.style.visibility='visible';
-}
-function setThoughtSource(source){
-  const chosen=source==='mine'?'mine':'ready';localStorage.setItem(getThoughtSourceKey(),chosen);normalThoughtCache=null;
-  markThoughtChangeForSync();renderThoughtSourceSettings();renderHomeExtras();
-}
-function renderThoughtSourceSettings(){
-  const source=getThoughtSource();
-  const r=document.getElementById('thoughtSourceReady'),m=document.getElementById('thoughtSourceMine');
-  if(r){r.classList.toggle('activeSource',source==='ready');r.setAttribute('aria-pressed',String(source==='ready'));}
-  if(m){m.classList.toggle('activeSource',source==='mine');m.setAttribute('aria-pressed',String(source==='mine'));}
-}
-function renderThoughtsLibrary(){
-  const area=document.getElementById("thoughtsLibraryArea");if(!area)return;
-  area.style.display="block";area.style.visibility="visible";area.style.width="100%";area.dataset.rendered="true";
-  try{
-    const query=(document.getElementById("thoughtSearchInput")?.value||"").trim().toLocaleLowerCase("hi");
-    const thoughts=Array.isArray(HINDI_THOUGHTS)?HINDI_THOUGHTS:[];
-    const items=thoughts.map((thought,index)=>({thought,index})).filter(x=>String(x.thought.t||"").toLocaleLowerCase("hi").includes(query)||String(x.thought.c||"").toLocaleLowerCase("hi").includes(query));
-    if(!items.length){area.innerHTML='<div class="emptyState">'+(thoughts.length?'कोई विचार नहीं मिला।':'विचार सूची लोड नहीं हो सकी। पेज रीफ्रेश करें।')+'</div>';return;}
-    let selected=null;try{selected=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||"null");}catch(e){}
-    const selectedIndex=selected&&selected.date===localDateKey()&&selected.source!=='personal'&&Number.isInteger(Number(selected.index))?Number(selected.index):null;
-    area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.thought.c||'विचार')+'</div><div class="thoughtItemText">'+escapeHtml(x.thought.t||'')+'</div></div></div><button type="button" class="thoughtBtn '+(selectedIndex===x.index?'secondary':'')+'" onclick="setTodayThought('+x.index+')">'+(selectedIndex===x.index?'आज के लिए चुना गया ✓':'आज के लिए सेट करें')+'</button></div>').join('');
-  }catch(error){console.error('Thought list render failed:',error);area.innerHTML='<div class="emptyState">विचार दिखाने में समस्या हुई। पेज रीफ्रेश करके फिर कोशिश करें।</div>';}
-}
+function thoughtUiLanguage(){const l=getAppThoughtLanguage();return l==='hindi'?{loop:'लूप:',hi:'250 तैयार - हिंदी',en:'250 तैयार - अंग्रेज़ी',app:'ऐप भाषा के विचार',mine:'मेरे विचार',tabHi:'250 तैयार विचार - हिंदी',tabEn:'250 तैयार विचार - अंग्रेज़ी',search:'250 विचारों में खोजें...',set:'आज के लिए सेट करें',selected:'आज के लिए चुना गया ✓',empty:'कोई विचार नहीं मिला।'}:l==='english'?{loop:'Loop:',hi:'250 ready - Hindi',en:'250 ready - English',app:'Thoughts in - App language',mine:'My Thoughts',tabHi:'250 ready thoughts - Hindi',tabEn:'250 ready thoughts - English',search:'Search 250 thoughts...',set:'Set for Today',selected:'Set for Today ✓',empty:'No thoughts found.'}:{loop:'Loop:',hi:'250 ready - Hindi',en:'250 ready - English',app:'Thoughts in - App language',mine:'My Thoughts',tabHi:'250 ready thoughts - Hindi',tabEn:'250 ready thoughts - English',search:'250 thoughts mein search karein...',set:'Aaj ke liye set karein',selected:'Aaj ke liye set hai ✓',empty:'Koi thought nahi mila.'};}
+function renderThoughtControls(){const t=thoughtUiLanguage();const set=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};set('thoughtLoopLabel',t.loop);set('thoughtSourceHindi',t.hi);set('thoughtSourceEnglish',t.en);set('thoughtSourceApp',t.app);set('thoughtSourceMine',t.mine);set('thoughtTabHindi',t.tabHi);set('thoughtTabEnglish',t.tabEn);set('thoughtTabMine',t.mine);const search=document.getElementById('thoughtSearchInput');if(search)search.placeholder=t.search;}
+function switchThoughtTab(tab){activeThoughtTab=['hindi','english','mine'].includes(tab)?tab:'hindi';const ready=document.getElementById('readyThoughtsPanel'),mine=document.getElementById('myThoughtsPanel');if(ready)ready.style.display=activeThoughtTab==='mine'?'none':'block';if(mine)mine.style.display=activeThoughtTab==='mine'?'block':'none';[['hindi','thoughtTabHindi'],['english','thoughtTabEnglish'],['mine','thoughtTabMine']].forEach(([key,id])=>{const b=document.getElementById(id);if(b){b.classList.toggle('active',activeThoughtTab===key);b.setAttribute('aria-selected',String(activeThoughtTab===key));}});renderThoughtControls();renderThoughtSourceSettings();if(activeThoughtTab==='mine')renderMyThoughtsList();else renderThoughtsLibrary();}
+function setThoughtSource(source){const chosen=['hindi','english','app','mine'].includes(source)?source:'app';localStorage.setItem(getThoughtSourceKey(),chosen);normalThoughtCache=null;markThoughtChangeForSync();renderThoughtSourceSettings();renderHomeExtras();}
+function renderThoughtSourceSettings(){const source=getThoughtSource();[['hindi','thoughtSourceHindi'],['english','thoughtSourceEnglish'],['app','thoughtSourceApp'],['mine','thoughtSourceMine']].forEach(([key,id])=>{const b=document.getElementById(id);if(b){b.classList.toggle('activeSource',source===key);b.setAttribute('aria-pressed',String(source===key));}});}
+function renderThoughtsLibrary(){const area=document.getElementById('thoughtsLibraryArea');if(!area)return;area.style.display='block';area.style.visibility='visible';area.style.width='100%';area.dataset.rendered='true';try{const list=getThoughtList(activeThoughtTab==='english'?'english':'hindi');const query=(document.getElementById('thoughtSearchInput')?.value||'').trim().toLocaleLowerCase();const items=list.map((thought,index)=>({thought,index})).filter(x=>String(x.thought.t||'').toLocaleLowerCase().includes(query)||String(x.thought.c||'').toLocaleLowerCase().includes(query));if(!items.length){area.innerHTML='<div class="emptyState">'+thoughtUiLanguage().empty+'</div>';return;}let selected=null;try{selected=JSON.parse(localStorage.getItem(getThoughtPreferenceKey())||'null');}catch(e){}const type=activeThoughtTab;const selectedIndex=selected&&selected.date===localDateKey()&&(selected.type===type||selected.source===type)&&Number.isInteger(Number(selected.index))?Number(selected.index):null;const labels=thoughtUiLanguage();area.innerHTML=items.map(x=>'<div class="thoughtItem"><div class="thoughtItemTop"><span class="thoughtNumber">'+(x.index+1)+'.</span><div class="thoughtItemBody"><div class="thoughtCategory">'+escapeHtml(x.thought.c||'Thought')+'</div><div class="thoughtItemText">'+escapeHtml(x.thought.t||'')+'</div></div></div><button type="button" class="thoughtBtn '+(selectedIndex===x.index?'secondary':'')+'" onclick="setTodayThought(this.dataset.type,'+x.index+')" data-type="'+type+'">'+(selectedIndex===x.index?labels.selected:labels.set)+'</button></div>').join('');}catch(error){console.error('Thought list render failed:',error);area.innerHTML='<div class="emptyState">Unable to display thoughts. Please refresh the page.</div>';}}
 function createMyThought(){
   activePersonalThoughtId=null;
   const editor=document.getElementById('personalThoughtEditor'),input=document.getElementById('personalThoughtInput');
@@ -4694,6 +4895,7 @@ function downloadPDF(index){
       <div style="font-weight:700;font-size:18px;">Tuition Manager</div>
     </div>
 
+
 </body></html>`);
   reportWindow.document.close();
 }
@@ -5597,7 +5799,7 @@ Object.assign(APP_TRANSLATIONS.english, {
 
   window.getAppLanguage=()=>currentLanguage;
   window.t=function(key){return translatePhrase(String(key));};
-  window.applyAppLanguage=function(language){currentLanguage=['hindi','english','hinglish'].includes(language)?language:'hinglish';translateApp();};
+  window.applyAppLanguage=function(language){currentLanguage=['hindi','english','hinglish'].includes(language)?language:'hinglish';normalThoughtCache=null;translateApp();if(typeof renderThoughtControls==='function'){renderThoughtControls();renderThoughtSourceSettings();}if(typeof renderHomeExtras==='function')renderHomeExtras();};
   const originalAlert=window.alert.bind(window),originalConfirm=window.confirm.bind(window),originalPrompt=window.prompt.bind(window);
   window.alert=(message)=>originalAlert(typeof message==='string'?translatePhrase(message):message);
   window.confirm=(message)=>originalConfirm(typeof message==='string'?translatePhrase(message):message);
@@ -6108,5 +6310,7 @@ if ("serviceWorker" in navigator) {
   else init();
 })();
 </script>
+
+<script>document.addEventListener("DOMContentLoaded",()=>{if(typeof renderThoughtControls==="function"){renderThoughtControls();renderThoughtSourceSettings();}});</script>
 </body>  
 </html>
