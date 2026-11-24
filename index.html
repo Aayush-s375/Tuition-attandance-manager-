@@ -1504,6 +1504,10 @@ let currentAccountKey = null;
 let currentAccountSub = null;
 
 let students = [];
+let households = [];
+const HOUSEHOLD_DATA_KEY_PREFIX = "tuitionHouseholds_v1_";
+const HOUSEHOLD_MIGRATION_KEY_PREFIX = "tuitionHouseholdMigration_v1_";
+const HOUSEHOLD_SAFETY_BACKUP_KEY_PREFIX = "tuitionHouseholdPreMigrationBackup_v1_";
 let currentStudent = null;
 let selectedStudentProfile = null;
 let studentProfileReturn = false;
@@ -2528,8 +2532,98 @@ function isDriveAuthorizationError(error) {
     message.includes("permission") || message.includes("authorization") || message.includes("consent") || Number(error?.status) === 401 || Number(error?.status) === 403);
 }
 
+function getHouseholdDataKey(){return HOUSEHOLD_DATA_KEY_PREFIX+(currentAccountKey||"local");}
+function getHouseholdMigrationKey(){return HOUSEHOLD_MIGRATION_KEY_PREFIX+(currentAccountKey||"local");}
+function getHouseholdSafetyBackupKey(){return HOUSEHOLD_SAFETY_BACKUP_KEY_PREFIX+(currentAccountKey||"local");}
+function createStableRecordId(prefix){
+  let token="";
+  try{if(window.crypto&&typeof window.crypto.randomUUID==="function")token=window.crypto.randomUUID().replace(/-/g,"");}catch(e){}
+  if(!token)token=Date.now().toString(36)+Math.random().toString(36).slice(2,12);
+  return prefix+"-"+token;
+}
+function buildProvisionalHousehold(student){
+  return {
+    householdId:createStableRecordId("HH"),
+    householdName:String(student?.householdName||student?.parentName||student?.name||"Unnamed Household").trim(),
+    guardianName:String(student?.parentName||"").trim(),
+    primaryMobile:String(student?.parentMobile||student?.mobile||"").trim(),
+    alternateMobile:String(student?.alternateMobile||"").trim(),
+    address:String(student?.address||"").trim(),
+    feeMode:"student",
+    householdFee:null,
+    studentIds:[String(student?.studentId||"")].filter(Boolean),
+    status:"active",
+    provisional:true,
+    createdAt:Date.now(),
+    updatedAt:Date.now()
+  };
+}
+function ensureHouseholdRelationships(){
+  if(!Array.isArray(households))households=[];
+  const byId=new Map(households.filter(h=>h&&h.householdId).map(h=>[String(h.householdId),h]));
+  students.forEach(student=>{
+    if(!student||typeof student!=="object")return;
+    if(!student.studentId)student.studentId=createStableRecordId("ST");
+    let household=student.householdId?byId.get(String(student.householdId)):null;
+    if(!household){
+      household=buildProvisionalHousehold(student);
+      household.studentIds=[String(student.studentId)];
+      student.householdId=household.householdId;
+      households.push(household);
+      byId.set(String(household.householdId),household);
+    }else{
+      if(!Array.isArray(household.studentIds))household.studentIds=[];
+      if(!household.studentIds.map(String).includes(String(student.studentId)))household.studentIds.push(String(student.studentId));
+    }
+  });
+  // Remove stale student references without deleting any student or household history.
+  const validStudentIds=new Set(students.filter(Boolean).map(s=>String(s.studentId)));
+  households.forEach(h=>{if(!Array.isArray(h.studentIds))h.studentIds=[];h.studentIds=h.studentIds.filter(id=>validStudentIds.has(String(id)));});
+}
+function migrateHouseholdDataSafely(){
+  const migrationKey=getHouseholdMigrationKey();
+  try{
+    const savedHouseholds=localStorage.getItem(getHouseholdDataKey());
+    if(savedHouseholds){const parsed=JSON.parse(savedHouseholds);households=Array.isArray(parsed)?parsed:[];}
+    else households=[];
+    if(localStorage.getItem(migrationKey)==="complete"){
+      ensureHouseholdRelationships();
+      localStorage.setItem(getHouseholdDataKey(),JSON.stringify(households));
+      return true;
+    }
+    // Save a full, account-specific safety snapshot before assigning any new IDs.
+    const backup={version:1,createdAt:Date.now(),students:JSON.parse(JSON.stringify(students)),households:JSON.parse(JSON.stringify(households)),deletedStudents:readTrash()};
+    const backupKey=getHouseholdSafetyBackupKey();
+    if(!localStorage.getItem(backupKey))localStorage.setItem(backupKey,JSON.stringify(backup));
+    const originalStudents=JSON.stringify(students),originalHouseholds=JSON.stringify(households);
+    try{
+      ensureHouseholdRelationships();
+      localStorage.setItem(getDataKey(),JSON.stringify(students));
+      localStorage.setItem(getHouseholdDataKey(),JSON.stringify(households));
+      localStorage.setItem(migrationKey,"complete");
+      return true;
+    }catch(error){
+      students=JSON.parse(originalStudents);households=JSON.parse(originalHouseholds);
+      try{localStorage.setItem(getDataKey(),originalStudents);localStorage.setItem(getHouseholdDataKey(),originalHouseholds);}catch(restoreError){}
+      throw error;
+    }
+  }catch(error){
+    console.error("Household migration was not completed:",error);
+    alert("Household data setup could not be completed. Existing student data has been kept unchanged. Please check available device storage and try again.");
+    return false;
+  }
+}
+function applyHouseholdsFromBackup(backup){
+  households=Array.isArray(backup?.households)?JSON.parse(JSON.stringify(backup.households)):[];
+  localStorage.setItem(getHouseholdDataKey(),JSON.stringify(households));
+  localStorage.removeItem(getHouseholdMigrationKey());
+  migrateHouseholdDataSafely();
+}
+
 function saveLocalData(markPending = true) {
+  ensureHouseholdRelationships();
   localStorage.setItem(getDataKey(), JSON.stringify(students));
+  localStorage.setItem(getHouseholdDataKey(), JSON.stringify(households));
   renderHomeExtras();
 
   if (markPending && currentAccountKey) {
@@ -2574,6 +2668,7 @@ function loadAccountData() {
     if (!s.joiningDate) s.joiningDate = new Date().toISOString().slice(0,10);
     if (!s.savedFeeInterval) s.savedFeeInterval = null;
   });
+  migrateHouseholdDataSafely();
 }
 
 function handleGoogleLogin(response) {
@@ -2911,6 +3006,7 @@ async function syncWithGoogleDrive() {
         profilePhoto: getOwnerProfilePhoto(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students,
+        households: households,
         deletedStudents: readTrash(),
         ...getThoughtBackupData(),
     ...getPuzzleFactsBackupData()
@@ -2949,6 +3045,7 @@ async function syncWithGoogleDrive() {
         profilePhoto: getOwnerProfilePhoto(),
         appPin: localStorage.getItem(getPinKey()) || null,
         students: students,
+        households: households,
         deletedStudents: readTrash(),
         ...getThoughtBackupData(),
     ...getPuzzleFactsBackupData()
@@ -2971,6 +3068,7 @@ async function syncWithGoogleDrive() {
     } else if (driveUpdatedAt > localUpdatedAt) {
       if (Array.isArray(driveBackup.students)) {
         students = driveBackup.students;
+        applyHouseholdsFromBackup(driveBackup);
         if(Array.isArray(driveBackup.deletedStudents))writeTrash(driveBackup.deletedStudents);
         applyThoughtBackupData(driveBackup);
         students.forEach(s => {
@@ -5974,6 +6072,7 @@ async function restoreFromGoogleDrive(){
     if(!confirmRestore) return;
 
     students = backup.students;
+    applyHouseholdsFromBackup(backup);
     if(Array.isArray(backup.deletedStudents))writeTrash(backup.deletedStudents);
     applyThoughtBackupData(backup);
     students.forEach(s => {
@@ -6012,6 +6111,7 @@ function backupData(){
 
   const backup = {
     students: students,
+    households: households,
     deletedStudents: readTrash(),
     ownerName: getOwnerName(),
     profilePhoto: getOwnerProfilePhoto(),
@@ -6062,6 +6162,7 @@ function restoreBackup(event){
       }
 
       students = backup.students;
+      applyHouseholdsFromBackup(backup);
       if(Array.isArray(backup.deletedStudents))writeTrash(backup.deletedStudents);
       applyThoughtBackupData(backup);
       students.forEach(s => {
