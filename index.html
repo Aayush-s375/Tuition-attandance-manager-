@@ -1232,7 +1232,7 @@ Reset PIN
         </div>
         <div class="ownerSettingsGroup">
           <label class="menuSettingsTitle" for="appLanguageSelect">App Language</label>
-          <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)"><option value="hinglish">Hinglish</option><option value="hindi">Hindi</option><option value="english">English</option></select>
+          <select id="appLanguageSelect" class="menuLanguageSelect" onchange="saveAppLanguage(this.value)"><option value="hinglish">Hinglish</option><option value="hindi">हिंदी</option><option value="english">English</option></select>
           
         </div>
         <div class="modernMenuItem menuLockItem ownerSettingsItem" onclick="toggleLock()"><span class="modernMenuIcon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg></span><span class="modernMenuLabel">App Lock</span><label class="switch menuLockSwitch" onclick="event.stopPropagation();"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider"></span></label></div>
@@ -4976,7 +4976,7 @@ else window.addEventListener("load", initializeBackNavigation, {once:true});
    User-entered names, notes, and student data are never translated. */
 const APP_TRANSLATIONS = {
   hindi: {
-    'Tuition Attendance Manager':'ट्यूशन उपस्थिति प्रबंधक','Sign in to continue':'जारी रखने के लिए साइन इन करें','App Locked':'ऐप लॉक है','Enter PIN or use fingerprint':'PIN डालें या फिंगरप्रिंट इस्तेमाल करें','Unlock with PIN':'PIN से अनलॉक करें','Forgot PIN?':'PIN भूल गए?','Reset PIN':'PIN रीसेट करें','Warning!':'चेतावनी!','Type':'टाइप करें','to continue.':'जारी रखने के लिए।','Cancel':'रद्द करें','Simple • Organized • Made for Teachers':'आसान • व्यवस्थित • शिक्षकों के लिए','Set Your Name':'अपना नाम सेट करें','Homework':'होमवर्क','Test Record':'टेस्ट रिकॉर्ड','My Notes':'मेरे नोट्स','Deleted Students':'हटाए गए विद्यार्थी','Settings':'सेटिंग्स','About App':'ऐप के बारे में','Connect Drive / Grant Permission':'Drive कनेक्ट करें / अनुमति दें','Welcome back,':'वापसी पर स्वागत है,','Welcome':'स्वागत है','Choose what you want to manage today.':'आज आप क्या मैनेज करना चाहते हैं?','Students':'विद्यार्थी','Manage your students':'विद्यार्थियों को मैनेज करें','Attendance':'उपस्थिति','Mark today\'s attendance':'आज की उपस्थिति दर्ज करें','Fees':'फीस','Record & manage fees':'फीस दर्ज और मैनेज करें','Reports':'रिपोर्ट','View monthly reports':'मासिक रिपोर्ट देखें','Profile and app preferences':'प्रोफाइल और ऐप की सेटिंग्स','← Back':'← वापस','App Theme':'ऐप थीम','☀ Light':'☀ लाइट','☾ Dark':'☾ डार्क','App Language':'ऐप की भाषा','Hinglish':'हिंग्लिश','Hindi':'हिंदी','English':'अंग्रेज़ी','App Lock':'ऐप लॉक','Change PIN':'PIN बदलें','Backup':'बैकअप','Restore':'रिस्टोर','Google account':'Google अकाउंट','Account not connected':'अकाउंट कनेक्ट नहीं है','Show on Display':'डिस्प्ले पर दिखाएँ','🧩 Puzzles':'🧩 पहेलियाँ','💡 Facts':'💡 रोचक तथ्य','👁 Seen':'👁 देखे गए','Show this text on Home Display':'यह टेक्स्ट होम स्क्रीन पर दिखाएँ','Yes':'हाँ','View and manage all your students':'सभी विद्यार्थियों को देखें और मैनेज करें','Student Profile':'विद्यार्थी प्रोफाइल','Complete student information':'विद्यार्थी की पूरी जानकारी','Daily Attendance':'दैनिक उपस्थिति','Mark attendance for all active students':'सभी सक्रिय विद्यार्थियों की उपस्थिति दर्ज करें','Attendance Date':'उपस्थिति की तारीख','Mark All Sunday':'सभी को रविवार सेट करें','= Present':'= उपस्थित','= Absent':'= अनुपस्थित','= Leave':'= छुट्टी','= Sunday':'= रविवार','= Sunday Manage':'= रविवार प्रबंधन','= Custom':'= कस्टम','Record and manage student payments':'विद्यार्थियों की फीस दर्ज और मैनेज करें','Monthly Fee Details':'मासिक फीस विवरण','Student payment history and fee status':'फीस का इतिहास और स्थिति','Monthly attendance & fee records':'मासिक उपस्थिति और फीस रिकॉर्ड','Home':'होम','Add Note':'नोट जोड़ें','Save Note':'नोट सेव करें','Update Fee':'फीस अपडेट करें','Select Fee Month':'फीस का महीना चुनें','Select Fee Period':'फीस की अवधि चुनें','Fee Month':'फीस का महीना','Fee Period':'फीस की अवधि','to':'से','Remaining Amount (Editable)':'बाकी राशि (बदल सकते हैं)','Select Payment Mode':'पेमेंट का तरीका चुनें','Cash':'नकद','UPI':'UPI','Save Fee':'फीस सेव करें','Attendance Status':'उपस्थिति की स्थिति','Delete Attendance':'उपस्थिति हटाएँ','Mobile Number':'मोबाइल नंबर','Address':'पता','Save Details':'जानकारी सेव करें','Close':'बंद करें','Edit Details':'जानकारी एडिट करें','Change Photo':'फोटो बदलें','Remove Photo':'फोटो हटाएँ','Account not connected':'अकाउंट कनेक्ट नहीं है','Development by':'डेवलप किया','Contact Developer':'डेवलपर से संपर्क करें','Email':'ईमेल','January':'जनवरी','February':'फ़रवरी','March':'मार्च','April':'अप्रैल','May':'मई','June':'जून','July':'जुलाई','August':'अगस्त','September':'सितंबर','October':'अक्टूबर','November':'नवंबर','December':'दिसंबर','सभी विचार':'सभी विचार','🌱 आज का विचार':'🌱 आज का विचार','मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।':'मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।','हिंदी विचार':'हिंदी विचार','तैयार विचार चुनें या अपने विचार लिखें':'तैयार विचार चुनें या अपने विचार लिखें','Loop:':'लूप:','250 तैयार':'250 तैयार','मेरे विचार':'मेरे विचार','250 तैयार विचार':'250 तैयार विचार','＋ नया विचार लिखें':'＋ नया विचार लिखें','अपना विचार लिखें':'अपना विचार लिखें','लिखते ही ड्राफ्ट अपने आप सेव होगा।':'लिखते ही ड्राफ्ट अपने आप सेव होगा।','विचार सेव करें':'विचार सेव करें','आज के लिए सेट करें':'आज के लिए सेट करें','बंद करें':'बंद करें','Paheliyan aur rochak jaankari':'पहेलियाँ और रोचक जानकारी','अपने काम और याद रखने वाली बातें लिखें':'अपने काम और याद रखने वाली बातें लिखें','30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ':'30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ','Application information and developer contact':'ऐप की जानकारी और डेवलपर से संपर्क','TUITION MANAGER':'ट्यूशन मैनेजर','Online Cyber Cafe':'ऑनलाइन साइबर कैफे','& Web Services':'और वेब सेवाएँ','I ❤️ Teaching':'मुझे पढ़ाना पसंद है','Select Fee Month':'फीस का महीना चुनें','Select Fee Period':'फीस की अवधि चुनें',
+    'Tuition Attendance Manager':'ट्यूशन उपस्थिति प्रबंधक','Sign in to continue':'जारी रखने के लिए साइन इन करें','App Locked':'ऐप लॉक है','Enter PIN or use fingerprint':'PIN डालें या फिंगरप्रिंट इस्तेमाल करें','Unlock with PIN':'PIN से अनलॉक करें','Forgot PIN?':'PIN भूल गए?','Reset PIN':'PIN रीसेट करें','Warning!':'चेतावनी!','Type':'टाइप करें','to continue.':'जारी रखने के लिए।','Cancel':'रद्द करें','Simple • Organized • Made for Teachers':'आसान • व्यवस्थित • शिक्षकों के लिए','Set Your Name':'अपना नाम सेट करें','Homework':'होमवर्क','Test Record':'टेस्ट रिकॉर्ड','My Notes':'मेरे नोट्स','Deleted Students':'हटाए गए विद्यार्थी','Settings':'सेटिंग्स','About App':'ऐप के बारे में','Connect Drive / Grant Permission':'Drive कनेक्ट करें / अनुमति दें','Welcome back,':'वापसी पर स्वागत है,','Welcome':'स्वागत है','Choose what you want to manage today.':'आज आप क्या मैनेज करना चाहते हैं?','Students':'विद्यार्थी','Manage your students':'विद्यार्थियों को मैनेज करें','Attendance':'उपस्थिति','Mark today\'s attendance':'आज की उपस्थिति दर्ज करें','Fees':'फीस','Record & manage fees':'फीस दर्ज और मैनेज करें','Reports':'रिपोर्ट','View monthly reports':'मासिक रिपोर्ट देखें','Profile and app preferences':'प्रोफाइल और ऐप की सेटिंग्स','← Back':'← वापस','App Theme':'ऐप थीम','☀ Light':'☀ लाइट','☾ Dark':'☾ डार्क','App Language':'ऐप की भाषा','Hinglish':'हिंग्लिश','Hindi':'हिंदी','English':'अंग्रेज़ी','App Lock':'ऐप लॉक','Change PIN':'PIN बदलें','Backup':'बैकअप','Restore':'रिस्टोर','Google account':'Google अकाउंट','Account not connected':'अकाउंट कनेक्ट नहीं है','Show on Display':'डिस्प्ले पर दिखाएँ','🧩 Puzzles':'🧩 पहेलियाँ','💡 Facts':'💡 रोचक तथ्य','👁 Seen':'👁 देखे गए','Show this text on Home Display':'यह टेक्स्ट होम स्क्रीन पर दिखाएँ','Yes':'हाँ','View and manage all your students':'सभी विद्यार्थियों को देखें और मैनेज करें','Student Profile':'विद्यार्थी प्रोफाइल','Complete student information':'विद्यार्थी की पूरी जानकारी','Daily Attendance':'दैनिक उपस्थिति','Mark attendance for all active students':'सभी सक्रिय विद्यार्थियों की उपस्थिति दर्ज करें','Attendance Date':'उपस्थिति की तारीख','Mark All Sunday':'सभी को रविवार सेट करें','= Present':'= उपस्थित','= Absent':'= अनुपस्थित','= Leave':'= छुट्टी','= Sunday':'= रविवार','= Sunday Manage':'= रविवार प्रबंधन','= Custom':'= कस्टम','Record and manage student payments':'विद्यार्थियों की फीस दर्ज और मैनेज करें','Monthly Fee Details':'मासिक फीस विवरण','Student payment history and fee status':'फीस का इतिहास और स्थिति','Monthly attendance & fee records':'मासिक उपस्थिति और फीस रिकॉर्ड','Home':'होम','Add Note':'नोट जोड़ें','Save Note':'नोट सेव करें','Update Fee':'फीस अपडेट करें','Select Fee Month':'फीस का महीना चुनें','Select Fee Period':'फीस की अवधि चुनें','Fee Month':'फीस का महीना','Fee Period':'फीस की अवधि','to':'से','Remaining Amount (Editable)':'बाकी राशि (बदल सकते हैं)','Select Payment Mode':'पेमेंट का तरीका चुनें','Cash':'नकद','UPI':'UPI','Save Fee':'फीस सेव करें','Attendance Status':'उपस्थिति की स्थिति','Delete Attendance':'उपस्थिति हटाएँ','Mobile Number':'मोबाइल नंबर','Address':'पता','Save Details':'जानकारी सेव करें','Close':'बंद करें','Edit Details':'जानकारी एडिट करें','Change Photo':'फोटो बदलें','Remove Photo':'फोटो हटाएँ','Account not connected':'अकाउंट कनेक्ट नहीं है','Development by':'डेवलप किया','Contact Developer':'डेवलपर से संपर्क करें','Email':'ईमेल','January':'जनवरी','February':'फ़रवरी','March':'मार्च','April':'अप्रैल','May':'मई','June':'जून','July':'जुलाई','August':'अगस्त','September':'सितंबर','October':'अक्टूबर','November':'नवंबर','December':'दिसंबर','सभी विचार':'सभी विचार','🌱 आज का विचार':'🌱 आज का विचार','मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।':'मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।','हिंदी विचार':'हिंदी विचार','तैयार विचार चुनें या अपने विचार लिखें':'तैयार विचार चुनें या अपने विचार लिखें','Loop:':'लूप:','250 तैयार':'250 तैयार','मेरे विचार':'मेरे विचार','250 तैयार विचार':'250 तैयार विचार','＋ नया विचार लिखें':'＋ नया विचार लिखें','अपना विचार लिखें':'अपना विचार लिखें','लिखते ही ड्राफ्ट अपने आप सेव होगा।':'लिखते ही ड्राफ्ट अपने आप सेव होगा।','विचार सेव करें':'विचार सेव करें','आज के लिए सेट करें':'आज के लिए सेट करें','बंद करें':'बंद करें','Paheliyan aur rochak jaankari':'पहेलियाँ और रोचक जानकारी','अपने काम और याद रखने वाली बातें लिखें':'अपने काम और याद रखने वाली बातें लिखें','30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ':'30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ','Application information and developer contact':'ऐप की जानकारी और डेवलपर से संपर्क','TUITION MANAGER':'ट्यूशन मैनेजर','Online Cyber Cafe':'ऑनलाइन साइबर कैफे','& Web Services':'और वेब सेवाएँ','Select Fee Month':'फीस का महीना चुनें','Select Fee Period':'फीस की अवधि चुनें',
     'Please select an image.':'कृपया एक इमेज चुनें।','Image open nahi ho payi.':'इमेज नहीं खुल पाई।','Attendance Saved':'उपस्थिति सेव हो गई।','Select Date':'तारीख चुनें','Please select a valid date.':'कृपया सही तारीख चुनें।','Fill all payment details':'पेमेंट की सभी जानकारी भरें।','Received amount must be greater than 0':'जमा राशि 0 से अधिक होनी चाहिए।','Remaining amount cannot be negative':'बाकी राशि नेगेटिव नहीं हो सकती।','Select Fee Month':'फीस का महीना चुनें।','Select Fee Period':'फीस की अवधि चुनें।','End date must be after start date':'अंतिम तारीख, शुरुआती तारीख के बाद होनी चाहिए।','PIN must be 4 digits':'PIN 4 अंकों का होना चाहिए।','Wrong PIN':'गलत PIN','Wrong Current PIN':'मौजूदा PIN गलत है।','App Lock Disabled':'ऐप लॉक बंद कर दिया गया।','App Lock Enabled':'ऐप लॉक चालू कर दिया गया।','PIN Changed Successfully':'PIN सफलतापूर्वक बदल गया।','Google Drive sync completed.':'Google Drive सिंक पूरा हुआ।','Google Drive sync failed. Your local data is safe.':'Google Drive सिंक नहीं हुआ। आपका लोकल डेटा सुरक्षित है।','Backup Created Successfully':'बैकअप सफलतापूर्वक बन गया।','Backup Restored Successfully':'बैकअप सफलतापूर्वक रिस्टोर हो गया।','Invalid Backup File':'बैकअप फाइल सही नहीं है।','Please sign in with your Google account first.':'पहले अपने Google अकाउंट से साइन इन करें।','Google Login failed. Please try again.':'Google लॉगिन नहीं हुआ। फिर कोशिश करें।','Name cannot be empty':'नाम खाली नहीं हो सकता।','Please select a valid Date of Joining.':'कृपया जुड़ने की सही तारीख चुनें।','Please select a valid Effective Month for the new monthly fee.':'नई मासिक फीस के लिए सही लागू महीना चुनें।','Select Payment Mode':'पेमेंट का तरीका चुनें।'
   },
   hinglish: {
@@ -4986,59 +4986,268 @@ const APP_TRANSLATIONS = {
   english: {
     'सभी विचार':'All Thoughts','🌱 आज का विचार':'🌱 Thought of the Day','मेहनत और अनुशासन से हर दिन बेहतर बनाया जा सकता है।':'Hard work and discipline can make every day better.','हिंदी विचार':'Thoughts','तैयार विचार चुनें या अपने विचार लिखें':'Choose a ready thought or write your own','Loop:':'Loop:','250 तैयार':'250 ready','मेरे विचार':'My Thoughts','250 तैयार विचार':'250 ready thoughts','＋ नया विचार लिखें':'＋ Write a New Thought','अपना विचार लिखें':'Write your thought','लिखते ही ड्राफ्ट अपने आप सेव होगा।':'Your draft will be saved automatically as you type.','विचार सेव करें':'Save Thought','आज के लिए सेट करें':'Set for Today','बंद करें':'Close','Paheliyan aur rochak jaankari':'Puzzles and interesting facts','अपने काम और याद रखने वाली बातें लिखें':'Write your tasks and reminders','30 दिनों के भीतर विद्यार्थी और उनका पूरा रिकॉर्ड वापस लाएँ':'Restore students and their complete records within 30 days','Application information and developer contact':'Application information and developer contact','TUITION MANAGER':'TUITION MANAGER','Online Cyber Cafe':'Online Cyber Cafe','& Web Services':'& Web Services'
   }
-};
+ };
+// Extended UI vocabulary. Keep user-entered content out of this dictionary.
+Object.assign(APP_TRANSLATIONS.hindi, {
+ 'App Language':'ऐप की भाषा','Hindi':'हिंदी','English':'अंग्रेज़ी','Hinglish':'हिंग्लिश',
+ 'Search student...':'विद्यार्थी खोजें...','Search student':'विद्यार्थी खोजें','View Profile':'प्रोफ़ाइल देखें',
+ 'Active':'सक्रिय','Inactive':'निष्क्रिय','Previous':'पिछले','Previous Student':'पिछले विद्यार्थी','Previous Students':'पिछले विद्यार्थी',
+ 'attendance records':'उपस्थिति रिकॉर्ड','Attendance Records':'उपस्थिति रिकॉर्ड','View Profile':'प्रोफ़ाइल देखें',
+ 'Present Class':'वर्तमान कक्षा','Monthly Fee':'मासिक फीस','Parent/Guardian Name':'माता-पिता/अभिभावक का नाम',
+ 'Parent/Guardian Mobile Number':'माता-पिता/अभिभावक का मोबाइल नंबर','Date of Joining':'जुड़ने की तारीख',
+ 'Tuition Joining Date':'ट्यूशन शुरू करने की तारीख','Address':'पता','Profile':'प्रोफ़ाइल','Student Name':'विद्यार्थी का नाम',
+ 'Edit Profile':'प्रोफ़ाइल संपादित करें','Edit Student':'विद्यार्थी की जानकारी बदलें','Save Changes':'बदलाव सेव करें',
+ 'Save':'सेव करें','Update':'अपडेट करें','Delete':'हटाएँ','Delete Permanently':'हमेशा के लिए हटाएँ','Recover':'वापस लाएँ',
+ 'Fee Credited':'ट्यूशन फीस प्राप्त हो गई','Fee Pending':'ट्यूशन फीस बाकी है','Pending':'बाकी','Credited':'प्राप्त',
+ 'Total Pending':'कुल बाकी फीस','Total Collections':'कुल प्राप्त फीस','Discount':'छूट','Advance':'अग्रिम भुगतान',
+ 'Calendar Month':'कैलेंडर महीना','Custom Period':'अनुकूलित अवधि','Fee Period':'फीस की अवधि','Monthly Details':'मासिक विवरण',
+ 'Not added':'जोड़ा नहीं गया','Cash':'नकद','UPI':'यूपीआई','Payment Date':'भुगतान की तारीख','Payment Mode':'भुगतान का तरीका',
+ 'No students yet':'अभी कोई विद्यार्थी नहीं है','Add a student first.':'पहले एक विद्यार्थी जोड़ें।','No active students':'कोई सक्रिय विद्यार्थी नहीं है',
+ 'Select Date':'तारीख चुनें','Select Month':'महीना चुनें','Select Year':'वर्ष चुनें','Start Date':'शुरुआती तारीख','End Date':'अंतिम तारीख',
+ 'days':'दिन','day':'दिन','fee interval':'फीस की अवधि','Edit Fee':'फीस संपादित करें','Delete this fee record?':'क्या यह फीस रिकॉर्ड हटाना चाहते हैं?',
+ 'Set Remaining to 0 if the unpaid amount is being waived as a discount.':'यदि बाकी राशि माफ करके छूट दे रहे हैं, तो बाकी राशि 0 रखें।',
+ 'Custom Period: enter the fee and Remaining amount manually.':'अनुकूलित अवधि: फीस और बाकी राशि स्वयं भरें।',
+ 'End date must be after start date':'अंतिम तारीख शुरुआती तारीख के बाद होनी चाहिए।',
+ 'Show answer':'उत्तर दिखाएँ','Hide answer':'उत्तर छिपाएँ','Show / hide answer':'उत्तर दिखाएँ / छिपाएँ',
+ 'Trash is empty':'हटाए गए विद्यार्थियों की सूची खाली है','Trash खाली है':'हटाए गए विद्यार्थियों की सूची खाली है',
+ 'Recover':'वापस लाएँ','Delete Permanently':'हमेशा के लिए हटाएँ','No content yet.':'अभी कोई सामग्री नहीं है।',
+ 'App Lock is not enabled. Please enable App Lock first.':'ऐप लॉक चालू नहीं है। पहले ऐप लॉक चालू करें।',
+ 'Enter Current PIN':'मौजूदा PIN डालें','Create New 4 Digit PIN':'नया 4 अंकों का PIN बनाएँ','Enter PIN to Disable Lock':'लॉक बंद करने के लिए PIN डालें',
+ 'Create 4 Digit PIN':'4 अंकों का PIN बनाएँ','Would you like to unlock App Lock with your phone\'s fingerprint too?':'क्या आप फोन के फिंगरप्रिंट से भी ऐप अनलॉक करना चाहेंगे?',
+ 'Fingerprint unlock enabled.':'फिंगरप्रिंट से अनलॉक चालू हो गया।','Retry Drive Connection':'Drive कनेक्शन फिर से आज़माएँ','Connecting…':'कनेक्ट हो रहा है…',
+ 'Google account not connected':'Google अकाउंट कनेक्ट नहीं है','No students yet':'अभी कोई विद्यार्थी नहीं है',
+ 'Attendance Saved':'उपस्थिति सेव हो गई।','Select Date':'तारीख चुनें','Enter Custom Attendance':'अनुकूलित उपस्थिति लिखें','Enter Extra Holiday':'अतिरिक्त छुट्टी लिखें',
+ 'Select Date':'तारीख चुनें','No active students':'कोई सक्रिय विद्यार्थी नहीं है','Total Pending -':'कुल बाकी फीस -',
+ 'Tuition Fee Received':'ट्यूशन फीस प्राप्त हो गई','Fee Credited ·':'ट्यूशन फीस प्राप्त हो गई ·',
+ 'Please select an image.':'कृपया एक तस्वीर चुनें।','Photo save nahi ho paya. Chhoti image select karke dobara try karein.':'तस्वीर सेव नहीं हो पाई। छोटी तस्वीर चुनकर फिर कोशिश करें।',
+ 'Image open nahi ho payi.':'तस्वीर नहीं खुल पाई।','Kya aap profile photo hatana chahte hain?':'क्या आप प्रोफ़ाइल फोटो हटाना चाहते हैं?',
+ 'Student Name':'विद्यार्थी का नाम','Unnamed Student':'बिना नाम का विद्यार्थी','Recover':'वापस लाएँ',
+ 'इस विद्यार्थी और उसके सभी Attendance/Fees रिकॉर्ड को हमेशा के लिए मिटाएँ? यह वापस नहीं आएगा?':'क्या इस विद्यार्थी और उसके सभी उपस्थिति/फीस रिकॉर्ड को हमेशा के लिए मिटाना चाहते हैं? यह वापस नहीं आएगा।',
+ 'पहले Note लिखें।':'पहले नोट लिखें।','इस Note को Delete करना चाहते हैं?':'क्या यह नोट हटाना चाहते हैं?',
+ 'आज के लिए चुना गया विचार हट गया है। सामान्य Loop फिर से चालू है।':'आज के लिए चुना गया विचार हट गया है। सामान्य क्रम फिर से चालू है।',
+ 'यह विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।':'यह विचार आज के होम पेज पर सेट हो गया है। दोबारा दबाने पर सामान्य क्रम चालू हो जाएगा।',
+ 'पहले विचार लिखें।':'पहले विचार लिखें।','पहले अपना विचार लिखें।':'पहले अपना विचार लिखें।','यह ड्राफ्ट खाली है। पहले इसे संपादित करें।':'यह प्रारूप खाली है। पहले इसे संपादित करें।',
+ 'आपका विचार सेव हो गया है।':'आपका विचार सेव हो गया है।','Enter your name':'अपना नाम लिखें','Name cannot be empty':'नाम खाली नहीं हो सकता',
+ 'Please sign in with your Google account first.':'पहले अपने Google अकाउंट से साइन इन करें।','Google Login failed. Please try again.':'Google लॉगिन नहीं हुआ। फिर कोशिश करें।',
+ 'Fill all payment details':'भुगतान की सभी जानकारी भरें।','Received amount must be greater than 0':'प्राप्त राशि 0 से अधिक होनी चाहिए।',
+ 'Remaining amount cannot be negative':'बाकी राशि ऋणात्मक नहीं हो सकती।','Delete this fee record?':'क्या यह फीस रिकॉर्ड हटाना चाहते हैं?',
+ 'No':'नहीं','Yes':'हाँ','Edit':'संपादित करें','View':'देखें','Back':'वापस','Close':'बंद करें','Add Student':'विद्यार्थी जोड़ें',
+ 'Student Details':'विद्यार्थी का विवरण','Fee Details':'फीस का विवरण','Attendance Details':'उपस्थिति का विवरण','Monthly Fee Details':'मासिक फीस विवरण',
+ 'Active Student':'सक्रिय विद्यार्थी','Inactive Student':'निष्क्रिय विद्यार्थी','All Students':'सभी विद्यार्थी','Search':'खोजें',
+ 'Present':'उपस्थित','Absent':'अनुपस्थित','Leave':'छुट्टी','Sunday':'रविवार','Sunday Manage':'रविवार प्रबंधन','Custom':'अन्य',
+ 'Restore students and their complete records within 30 days':'30 दिनों के भीतर विद्यार्थियों और उनके पूरे रिकॉर्ड को वापस लाएँ',
+ 'Application information and developer contact':'ऐप की जानकारी और डेवलपर से संपर्क',
+ 'I ❤️ Teaching':'I ❤️ Teaching'
+})
+Object.assign(APP_TRANSLATIONS.hinglish, {
+ 'App Language':'App ki language','Hindi':'हिंदी','English':'English','Hinglish':'Hinglish',
+ 'Search student...':'Student khojein...','Search student':'Student khojein','View Profile':'Profile dekhein',
+ 'Active':'Active','Inactive':'Inactive','Previous':'Pichhle','Previous Student':'Pichhle students','Previous Students':'Pichhle students',
+ 'attendance records':'attendance records','Attendance Records':'Attendance records',
+ 'Present Class':'Current class','Monthly Fee':'Monthly fees','Parent/Guardian Name':'Parent/Guardian ka naam',
+ 'Parent/Guardian Mobile Number':'Parent/Guardian ka mobile number','Date of Joining':'Joining date',
+ 'Tuition Joining Date':'Tuition shuru hone ki date','Address':'Pata','Profile':'Profile','Student Name':'Student ka naam',
+ 'Edit Profile':'Profile edit karein','Edit Student':'Student details edit karein','Save Changes':'Changes save karein',
+ 'Save':'Save karein','Update':'Update karein','Delete':'Delete karein','Delete Permanently':'Hamesha ke liye delete karein','Recover':'Wapas laayein',
+ 'Fee Credited':'Tuition fee mil gayi','Fee Pending':'Tuition fee baaki hai','Pending':'Baaki','Credited':'Mil gayi',
+ 'Total Pending':'Total baaki fees','Total Collections':'Total mili hui fees','Discount':'Chhoot','Advance':'Advance payment',
+ 'Calendar Month':'Calendar month','Custom Period':'Custom period','Fee Period':'Fee period','Monthly Details':'Monthly details',
+ 'Not added':'Add nahi kiya gaya','Cash':'Cash','UPI':'UPI','Payment Date':'Payment date','Payment Mode':'Payment mode',
+ 'No students yet':'Abhi koi student nahi hai','Add a student first.':'Pehle student add karein.','No active students':'Koi active student nahi hai',
+ 'Select Date':'Date select karein','Select Month':'Month select karein','Select Year':'Year select karein','Start Date':'Start date','End Date':'End date',
+ 'days':'din','day':'din','fee interval':'fee period','Edit Fee':'Fee edit karein','Delete this fee record?':'Kya ye fee record delete karna hai?',
+ 'Set Remaining to 0 if the unpaid amount is being waived as a discount.':'Agar baaki amount maaf karke chhoot de rahe hain, to remaining amount 0 rakhein.',
+ 'Custom Period: enter the fee and Remaining amount manually.':'Custom period: fee aur remaining amount khud bharein.',
+ 'End date must be after start date':'End date, start date ke baad honi chahiye.',
+ 'Show answer':'Answer dekhein','Hide answer':'Answer chhupayein','Show / hide answer':'Answer dekhein / chhupayein',
+ 'Trash is empty':'Deleted students ki list khaali hai','Trash खाली है':'Deleted students ki list khaali hai',
+ 'App Lock is not enabled. Please enable App Lock first.':'App Lock on nahi hai. Pehle App Lock on karein.',
+ 'Enter Current PIN':'Current PIN daalein','Create New 4 Digit PIN':'Naya 4 digit PIN banayein','Enter PIN to Disable Lock':'Lock band karne ke liye PIN daalein',
+ 'Create 4 Digit PIN':'4 digit PIN banayein','Would you like to unlock App Lock with your phone\'s fingerprint too?':'Kya aap phone ke fingerprint se bhi App Lock unlock karna chahenge?',
+ 'Fingerprint unlock enabled.':'Fingerprint unlock on ho gaya.','Retry Drive Connection':'Drive connection dobara try karein','Connecting…':'Connect ho raha hai…',
+ 'Google account not connected':'Google account connect nahi hai','Attendance Saved':'Attendance save ho gayi.','Enter Custom Attendance':'Custom attendance likhein','Enter Extra Holiday':'Extra holiday likhein',
+ 'Total Pending -':'Total baaki fees -','Please select an image.':'Please ek photo select karein.','Image open nahi ho payi.':'Photo open nahi ho payi.',
+ 'Kya aap profile photo hatana chahte hain?':'Kya aap profile photo remove karna chahte hain?',
+ 'पहले Note लिखें।':'Pehle note likhein.','इस Note को Delete करना चाहते हैं?':'Kya ye note delete karna hai?',
+ 'आज के लिए चुना गया विचार हट गया है। सामान्य Loop फिर से चालू है।':'Aaj ke liye select kiya gaya thought hat gaya hai. Normal loop phir se chalu hai.',
+ 'यह विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।':'Ye thought aaj ke Home Page par set ho gaya hai. Dobara tap karne par normal loop chalu ho jayega.',
+ 'पहले विचार लिखें।':'Pehle thought likhein.','पहले अपना विचार लिखें।':'Pehle apna thought likhein.','यह ड्राफ्ट खाली है। पहले इसे संपादित करें।':'Ye draft khaali hai. Pehle ise edit karein.',
+ 'आपका विचार सेव हो गया है।':'Aapka thought save ho gaya hai.','Enter your name':'Apna naam likhein','Name cannot be empty':'Name khaali nahi ho sakta',
+ 'Please sign in with your Google account first.':'Pehle apne Google account se sign in karein.','Google Login failed. Please try again.':'Google login nahi hua. Dobara try karein.',
+ 'Fill all payment details':'Payment ki saari details bharein.','Received amount must be greater than 0':'Mili hui amount 0 se zyada honi chahiye.',
+ 'Remaining amount cannot be negative':'Baaki amount negative nahi ho sakta.','No':'Nahi','Yes':'Haan','Edit':'Edit karein','View':'Dekhein','Back':'Wapas','Close':'Band karein','Add Student':'Student add karein',
+ 'Student Details':'Student details','Fee Details':'Fee details','Attendance Details':'Attendance details','Active Student':'Active student','Inactive Student':'Inactive student',
+ 'All Students':'All students','Search':'Khojein','Present':'Present','Absent':'Absent','Leave':'Chhutti','Sunday':'Sunday','Sunday Manage':'Sunday manage','Custom':'Custom',
+ 'I ❤️ Teaching':'I ❤️ Teaching'
+})
+Object.assign(APP_TRANSLATIONS.hinglish, {
+ 'Students':'Vidyarthi','Manage your students':'Apne vidyarthiyon ko manage karein','Attendance':'Upasthiti',"Mark today's attendance":'Aaj ki upasthiti darj karein',
+ 'Reports':'Report','View monthly reports':'Mahine ki report dekhein','View and manage all your students':'Sabhi vidyarthiyon ko dekhein aur manage karein',
+ 'Student Profile':'Vidyarthi Profile','Complete student information':'Vidyarthi ki poori jankari','Daily Attendance':'Roz ki upasthiti',
+ 'Mark attendance for all active students':'Sabhi sakriya vidyarthiyon ki upasthiti darj karein','Attendance Date':'Upasthiti ki tareekh',
+ 'Active':'Sakriya','Inactive':'Nishkriya','attendance records':'upasthiti record','Search student...':'Vidyarthi khojein...',
+ 'View Profile':'Profile dekhein','Present Class':'Maujooda kaksha','Monthly Fee':'Mahine ki fees','Parent/Guardian Name':'Abhibhavak ka naam',
+ 'Parent/Guardian Mobile Number':'Abhibhavak ka mobile number','Date of Joining':'Jodne ki tareekh','Tuition Joining Date':'Tuition shuru hone ki tareekh',
+ 'Address':'Pata','Previous Students':'Pichhle vidyarthi','Active Student':'Sakriya vidyarthi','Inactive Student':'Nishkriya vidyarthi',
+ 'Present':'Hazir','Absent':'Gairhazir','Leave':'Chhutti','Sunday':'Ravivar','Sunday Manage':'Ravivar prabandhan',
+ 'Fee Credited':'Tuition fees mil gayi','Fee Pending':'Tuition fees baaki hai','Pending':'Baaki','Credited':'Mil gayi',
+ 'Total Pending':'Kul baaki fees','Total Collections':'Kul prapt fees','Calendar Month':'Calendar ka mahina','Monthly Details':'Mahine ka vivaran',
+ 'App Language':'App ki bhasha','App Theme':'App ki theme','Settings':'Settings','About App':'App ke baare mein',
+ 'Deleted Students':'Hataye gaye vidyarthi','My Notes':'Mere notes','Add Student':'Vidyarthi jodein','Student Name':'Vidyarthi ka naam',
+ 'Save Changes':'Badlav save karein','Delete Permanently':'Hamesha ke liye hatayein','Recover':'Wapas laayein'
+});
+Object.assign(APP_TRANSLATIONS.hindi, {
+ 'Other Students':'अन्य विद्यार्थी','Other students in same tuition':'इसी ट्यूशन के अन्य विद्यार्थी','Student 2 Name':'दूसरे विद्यार्थी का नाम',
+ '+ Add another student in same tuition':'+ इसी ट्यूशन में एक और विद्यार्थी जोड़ें','Cancel':'रद्द करें','Tap photo to change or remove':'फोटो बदलने या हटाने के लिए दबाएँ',
+ 'Enter present class':'वर्तमान कक्षा लिखें','Monthly Fee (₹)':'मासिक फीस (₹)','New Monthly Fee Effective Month':'नई मासिक फीस लागू होने का महीना',
+ 'The new fee will apply from this month. Previous months will keep their old fee.':'नई फीस इसी महीने से लागू होगी। पिछले महीनों की फीस पहले जैसी रहेगी।',
+ 'Student Status':'विद्यार्थी की स्थिति','Active':'सक्रिय','Inactive':'निष्क्रिय','Save Changes':'बदलाव सेव करें',
+ 'Total Fee Pending -':'कुल बाकी फीस -','Total Pending -':'कुल बाकी फीस -','Other Students':'अन्य विद्यार्थी',
+ 'Remove student':'विद्यार्थी हटाएँ','Change or remove student photo':'विद्यार्थी की फोटो बदलें या हटाएँ'
+});
+Object.assign(APP_TRANSLATIONS.hinglish, {
+ 'Other Students':'Doosre vidyarthi','Other students in same tuition':'Isi tuition ke doosre vidyarthi','Student 2 Name':'Doosre vidyarthi ka naam',
+ '+ Add another student in same tuition':'+ Isi tuition mein ek aur vidyarthi jodein','Cancel':'Radd karein','Tap photo to change or remove':'Photo badalne ya hatane ke liye tap karein',
+ 'Enter present class':'Maujooda kaksha likhein','Monthly Fee (₹)':'Mahine ki fees (₹)','New Monthly Fee Effective Month':'Nayi monthly fees lagu hone ka mahina',
+ 'The new fee will apply from this month. Previous months will keep their old fee.':'Nayi fees isi mahine se lagu hogi. Pichhle mahino ki fees pehle jaisi rahegi.',
+ 'Student Status':'Vidyarthi ki sthiti','Active':'Sakriya','Inactive':'Nishkriya','Save Changes':'Badlav save karein',
+ 'Total Fee Pending -':'Kul baaki fees -','Total Pending -':'Kul baaki fees -','Remove student':'Vidyarthi hatayein','Change or remove student photo':'Vidyarthi ki photo badlein ya hatayein'
+});
+Object.assign(APP_TRANSLATIONS.hindi, {
+ 'Photo save nahi ho paya. Chhoti image select karke dobara try karein.':'फोटो सेव नहीं हो पाई। छोटी तस्वीर चुनकर फिर कोशिश करें।',
+ 'यह विद्यार्थी पहले से मौजूद है।':'यह विद्यार्थी पहले से सूची में मौजूद है।','विद्यार्थी और उसका पूरा रिकॉर्ड वापस आ गया है।':'विद्यार्थी और उसका पूरा रिकॉर्ड वापस आ गया है।',
+ 'Text blank nahi ho sakta. Kripya kuch text likhein.':'टेक्स्ट खाली नहीं हो सकता। कृपया कुछ लिखें।','Unable to load this image.':'यह तस्वीर लोड नहीं हो सकी।',
+ 'Fingerprint/biometric unlock is not available in this browser. Use your PIN.':'इस ब्राउज़र में फिंगरप्रिंट से अनलॉक की सुविधा उपलब्ध नहीं है। अपना PIN इस्तेमाल करें।',
+ 'New PINs do not match':'दोनों नए PIN मेल नहीं खाते।','No Google Drive data found for this Google account.':'इस Google अकाउंट के लिए Google Drive में कोई डेटा नहीं मिला।',
+ 'Invalid Google Drive data.':'Google Drive का डेटा सही नहीं है।','Google Drive data restored successfully.':'Google Drive का डेटा सफलतापूर्वक वापस आ गया।',
+ 'Google Drive restore failed. Your local data is safe.':'Google Drive से डेटा वापस नहीं आया। आपका लोकल डेटा सुरक्षित है।',
+ 'Effective Month cannot be earlier than the current month. This protects previous fee history.':'लागू होने का महीना वर्तमान महीने से पहले नहीं हो सकता। इससे पिछली फीस का रिकॉर्ड सुरक्षित रहता है।',
+ 'Please select a valid Effective Month for the new monthly fee.':'नई मासिक फीस लागू करने के लिए सही महीना चुनें।',
+ 'Please select a valid Date of Joining.':'कृपया जुड़ने की सही तारीख चुनें।','Enter PIN to Disable Lock':'लॉक बंद करने के लिए PIN डालें',
+ 'Create 4 Digit PIN':'4 अंकों का PIN बनाएँ','Re-enter New PIN':'नया PIN दोबारा डालें','Edit Student Name':'विद्यार्थी का नाम बदलें',
+ 'Enter Custom Attendance':'अनुकूलित उपस्थिति लिखें','Enter Extra Holiday':'अतिरिक्त छुट्टी लिखें','Student Name':'विद्यार्थी का नाम',
+ "Remove this student\\'s photo?":'क्या इस विद्यार्थी की फोटो हटाना चाहते हैं?','Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।':'नोट में बदलाव हैं। OK चुनने पर सेव होंगे और Cancel चुनने पर बदलाव रद्द होंगे।',
+ 'इस विद्यार्थी को Trash में भेजें? वह 30 दिनों तक पूरा रिकॉर्ड सहित वापस लाया जा सकता है।':'क्या इस विद्यार्थी को हटाए गए विद्यार्थियों में भेजना चाहते हैं? उसे 30 दिनों तक पूरे रिकॉर्ड सहित वापस लाया जा सकता है।',
+ 'इस Note को Delete करना चाहते हैं?':'क्या यह नोट हटाना चाहते हैं?','इस विचार को हमेशा के लिए हटाना चाहते हैं?':'क्या यह विचार हमेशा के लिए हटाना चाहते हैं?',
+ 'Delete this fee record?':'क्या यह फीस रिकॉर्ड हटाना चाहते हैं?','Wrong PIN':'गलत PIN','Wrong Current PIN':'मौजूदा PIN गलत है।',
+ 'PIN Changed Successfully':'PIN सफलतापूर्वक बदल गया।','Google Drive sync completed.':'Google Drive सिंक पूरा हो गया।',
+ 'Google Drive sync failed. Your local data is safe.':'Google Drive सिंक नहीं हुआ। आपका लोकल डेटा सुरक्षित है।',
+ 'No':'नहीं','Yes':'हाँ','Retry Drive Connection':'Drive कनेक्शन फिर से आज़माएँ'
+});
+Object.assign(APP_TRANSLATIONS.hinglish, {
+ 'Photo save nahi ho paya. Chhoti image select karke dobara try karein.':'Photo save nahi ho payi. Chhoti photo select karke dobara try karein.',
+ 'यह विद्यार्थी पहले से मौजूद है।':'Ye vidyarthi pehle se list mein hai.','विद्यार्थी और उसका पूरा रिकॉर्ड वापस आ गया है।':'Vidyarthi aur uska poora record wapas aa gaya hai.',
+ 'Text blank nahi ho sakta. Kripya kuch text likhein.':'Text khaali nahi ho sakta. Kripya kuch likhein.','Unable to load this image.':'Ye photo load nahi ho payi.',
+ 'Fingerprint/biometric unlock is not available in this browser. Use your PIN.':'Is browser mein fingerprint unlock available nahi hai. Apna PIN use karein.',
+ 'New PINs do not match':'Dono naye PIN match nahi karte.','No Google Drive data found for this Google account.':'Is Google account ke liye Google Drive mein data nahi mila.',
+ 'Invalid Google Drive data.':'Google Drive ka data sahi nahi hai.','Google Drive data restored successfully.':'Google Drive ka data successfully wapas aa gaya.',
+ 'Google Drive restore failed. Your local data is safe.':'Google Drive se data restore nahi hua. Aapka local data safe hai.',
+ 'Effective Month cannot be earlier than the current month. This protects previous fee history.':'Effective month current month se pehle nahi ho sakta. Isse purani fees history safe rahegi.',
+ 'Please select a valid Effective Month for the new monthly fee.':'Nayi monthly fees lagu karne ke liye sahi month select karein.',
+ 'Please select a valid Date of Joining.':'Joining ki sahi date select karein.','Enter PIN to Disable Lock':'Lock band karne ke liye PIN daalein',
+ 'Create 4 Digit PIN':'4 digit PIN banayein','Re-enter New PIN':'Naya PIN dobara daalein','Edit Student Name':'Vidyarthi ka naam edit karein',
+ 'Enter Custom Attendance':'Custom upasthiti likhein','Enter Extra Holiday':'Extra chhutti likhein','Student Name':'Vidyarthi ka naam',
+ "Remove this student\\'s photo?":'Kya is vidyarthi ki photo hatani hai?','Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।':'Note mein badlav hain. OK = Save, Cancel = badlav cancel karein.',
+ 'इस विद्यार्थी को Trash में भेजें? वह 30 दिनों तक पूरा रिकॉर्ड सहित वापस लाया जा सकता है।':'Kya is vidyarthi ko Trash mein bhejna hai? Ise 30 din tak poore record ke saath wapas la sakte hain.',
+ 'इस Note को Delete करना चाहते हैं?':'Kya ye note delete karna hai?','इस विचार को हमेशा के लिए हटाना चाहते हैं?':'Kya ye thought hamesha ke liye delete karna hai?',
+ 'Delete this fee record?':'Kya ye fee record delete karna hai?','Wrong PIN':'PIN galat hai','Wrong Current PIN':'Current PIN galat hai.',
+ 'PIN Changed Successfully':'PIN successfully change ho gaya.','Google Drive sync completed.':'Google Drive sync complete ho gaya.',
+ 'Google Drive sync failed. Your local data is safe.':'Google Drive sync nahi hua. Aapka local data safe hai.',
+ 'Retry Drive Connection':'Drive connection dobara try karein'
+});
+Object.assign(APP_TRANSLATIONS.english, {
+ 'वापस':'Back','वापसी पर स्वागत है,':'Welcome back,','विद्यार्थी':'Students','विद्यार्थी प्रोफाइल':'Student Profile','विद्यार्थी की पूरी जानकारी':'Complete student information',
+ 'मासिक फीस विवरण':'Monthly Fee Details','फीस का इतिहास और स्थिति':'Fee history and status','फीस':'Fees','उपस्थिति':'Attendance','रिपोर्ट':'Reports','सेटिंग्स':'Settings',
+ 'ऐप की भाषा':'App Language','हिंदी':'Hindi','अंग्रेज़ी':'English','हिंग्लिश':'Hinglish','ट्यूशन फीस प्राप्त हो गई':'Tuition Fee Received',
+ 'ट्यूशन फीस बाकी है':'Tuition Fee Pending','कुल बाकी फीस':'Total Pending Fees','कुल प्राप्त फीस':'Total Fees Received','सक्रिय':'Active','निष्क्रिय':'Inactive',
+ 'प्रोफ़ाइल देखें':'View Profile','विद्यार्थी खोजें...':'Search student...','वर्तमान कक्षा':'Present Class','मासिक फीस':'Monthly Fee','माता-पिता/अभिभावक का नाम':'Parent/Guardian Name',
+ 'माता-पिता/अभिभावक का मोबाइल नंबर':'Parent/Guardian Mobile Number','जुड़ने की तारीख':'Date of Joining','ट्यूशन शुरू करने की तारीख':'Tuition Joining Date',
+ 'नकद':'Cash','बाकी':'Pending','प्राप्त':'Credited','छूट':'Discount','कैलेंडर महीना':'Calendar Month','मासिक विवरण':'Monthly Details',
+ 'तारीख चुनें':'Select Date','शुरुआती तारीख':'Start Date','अंतिम तारीख':'End Date','संपादित करें':'Edit','हटाएँ':'Delete','वापस लाएँ':'Recover',
+ 'ऐप लॉक चालू नहीं है। पहले ऐप लॉक चालू करें।':'App Lock is not enabled. Please enable App Lock first.',
+ 'मौजूदा PIN डालें':'Enter Current PIN','नया 4 अंकों का PIN बनाएँ':'Create New 4 Digit PIN','उत्तर दिखाएँ':'Show answer','उत्तर छिपाएँ':'Hide answer'
+});
 (function(){
   const originalTextNodes=new WeakMap();
   const originalAttributes=new WeakMap();
   let currentLanguage='hinglish';
+  const NEVER_TRANSLATE = '#teachingMottoHome,#teachingMottoPreview,#homeMyNotesContent,.myNoteContent,.thoughtItemText,.pfQuestion,.pfAnswer,[data-no-translate],input,textarea,[contenteditable="true"]';
+  const PATTERNS = {
+    hindi: [
+      [/^Mark (.+) as Inactive\?([\s\S]*)$/i,(_,name,tail)=>`${name} को निष्क्रिय करें?${tail.replace(/This student will stop appearing in Daily Attendance\. Previous attendance and fee data will remain safe\./,'\n\nयह विद्यार्थी दैनिक उपस्थिति में नहीं दिखेगा। पिछली उपस्थिति और फीस का रिकॉर्ड सुरक्षित रहेगा।')}`],
+      [/^Mark (.+) as Active\?([\s\S]*)$/i,(_,name,tail)=>`${name} को सक्रिय करें?${tail.replace(/This student will appear again in Daily Attendance\./,'\n\nयह विद्यार्थी फिर से दैनिक उपस्थिति में दिखेगा।')}`],
+      [/^This fee period overlaps an already saved period: (.+)\.([\s\S]*)$/i,(_,period,tail)=>`यह फीस अवधि पहले से सेव अवधि से मेल खाती है: ${period}।\n\nकृपया ऐसी नई अवधि चुनें जो पहले की अवधि से न टकराए।`],
+      [/^Google Drive connection failed\.\s*([\s\S]*)$/i,(_,detail)=>`Google Drive कनेक्शन विफल हुआ।\n${detail}`],
+      [/^(.+) days? remaining$/i,(_,n)=>`${n} दिन बाकी`],
+      [/^(Active|Inactive)\s*[·•]\s*(\d+)\s*attendance records?$/i,(_,s,n)=>`${s==='Active'?'सक्रिय':'निष्क्रिय'} · ${n} उपस्थिति रिकॉर्ड`],
+      [/^(\d+)\s*active(?:\s*·\s*(\d+)\s*previous)?$/i,(_,a,b)=>`${a} सक्रिय${b?' · '+b+' पिछले':''}`],
+      [/^(\d+)\s*day(s)? fee interval$/i,(_,n)=>`${n} दिन की फीस अवधि`],
+      [/^Fee Credited\s*[·-]\s*(.+)$/i,(_,amount)=>`ट्यूशन फीस प्राप्त हो गई · ${amount}`],
+      [/^Total Pending\s*-\s*(.+)$/i,(_,amount)=>`कुल बाकी फीस - ${amount}`],
+      [/^(.+)\s*records?\s*[·•]\s*Fees:\s*(.+)$/i,(_,a,b)=>`${a} रिकॉर्ड · फीस: ${b}`]
+    ],
+    hinglish: [
+      [/^Mark (.+) as Inactive\?([\s\S]*)$/i,(_,name,tail)=>`${name} ko nishkriya karein?\n\nYe vidyarthi daily attendance mein nahi dikhega. Purani attendance aur fees ka record safe rahega.`],
+      [/^Mark (.+) as Active\?([\s\S]*)$/i,(_,name,tail)=>`${name} ko sakriya karein?\n\nYe vidyarthi phir se daily attendance mein dikhega.`],
+      [/^This fee period overlaps an already saved period: (.+)\.([\s\S]*)$/i,(_,period,tail)=>`Ye fee period pehle se save period se overlap karta hai: ${period}.\n\nKripya naya period select karein jo pehle wale period se overlap na kare.`],
+      [/^Google Drive connection failed\.\s*([\s\S]*)$/i,(_,detail)=>`Google Drive connection fail ho gaya.\n${detail}`],
+      [/^(.+) days? remaining$/i,(_,n)=>`${n} din baaki`],
+      [/^(Active|Inactive)\s*[·•]\s*(\d+)\s*attendance records?$/i,(_,s,n)=>`${s==='Active'?'Sakriya':'Nishkriya'} · ${n} upasthiti record`],
+      [/^(\d+)\s*active(?:\s*·\s*(\d+)\s*previous)?$/i,(_,a,b)=>`${a} active${b?' · '+b+' previous':''}`],
+      [/^(\d+)\s*day(s)? fee interval$/i,(_,n)=>`${n} din ka fee period`],
+      [/^Fee Credited\s*[·-]\s*(.+)$/i,(_,amount)=>`Tuition fee mil gayi · ${amount}`],
+      [/^Total Pending\s*-\s*(.+)$/i,(_,amount)=>`Total baaki fees - ${amount}`]
+    ],
+    english: [
+      [/^ट्यूशन फीस प्राप्त हो गई\s*[·-]\s*(.+)$/i,(_,amount)=>`Tuition Fee Received · ${amount}`],
+      [/^कुल बाकी फीस\s*-\s*(.+)$/i,(_,amount)=>`Total Pending Fees - ${amount}`]
+    ]
+  };
   function translatePhrase(value){
     const dict=APP_TRANSLATIONS[currentLanguage]||{};
     if(Object.prototype.hasOwnProperty.call(dict,value)) return dict[value];
+    for(const [pattern,replace] of (PATTERNS[currentLanguage]||[])){const match=value.match(pattern);if(match)return value.replace(pattern,replace);}
     return value;
   }
+  function shouldSkip(el){return !!(el&&el.closest&&el.closest(NEVER_TRANSLATE));}
   function translateNode(node){
-    if(node.nodeType!==Node.TEXT_NODE || !node.parentElement) return;
-    if(node.parentElement.closest('script,style,textarea,input,select,option,[data-no-translate]')) return;
+    if(node.nodeType!==Node.TEXT_NODE || !node.parentElement || shouldSkip(node.parentElement)) return;
+    if(node.parentElement.closest('script,style')) return;
     if(!originalTextNodes.has(node)) originalTextNodes.set(node,node.nodeValue);
-    const original=originalTextNodes.get(node);
-    const trimmed=original.trim();
+    const original=originalTextNodes.get(node), trimmed=original.trim();
     if(!trimmed) return;
     const translated=translatePhrase(trimmed);
-    const start=original.match(/^\s*/)?.[0]||'';
-    const end=original.match(/\s*$/)?.[0]||'';
+    const start=original.match(/^\s*/)?.[0]||'', end=original.match(/\s*$/)?.[0]||'';
     const target=start+translated+end;
     if(node.nodeValue!==target) node.nodeValue=target;
   }
   function translateAttributes(root){
     const nodes=[];
     if(root.nodeType===Node.ELEMENT_NODE) nodes.push(root);
-    if(root.querySelectorAll) nodes.push(...root.querySelectorAll('[placeholder],[title],[aria-label]'));
+    if(root.querySelectorAll) nodes.push(...root.querySelectorAll('[placeholder],[title],[aria-label],[value]'));
     for(const el of nodes){
-      for(const attr of ['placeholder','title','aria-label']){
+      if(shouldSkip(el)) continue;
+      for(const attr of ['placeholder','title','aria-label','value']){
         if(!el.hasAttribute(attr)) continue;
-        let saved=originalAttributes.get(el); if(!saved){saved={};originalAttributes.set(el,saved);}
+        if(attr==='value' && !['button','submit','reset'].includes((el.type||'').toLowerCase())) continue;
+        let saved=originalAttributes.get(el);if(!saved){saved={};originalAttributes.set(el,saved);}
         if(!(attr in saved)) saved[attr]=el.getAttribute(attr);
-        const original=saved[attr]; const translated=translatePhrase(original);
+        const translated=translatePhrase(saved[attr]);
         if(el.getAttribute(attr)!==translated) el.setAttribute(attr,translated);
       }
     }
   }
   function translateApp(){
-    const root=document.body;
-    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
-    let node; while((node=walker.nextNode())) translateNode(node);
+    const root=document.body,walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;
+    while((node=walker.nextNode())) translateNode(node);
     translateAttributes(root);
-    const selector=document.getElementById('appLanguageSelect');
-    if(selector) selector.value=currentLanguage;
+    const selector=document.getElementById('appLanguageSelect');if(selector)selector.value=currentLanguage;
     document.documentElement.lang=currentLanguage==='hindi'?'hi':(currentLanguage==='english'?'en':'en-IN');
   }
   window.getAppLanguage=()=>currentLanguage;
   window.t=function(key){return translatePhrase(String(key));};
-  window.applyAppLanguage=function(language){
-    currentLanguage=['hindi','english','hinglish'].includes(language)?language:'hinglish';
-    translateApp();
-  };
-  const originalAlert=window.alert.bind(window), originalConfirm=window.confirm.bind(window), originalPrompt=window.prompt.bind(window);
+  window.applyAppLanguage=function(language){currentLanguage=['hindi','english','hinglish'].includes(language)?language:'hinglish';translateApp();};
+  const originalAlert=window.alert.bind(window),originalConfirm=window.confirm.bind(window),originalPrompt=window.prompt.bind(window);
   window.alert=(message)=>originalAlert(typeof message==='string'?translatePhrase(message):message);
   window.confirm=(message)=>originalConfirm(typeof message==='string'?translatePhrase(message):message);
   window.prompt=(message,defaultValue)=>originalPrompt(typeof message==='string'?translatePhrase(message):message,defaultValue);
@@ -5046,21 +5255,13 @@ const APP_TRANSLATIONS = {
     for(const record of records){
       if(record.type==='characterData') translateNode(record.target);
       for(const added of record.addedNodes||[]){
-        if(added.nodeType===Node.TEXT_NODE) translateNode(added);
-        else if(added.nodeType===Node.ELEMENT_NODE){
-          const walker=document.createTreeWalker(added,NodeFilter.SHOW_TEXT);let n;
-          while((n=walker.nextNode())) translateNode(n);
-          translateAttributes(added);
-        }
+        if(added.nodeType===Node.TEXT_NODE)translateNode(added);
+        else if(added.nodeType===Node.ELEMENT_NODE){const walker=document.createTreeWalker(added,NodeFilter.SHOW_TEXT);let n;while((n=walker.nextNode()))translateNode(n);translateAttributes(added);}
       }
     }
   });
-  function start(){
-    let saved='hinglish';try{saved=localStorage.getItem('tuitionManagerAppLanguage_v1')||'hinglish';}catch(e){}
-    applyAppLanguage(saved);
-    observer.observe(document.body,{subtree:true,childList:true,characterData:true});
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
+  function start(){let saved='hinglish';try{saved=localStorage.getItem('tuitionManagerAppLanguage_v1')||'hinglish';}catch(e){}applyAppLanguage(saved);observer.observe(document.body,{subtree:true,childList:true,characterData:true});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 
 let menuCloseTimer=null;
