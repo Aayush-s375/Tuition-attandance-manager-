@@ -804,10 +804,6 @@ body.darkMode #reportArea .student{
 }
 
 
-/* Hindi report typography: visually match the English report text. */
-html[lang="hi"] #reportArea .reportSlide > p{font-size:14px!important;}
-html[lang="hi"] #reportArea .reportSlide .summary{font-size:14px!important;}
-
 /* Hindi + dark mode fee card: keep the first date-range and Update control on one row. */
 body.darkMode .modernStudent.feeHindiDarkRow,html[lang="hi"] body.darkMode .modernStudent:has(.feeStatusBlock){align-items:flex-start;gap:8px;}
 body.darkMode .modernStudent.feeHindiDarkRow .studentMain,html[lang="hi"] body.darkMode .modernStudent:has(.feeStatusBlock) .studentMain{min-width:0;}
@@ -2037,11 +2033,19 @@ function renderHomeExtras(){
       }
       if(missed.length){
         const dates=missed.map(formatMissedDate);
+        const language=window.getAppLanguage?window.getAppLanguage():"hinglish";
+        const conjunction=language==="english"?" and ":(language==="hindi"?" और ":" aur ");
         let dateText='';
         if(dates.length===1) dateText=dates[0];
-        else if(dates.length===2) dateText=dates[0]+' और '+dates[1];
-        else dateText=dates.slice(0,-1).join(', ')+' और '+dates[dates.length-1];
-        boxes.push('<div class="attendanceReminderItem">📌 '+escapeHtml(String(st.name||'विद्यार्थी'))+' का '+escapeHtml(dateText)+' का Attendance बाकी है।</div>');
+        else if(dates.length===2) dateText=dates[0]+conjunction+dates[1];
+        else dateText=dates.slice(0,-1).join(', ')+conjunction+dates[dates.length-1];
+        const studentName=escapeHtml(String(st.name||(language==="hindi"?"विद्यार्थी":language==="english"?"Student":"Vidyarthi")));
+        const safeDates=escapeHtml(dateText);
+        let reminderText='';
+        if(language==="hindi") reminderText=studentName+' की '+safeDates+' की उपस्थिति दर्ज करना बाकी है।';
+        else if(language==="english") reminderText=studentName+"'s attendance for "+safeDates+" is pending.";
+        else reminderText=studentName+' ki '+safeDates+' ki attendance baaki hai.';
+        boxes.push('<div class="attendanceReminderItem">📌 '+reminderText+'</div>');
       }
     });
     reminder.innerHTML=boxes.join('');
@@ -3529,6 +3533,19 @@ function attendanceStatusInfo(status){
   return {code:"H", label:"Custom"};
 }
 
+function getAttendanceDisplayLabel(status){
+  const raw=String(status||"");
+  const translate=(key)=>typeof window.t==="function"?window.t(key):key;
+  if(raw.startsWith("EH|")) return raw.split("|").slice(1).join("|");
+  if(raw==="Present") return translate("Present");
+  if(raw==="Absent ❌") return translate("Absent ❌");
+  if(raw==="Absent") return translate("Absent");
+  if(raw==="Leave") return translate("Leave");
+  if(raw==="Sunday") return translate("Sunday");
+  if(raw==="Sunday Manage ✅" || raw==="Sunday Manage") return translate("Sunday Manage ✅");
+  return translate(raw);
+}
+
 function getAttendanceStatusForDate(index,date){
   const s=students[index];
   if(!s || !Array.isArray(s.attendance)) return "";
@@ -3775,7 +3792,7 @@ function renderReports(){
         else if(a.status=="Sunday Manage ✅") color="green";
         else color="#ff8800";
 
-        const displayStatus = a.status.startsWith("EH|") ? a.status.split("|").slice(1).join("|") : a.status;
+        const displayStatus = getAttendanceDisplayLabel(a.status);
         const safeDate = a.date.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 
         const statusClass = a.status==="Present" ? "reportStatusPresent" : (a.status==="Sunday" ? "reportStatusSunday" : (a.status==="Sunday Manage ✅" ? "reportStatusSundayManage" : ""));
@@ -4578,7 +4595,6 @@ function downloadPDF(index){
     <div><b>${reportText("Parent/Guardian Mobile Number")}:</b> ${reportValue(s.parentMobile)}</div>
     <div><b>${reportText("Address")}:</b> ${reportValue(s.address)}</div>
   </div>
-  <p><b>${reportText("Month")} :</b> ${reportMonth}, ${selectedYear}</p>
   <hr>`;
 
   const selectedKey=`${selectedYear}-${String(selectedMonth).padStart(2,'0')}`;
@@ -4590,6 +4606,7 @@ function downloadPDF(index){
   }).sort((a,b)=>String(a.start||'').localeCompare(String(b.start||'')));
 
   reportHtml += `<h3>${reportText("Fee Details")}</h3>`;
+  reportHtml += `<p style="margin:4px 0 10px;"><b>${reportText("Month")} :</b> ${reportMonth}, ${selectedYear}</p>`;
   const hasCredited=feeItems.some(item=>item.record?.status==='credited');
   if(hasCredited) reportHtml += `<p style="color:green;font-weight:bold;">${reportText("Fee Collected")} ✓</p>`;
 
@@ -4599,13 +4616,17 @@ function downloadPDF(index){
       const amount=Number(rec?.amount || getKnownFeeAmount(s) || 0);
       if(rec?.status==='credited'){
         const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
-        reportHtml += `<p><b>${item.label}</b><br><span style="color:green;font-weight:bold;">${reportText("Credited")}</span> ₹${amount} ${reportText("via")} ${rec.mode||reportText("Mode not set")} ${reportText("on")} ${paymentDate}</p>`;
+        const periodLabel=String(item.label||"");
+        const redundantMonthLabel=periodLabel.toLowerCase()===`${monthNames[parseInt(selectedMonth)-1]} ${selectedYear}`.toLowerCase();
+        reportHtml += `<p>${redundantMonthLabel?'':`<b>${escapeHtml(periodLabel)}</b><br>`}<span style="color:green;font-weight:bold;">${reportText("Credited")}</span> ₹${amount} ${reportText("via")} ${rec.mode||reportText("Mode not set")} ${reportText("on")} ${paymentDate}</p>`;
       }else{
-        reportHtml += `<p><b>${item.label}</b><br><span style="color:#d97706;font-weight:bold;">${reportText("Pending")}</span>${amount ? ` · ₹${amount}` : ''}</p>`;
+        const periodLabel=String(item.label||"");
+        const redundantMonthLabel=periodLabel.toLowerCase()===`${monthNames[parseInt(selectedMonth)-1]} ${selectedYear}`.toLowerCase();
+        reportHtml += `<p>${redundantMonthLabel?'':`<b>${escapeHtml(periodLabel)}</b><br>`}<span style="color:#d97706;font-weight:bold;">${reportText("Fee Pending Short")}</span>${amount ? ` · ₹${amount}` : ''}</p>`;
       }
     });
   }else{
-    reportHtml += `<p>${reportText("Pending")}</p>`;
+    reportHtml += `<p><span style="color:#d97706;font-weight:bold;">${reportText("Fee Pending Short")}</span></p>`;
   }
   reportHtml += `<hr>`;
 
@@ -4619,17 +4640,7 @@ function downloadPDF(index){
     if(parts[0] === selectedYear && parts[1] === selectedMonth){
       foundAttendance=true;
       const day=parts[2];
-      const rawStatus=a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
-      const standardStatus={
-        "Present":reportText("Present"),
-        "Absent ❌":reportText("Absent ❌"),
-        "Absent":reportText("Absent"),
-        "Leave":reportText("Leave"),
-        "Sunday":reportText("Sunday"),
-        "Sunday Manage ✅":reportText("Sunday Manage ✅"),
-        "Chhath Puja":reportText("Chhath Puja")
-      };
-      const displayStatus=Object.prototype.hasOwnProperty.call(standardStatus,rawStatus)?standardStatus[rawStatus]:rawStatus;
+      const displayStatus=getAttendanceDisplayLabel(a.status);
       reportHtml += `<p>${day} - ${displayStatus}</p>`;
 
       if(a.status=="Present") present++;
@@ -5554,6 +5565,26 @@ Object.assign(APP_TRANSLATIONS.english, {
     const selector=document.getElementById('appLanguageSelect');if(selector)selector.value=currentLanguage;
     document.documentElement.lang=currentLanguage==='hindi'?'hi':(currentLanguage==='english'?'en':'en-IN');
   }
+  // Keep Report Card labels identical to the current Attendance Card wording.
+  Object.assign(APP_TRANSLATIONS.hindi, {
+    'Leave':'विद्यार्थी छुट्टी लिया',
+    'Sunday Manage':'रविवार (पिछला अनुपस्थिति मैनेज)',
+    'Sunday Manage ✅':'रविवार (पिछला अनुपस्थिति मैनेज) ✅',
+    'Fee Pending Short':'फीस बाकी'
+  });
+  Object.assign(APP_TRANSLATIONS.hinglish, {
+    'Leave':'Student Chhutti Liya',
+    'Sunday Manage':'Ravivar (pichhli gairhaziri manage)',
+    'Sunday Manage ✅':'Ravivar (pichhli gairhaziri manage) ✅',
+    'Fee Pending Short':'Fees baaki'
+  });
+  Object.assign(APP_TRANSLATIONS.english, {
+    'Leave':'Student Leave',
+    'Sunday Manage':'Sunday (Previous absent manage)',
+    'Sunday Manage ✅':'Sunday (Previous absent manage) ✅',
+    'Fee Pending Short':'Fee Pending'
+  });
+
   window.getAppLanguage=()=>currentLanguage;
   window.t=function(key){return translatePhrase(String(key));};
   window.applyAppLanguage=function(language){currentLanguage=['hindi','english','hinglish'].includes(language)?language:'hinglish';translateApp();};
