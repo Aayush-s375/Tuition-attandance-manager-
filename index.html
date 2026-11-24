@@ -1344,7 +1344,7 @@ Reset PIN
         <button id="sundayBtn" class="saveBtn" style="display:none;background:#6f42c1;margin-bottom:0;" onclick="markAllSunday()">Mark All Sunday</button>
       </div>
       <div class="modernPanel">
-        <div id="attendanceLegend"><b>P</b> = Present &nbsp; <b>A</b> = Absent &nbsp; <b>L</b> = Leave &nbsp; <b>S</b> = Sunday &nbsp; <b>M</b> = Sunday Manage &nbsp; <b>H</b> = Custom</div>
+        <div id="attendanceLegend"><b>P</b> = Present &nbsp; <b>A</b> = Absent &nbsp; <b>L</b> = Leave &nbsp; <b>S</b> = Sunday &nbsp; <b>M</b> = Sunday Manage &nbsp; <b>H</b> = Extra Holidays</div>
         <div id="attendanceArea"></div>
       </div>
     </section>
@@ -2002,13 +2002,19 @@ function renderHomeExtras(){
     const boxes=[];
     // Today's count stays anonymous, as requested.
     if(active.length&&todayPending.length){
-      const todayText=todayPending.length===1?"1 विद्यार्थी की आज की Attendance बाकी है।":todayPending.length+" विद्यार्थियों की आज की Attendance बाकी है।";
+      const todayText=todayPending.length===1
+        ? (typeof window.t==="function"?window.t("1 विद्यार्थी की आज की Attendance बाकी है।"):"1 विद्यार्थी की आज की Attendance बाकी है।")
+        : (window.getAppLanguage && window.getAppLanguage()==="hindi"
+            ? todayPending.length+" विद्यार्थियों की आज की उपस्थिति दर्ज करना बाकी है।"
+            : window.getAppLanguage && window.getAppLanguage()==="english"
+              ? todayPending.length+" students still need today's attendance recorded."
+              : todayPending.length+" vidyarthiyon ki aaj ki upasthiti darj karna baaki hai.");
       boxes.push('<div class="attendanceReminderItem">📌 '+todayText+'</div>');
     }
     // Show missed past dates by student, without changing today's reminder.
     const todayDate=new Date(today+'T12:00:00');
     const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const formatMissedDate=(key)=>{const parts=key.split('-').map(Number);return parts[2]+' '+monthNames[parts[1]-1];};
+    const formatMissedDate=(key)=>{const parts=key.split('-').map(Number);return parts[2]+' '+(typeof window.t==='function'?window.t(monthNames[parts[1]-1]):monthNames[parts[1]-1]);};
     active.forEach(st=>{
       const startKey=st.joiningDate&&/^\d{4}-\d{2}-\d{2}$/.test(st.joiningDate)?st.joiningDate:today;
       const cursor=new Date(startKey+'T12:00:00');
@@ -3546,7 +3552,7 @@ function renderAttendance(){
           <button class="attendanceChoice ${selected==='L'?'selected statusL':''}" title="Leave" onclick="setAttendanceStatus(${index},'L')">L</button>
           <button class="attendanceChoice ${selected==='S'?'selected statusS':''}" title="Sunday" onclick="setAttendanceStatus(${index},'S')">S</button>
           <button class="attendanceChoice ${selected==='M'?'selected statusM':''}" title="Sunday Manage" onclick="setAttendanceStatus(${index},'M')">M</button>
-          <button class="attendanceChoice ${selected==='H'?'selected statusH':''}" title="Custom" onclick="setAttendanceStatus(${index},'H')">H</button>
+          <button class="attendanceChoice ${selected==='H'?'selected statusH':''}" title="Extra Holidays" onclick="setAttendanceStatus(${index},'H')">H</button>
         </div>
       </div>`;
   });
@@ -3577,7 +3583,7 @@ function setAttendanceStatus(index,code){
   if(code==='S') status="Sunday";
   if(code==='M') status="Sunday Manage ✅";
   if(code==='H'){
-    const text=prompt("Enter Custom Attendance","");
+    const text=prompt(typeof window.t==="function"?window.t("Write Extra Holidays"):"Write Extra Holidays","");
     if(text===null || !text.trim()) return;
     status="EH|"+text.trim();
   }
@@ -4546,11 +4552,13 @@ function downloadPDF(index){
     "January","February","March","April","May","June",
     "July","August","September","October","November","December"
   ];
+  const reportText=(value)=>typeof window.t==="function"?window.t(value):value;
+  const reportMonth=reportText(monthNames[parseInt(selectedMonth)-1]);
 
   let reportHtml = `
-  <h1 style="color:#0d6efd;">Tuition Report</h1>
+  <h1 style="color:#0d6efd;">${reportText("Tuition Report")}</h1>
   <h2>${s.name}</h2>
-  <p><b>Month :</b> ${monthNames[parseInt(selectedMonth)-1]}, ${selectedYear}</p>
+  <p><b>${reportText("Month")} :</b> ${reportMonth}, ${selectedYear}</p>
   <hr>`;
 
   const selectedKey=`${selectedYear}-${String(selectedMonth).padStart(2,'0')}`;
@@ -4561,9 +4569,9 @@ function downloadPDF(index){
     return start && end && start<=feeDateObj(monthEnd) && end>=feeDateObj(monthStart);
   }).sort((a,b)=>String(a.start||'').localeCompare(String(b.start||'')));
 
-  reportHtml += `<h3>Fee Details</h3>`;
+  reportHtml += `<h3>${reportText("Fee Details")}</h3>`;
   const hasCredited=feeItems.some(item=>item.record?.status==='credited');
-  if(hasCredited) reportHtml += `<p style="color:green;font-weight:bold;">Fee Collected ✓</p>`;
+  if(hasCredited) reportHtml += `<p style="color:green;font-weight:bold;">${reportText("Fee Collected")} ✓</p>`;
 
   if(feeItems.length){
     feeItems.forEach(item=>{
@@ -4571,17 +4579,17 @@ function downloadPDF(index){
       const amount=Number(rec?.amount || getKnownFeeAmount(s) || 0);
       if(rec?.status==='credited'){
         const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
-        reportHtml += `<p><b>${item.label}</b><br><span style="color:green;font-weight:bold;">Credited</span> ₹${amount} via ${rec.mode||'Mode not set'} on ${paymentDate}</p>`;
+        reportHtml += `<p><b>${item.label}</b><br><span style="color:green;font-weight:bold;">${reportText("Credited")}</span> ₹${amount} ${reportText("via")} ${rec.mode||reportText("Mode not set")} ${reportText("on")} ${paymentDate}</p>`;
       }else{
-        reportHtml += `<p><b>${item.label}</b><br><span style="color:#d97706;font-weight:bold;">Pending</span>${amount ? ` · ₹${amount}` : ''}</p>`;
+        reportHtml += `<p><b>${item.label}</b><br><span style="color:#d97706;font-weight:bold;">${reportText("Pending")}</span>${amount ? ` · ₹${amount}` : ''}</p>`;
       }
     });
   }else{
-    reportHtml += `<p>Pending</p>`;
+    reportHtml += `<p>${reportText("Pending")}</p>`;
   }
   reportHtml += `<hr>`;
 
-  reportHtml += `<h3>Attendance</h3>`;
+  reportHtml += `<h3>${reportText("Attendance")}</h3>`;
 
   let present=0, absent=0, leave=0, sunday=0, sundayManage=0, extraHoliday=0;
   let foundAttendance=false;
@@ -4591,8 +4599,17 @@ function downloadPDF(index){
     if(parts[0] === selectedYear && parts[1] === selectedMonth){
       foundAttendance=true;
       const day=parts[2];
-      const displayStatus=a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
-
+      const rawStatus=a.status.startsWith("EH|") ? a.status.split("|")[1] : a.status;
+      const standardStatus={
+        "Present":reportText("Present"),
+        "Absent ❌":reportText("Absent ❌"),
+        "Absent":reportText("Absent"),
+        "Leave":reportText("Leave"),
+        "Sunday":reportText("Sunday"),
+        "Sunday Manage ✅":reportText("Sunday Manage ✅"),
+        "Chhath Puja":reportText("Chhath Puja")
+      };
+      const displayStatus=Object.prototype.hasOwnProperty.call(standardStatus,rawStatus)?standardStatus[rawStatus]:rawStatus;
       reportHtml += `<p>${day} - ${displayStatus}</p>`;
 
       if(a.status=="Present") present++;
@@ -4617,7 +4634,7 @@ function downloadPDF(index){
     ${extraHoliday>0 ? `| <span style="color:#ff8800">EH : ${extraHoliday}</span>` : ""}
   </div>`;
 
-  if(!foundAttendance) reportHtml += `<p>No attendance found</p>`;
+  if(!foundAttendance) reportHtml += `<p>${reportText("No attendance found")}</p>`;
 
   const reportWindow=window.open("","_blank");
   reportWindow.document.write(`
@@ -4627,7 +4644,7 @@ function downloadPDF(index){
   <body style="font-family:Arial;padding:20px;">
     <div style="text-align:right;margin-bottom:20px;">
       <button onclick="window.print()" style="padding:10px 18px;background:#0d6efd;color:white;border:none;border-radius:8px;font-size:16px;cursor:pointer;">
-        Print Report
+        ${reportText("Print Report")}
       </button>
     </div>
     ${reportHtml}
@@ -5167,11 +5184,233 @@ Object.assign(APP_TRANSLATIONS.english, {
  'ऐप लॉक चालू नहीं है। पहले ऐप लॉक चालू करें।':'App Lock is not enabled. Please enable App Lock first.',
  'मौजूदा PIN डालें':'Enter Current PIN','नया 4 अंकों का PIN बनाएँ':'Create New 4 Digit PIN','उत्तर दिखाएँ':'Show answer','उत्तर छिपाएँ':'Hide answer'
 });
+
+ Object.assign(APP_TRANSLATIONS.hindi, {
+ 'Hindi':'हिंदी','English':'अंग्रेज़ी','Hinglish':'हिंग्लिश',
+ 'Monthly Fee':'मासिक ट्यूशन फीस','Tuition Joining Date':'ट्यूशन शुरू करने की तारीख',
+ 'Cash':'नकद','UPI':'UPI','Total Collections':'कुल फीस प्राप्ति',
+ 'Fee Credited':'ट्यूशन फीस प्राप्त हो गई','Fee Pending':'ट्यूशन फीस बाकी है',
+ 'Total Fee Pending':'कुल बकाया ट्यूशन फीस','Total Fee Pending -':'कुल बकाया ट्यूशन फीस -',
+ 'Total Pending -':'कुल बकाया ट्यूशन फीस -','Remaining':'बाकी राशि','Discount':'छूट',
+ 'Advance':'अग्रिम भुगतान','Mode not set':'भुगतान का तरीका नहीं चुना गया',
+ 'Sunday Manage':'रविवार (पिछला अनुपस्थिति मैनेज)',
+ '= Extra Holidays':'= अतिरिक्त छुट्टी',
+ 'Sunday Manage ✅':'रविवार (पिछला अनुपस्थिति मैनेज) ✅',
+ '= Sunday Manage':'= रविवार (पिछला अनुपस्थिति मैनेज)',
+ 'Extra Holidays':'अतिरिक्त छुट्टी','Write Extra Holidays':'अतिरिक्त छुट्टी लिखें',
+ 'Enter Extra Holiday':'अतिरिक्त छुट्टी लिखें','Custom':'अतिरिक्त छुट्टी',
+ '= Custom':'= अतिरिक्त छुट्टी','Print Report':'रिपोर्ट प्रिंट करें',
+ 'Fee Collected':'ट्यूशन फीस प्राप्त हुई','Fee Details':'फीस का विवरण',
+ 'Credited':'प्राप्त','Pending':'बाकी','Fee Period':'फीस की अवधि',
+ 'Calendar Month':'कैलेंडर महीना','Monthly Details':'मासिक विवरण',
+ 'Not added':'जोड़ा नहीं गया','Set Joining Date':'ट्यूशन शुरू करने की तारीख सेट करें',
+ 'Joining date is not set yet.':'ट्यूशन शुरू करने की तारीख अभी दर्ज नहीं है।',
+ 'Search Student':'विद्यार्थी खोजें','Search student...':'विद्यार्थी खोजें...',
+ '1 विद्यार्थी की आज की Attendance बाकी है।':'1 विद्यार्थी की आज की उपस्थिति दर्ज करना बाकी है।',
+ 'विद्यार्थी की आज की Attendance बाकी है।':'विद्यार्थी की आज की उपस्थिति दर्ज करना बाकी है।',
+ 'Chhath Puja':'छठ पूजा','Present':'उपस्थित','Absent':'अनुपस्थित',
+ 'Absent ❌':'अनुपस्थित ❌','Leave':'छुट्टी','Sunday':'रविवार',
+ 'OK':'ठीक है','Cancel':'रद्द करें','Month Name':'महीने का नाम',
+ 'No fee details in this year yet.':'इस वर्ष की फीस का कोई विवरण अभी उपलब्ध नहीं है।',
+ 'No attendance found':'उपस्थिति का कोई रिकॉर्ड नहीं मिला।',
+ 'Tuition Report':'ट्यूशन रिपोर्ट','Month':'महीना','via':'के माध्यम से','on':'को',
+ 'Edit fee record':'फीस रिकॉर्ड संपादित करें','Delete fee record':'फीस रिकॉर्ड हटाएँ',
+ 'Edit joining date':'शुरू करने की तारीख संपादित करें',
+ 'Student details not added yet.':'विद्यार्थी का विवरण अभी नहीं जोड़ा गया है।',
+ 'Mobile Number':'मोबाइल नंबर','Activate':'सक्रिय करें',
+ 'Active Student':'सक्रिय विद्यार्थी','Inactive Student':'निष्क्रिय विद्यार्थी'
+ });
+ Object.assign(APP_TRANSLATIONS.hinglish, {
+ 'Hindi':'Hindi','English':'English','Hinglish':'Hinglish',
+ 'January':'Janvari','February':'Farvari','August':'Agast','September':'Sitambar',
+ 'October':'Aktubar','November':'Navambar','December':'Disambar',
+ 'Monthly Fee':'Monthly tuition fee','Tuition Joining Date':'Tuition shuru karne ki tareekh',
+ 'Cash':'Cash','UPI':'UPI','Total Collections':'Kul tuition fees mili',
+ 'Fee Credited':'Tuition fee mil gayi','Fee Pending':'Tuition fee baaki hai',
+ 'Total Fee Pending':'Kul baaki tuition fees','Total Fee Pending -':'Kul baaki tuition fees -',
+ 'Total Pending -':'Kul baaki tuition fees -','Remaining':'Baaki rakam','Discount':'Chhoot',
+ 'Advance':'Advance payment','Mode not set':'Payment ka tareeka nahi chuna gaya',
+ 'Sunday Manage':'Ravivar (pichhli gairhaziri manage)',
+ '= Extra Holidays':'= Extra chhutti',
+ 'Sunday Manage ✅':'Ravivar (pichhli gairhaziri manage) ✅',
+ '= Sunday Manage':'= Ravivar (pichhli gairhaziri manage)',
+ 'Extra Holidays':'Extra chhutti','Write Extra Holidays':'Extra chhutti likhein',
+ 'Enter Extra Holiday':'Extra chhutti likhein','Custom':'Extra chhutti',
+ '= Custom':'= Extra chhutti','Print Report':'Report print karein',
+ 'Fee Collected':'Tuition fee mil gayi','Fee Details':'Fees ka vivaran',
+ 'Credited':'Mil gayi','Pending':'Baaki','Fee Period':'Fees ki avadhi',
+ 'Calendar Month':'Calendar month','Monthly Details':'Mahine ka vivaran',
+ 'Not added':'Nahi joda gaya','Set Joining Date':'Tuition shuru hone ki tareekh set karein',
+ 'Joining date is not set yet.':'Tuition shuru hone ki tareekh abhi darj nahi hai.',
+ 'Search Student':'Vidyarthi khojein','Search student...':'Vidyarthi khojein...',
+ '1 विद्यार्थी की आज की Attendance बाकी है।':'1 vidyarthi ki aaj ki upasthiti darj karna baaki hai.',
+ 'विद्यार्थी की आज की Attendance बाकी है।':'Vidyarthi ki aaj ki upasthiti darj karna baaki hai.',
+ 'Chhath Puja':'Chhath Puja','Present':'Hazir','Absent':'Gairhazir',
+ 'Absent ❌':'Gairhazir ❌','Leave':'Chhutti','Sunday':'Ravivar',
+ 'OK':'Theek hai','Cancel':'Radd karein','Month Name':'Mahine ka naam',
+ 'No fee details in this year yet.':'Is saal fees ka koi vivaran abhi nahi hai.',
+ 'No attendance found':'Upasthiti ka koi record nahi mila.',
+ 'Tuition Report':'Tuition report','Month':'Mahina','via':'ke zariye','on':'ko',
+ 'Edit fee record':'Fee record edit karein','Delete fee record':'Fee record delete karein',
+ 'Edit joining date':'Tuition shuru hone ki tareekh edit karein',
+ 'Student details not added yet.':'Student ki details abhi add nahi hui hain.',
+ 'Mobile Number':'Mobile number','Active':'Sakriya','Inactive':'Nishkriya','Activate':'Sakriya karein',
+ 'Active Student':'Sakriya vidyarthi','Inactive Student':'Nishkriya vidyarthi'
+ });
+
+ Object.assign(APP_TRANSLATIONS.hindi, {
+  'आपका विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।':'आपका विचार आज के लिए होम स्क्रीन पर सेट हो गया है। दोबारा दबाने पर सामान्य क्रम फिर से चालू हो जाएगा।',
+  'इस विद्यार्थी और उसके सभी Attendance/Fees रिकॉर्ड को हमेशा के लिए मिटाएँ? यह वापस नहीं आएगा?':'क्या आप इस विद्यार्थी और उसके सभी उपस्थिति/फीस रिकॉर्ड को हमेशा के लिए हटाना चाहते हैं? इसे वापस नहीं लाया जा सकेगा।',
+  'इस Note को Delete करना चाहते हैं?':'क्या आप यह नोट हटाना चाहते हैं?',
+  'इस विचार को हमेशा के लिए हटाना चाहते हैं?':'क्या आप इस विचार को हमेशा के लिए हटाना चाहते हैं?',
+  'इस विद्यार्थी को Trash में भेजें? वह 30 दिनों तक पूरा रिकॉर्ड सहित वापस लाया जा सकता है।':'क्या आप इस विद्यार्थी को हटाए गए विद्यार्थियों में भेजना चाहते हैं? इसे 30 दिनों तक पूरे रिकॉर्ड सहित वापस लाया जा सकता है।',
+  'Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।':'नोट में बदलाव हैं। OK दबाने पर नोट सेव होगा और Cancel दबाने पर बदलाव रद्द होंगे।',
+  'Kya aap profile photo hatana chahte hain?':'क्या आप प्रोफ़ाइल फोटो हटाना चाहते हैं?',
+  'Photo save nahi ho paya. Chhoti image select karke dobara try karein.':'फोटो सेव नहीं हो पाई। छोटी तस्वीर चुनकर फिर कोशिश करें।',
+  'Text blank nahi ho sakta. Kripya kuch text likhein.':'टेक्स्ट खाली नहीं हो सकता। कृपया कुछ लिखें।',
+  'Home Display par kaunsa text dikhana hai?':'होम स्क्रीन पर कौन-सा टेक्स्ट दिखाना है?'
+ });
+ Object.assign(APP_TRANSLATIONS.hinglish, {
+  'आपका विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।':'Aapka thought aaj ke liye Home screen par set ho gaya hai. Dobara tap karne par normal sequence phir se chalu ho jayega.',
+  'इस विद्यार्थी और उसके सभी Attendance/Fees रिकॉर्ड को हमेशा के लिए मिटाएँ? यह वापस नहीं आएगा?':'Kya aap is vidyarthi aur uske sabhi attendance/fees records hamesha ke liye delete karna chahte hain? Ise wapas nahi la sakenge.',
+  'इस Note को Delete करना चाहते हैं?':'Kya aap ye note delete karna chahte hain?',
+  'इस विचार को हमेशा के लिए हटाना चाहते हैं?':'Kya aap ye thought hamesha ke liye delete karna chahte hain?',
+  'इस विद्यार्थी को Trash में भेजें? वह 30 दिनों तक पूरा रिकॉर्ड सहित वापस लाया जा सकता है।':'Kya aap is vidyarthi ko deleted students mein bhejna chahte hain? Ise 30 din tak poore record ke saath wapas la sakte hain.',
+  'Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।':'Note mein badlav hain. OK dabane par note save hoga aur Cancel dabane par badlav cancel honge.',
+  'Kya aap profile photo hatana chahte hain?':'Kya aap profile photo hatana chahte hain?',
+  'Photo save nahi ho paya. Chhoti image select karke dobara try karein.':'Photo save nahi ho payi. Chhoti photo select karke dobara try karein.',
+  'Text blank nahi ho sakta. Kripya kuch text likhein.':'Text khaali nahi ho sakta. Kripya kuch likhein.',
+  'Home Display par kaunsa text dikhana hai?':'Home screen par kaunsa text dikhana hai?'
+ });
+
+ Object.assign(APP_TRANSLATIONS.english, {
+  'आपका विचार आज के लिए Home Page पर सेट हो गया है। दोबारा दबाने पर सामान्य Loop चालू हो जाएगा।':'Your thought is set on the Home screen for today. Tap again to resume the normal sequence.',
+  'इस विद्यार्थी और उसके सभी Attendance/Fees रिकॉर्ड को हमेशा के लिए मिटाएँ? यह वापस नहीं आएगा?':'Permanently delete this student and all attendance/fee records? This cannot be undone.',
+  'इस Note को Delete करना चाहते हैं?':'Do you want to delete this note?',
+  'इस विचार को हमेशा के लिए हटाना चाहते हैं?':'Do you want to permanently delete this thought?',
+  'इस विद्यार्थी को Trash में भेजें? वह 30 दिनों तक पूरा रिकॉर्ड सहित वापस लाया जा सकता है।':'Move this student to Deleted Students? The student and full record can be recovered for 30 days.',
+  'Note में बदलाव हैं। OK = Save, Cancel = बदलाव रद्द करें।':'The note has changes. Press OK to save the note or Cancel to discard the changes.',
+  'Kya aap profile photo hatana chahte hain?':'Do you want to remove the profile photo?',
+  'Photo save nahi ho paya. Chhoti image select karke dobara try karein.':'The photo could not be saved. Select a smaller image and try again.',
+  'Text blank nahi ho sakta. Kripya kuch text likhein.':'Text cannot be blank. Please enter some text.',
+  'Home Display par kaunsa text dikhana hai?':'What text should appear on the Home screen?'
+ });
+ Object.assign(APP_TRANSLATIONS.english, {
+ 'Sunday Manage':'Sunday (Previous absent manage)','Sunday Manage ✅':'Sunday (Previous absent manage) ✅',
+ '= Sunday Manage':'= Sunday (Previous absent manage)',
+ 'रविवार (पिछला अनुपस्थिति मैनेज)':'Sunday (Previous absent manage)',
+ 'रविवार (पिछला अनुपस्थिति मैनेज) ✅':'Sunday (Previous absent manage) ✅',
+ 'अतिरिक्त छुट्टी':'Extra Holidays','अतिरिक्त छुट्टी लिखें':'Write Extra Holidays',
+ 'रिपोर्ट प्रिंट करें':'Print Report','ट्यूशन फीस प्राप्त हो गई':'Tuition Fee Received',
+ 'ट्यूशन फीस बाकी है':'Tuition Fee Pending','कुल फीस प्राप्ति':'Total Collections',
+ 'मासिक ट्यूशन फीस':'Monthly Fee','ट्यूशन शुरू करने की तारीख':'Tuition Joining Date',
+ 'नकद':'Cash','कुल बकाया ट्यूशन फीस':'Total Fee Pending',
+ 'विद्यार्थी खोजें':'Search Student','उपस्थिति':'Attendance',
+ 'उपस्थित':'Present','अनुपस्थित':'Absent','छुट्टी':'Leave','रविवार':'Sunday',
+ 'ठीक है':'OK','रद्द करें':'Cancel','छठ पूजा':'Chhath Puja',
+ '1 विद्यार्थी की आज की उपस्थिति दर्ज करना बाकी है।':'1 student attendance is still pending for today.','1 विद्यार्थी की आज की Attendance बाकी है।':'1 student attendance is still pending for today.','महीना':'Month'
+ });
+
+
+ Object.assign(APP_TRANSLATIONS.hindi, {
+  'Please select an image.':'कृपया एक तस्वीर चुनें।',
+  'Image open nahi ho payi.':'तस्वीर नहीं खुल पाई।',
+  'Name cannot be empty':'नाम खाली नहीं हो सकता।',
+  'Google Login failed. Please try again.':'Google लॉगिन नहीं हुआ। कृपया फिर कोशिश करें।',
+  'Please sign in with your Google account first.':'कृपया पहले अपने Google अकाउंट से साइन इन करें।',
+  'App Lock Disabled':'ऐप लॉक बंद कर दिया गया।','App Lock Enabled':'ऐप लॉक चालू कर दिया गया।',
+  'Wrong PIN':'गलत PIN','PIN must be 4 digits':'PIN 4 अंकों का होना चाहिए।',
+  'Select Date':'तारीख चुनें','Attendance Saved':'उपस्थिति सेव हो गई।',
+  'Please select a valid date.':'कृपया सही तारीख चुनें।',
+  'Fill all payment details':'भुगतान की सभी जानकारी भरें।',
+  'Received amount must be greater than 0':'प्राप्त राशि 0 से अधिक होनी चाहिए।',
+  'Remaining amount cannot be negative':'बाकी राशि ऋणात्मक नहीं हो सकती।',
+  'Select Fee Month':'फीस का महीना चुनें।','Select Fee Period':'फीस की अवधि चुनें।',
+  'End date must be after start date':'अंतिम तारीख शुरुआती तारीख के बाद होनी चाहिए।',
+  'Please select a valid Effective Month for the new monthly fee.':'नई मासिक फीस लागू करने के लिए सही महीना चुनें।',
+  'Effective Month cannot be earlier than the current month. This protects previous fee history.':'फीस लागू होने का महीना वर्तमान महीने से पहले नहीं हो सकता। इससे पिछली फीस का रिकॉर्ड सुरक्षित रहेगा।',
+  'Please select a valid Date of Joining.':'कृपया ट्यूशन शुरू करने की सही तारीख चुनें।',
+  'Unable to load this image.':'यह तस्वीर लोड नहीं हो सकी।',
+  'Fingerprint/biometric unlock is not available in this browser. Use your PIN.':'इस ब्राउज़र में फिंगरप्रिंट से अनलॉक करने की सुविधा नहीं है। अपना PIN इस्तेमाल करें।',
+  'App Lock is not enabled. Please enable App Lock first.':'ऐप लॉक चालू नहीं है। पहले ऐप लॉक चालू करें।',
+  'Wrong Current PIN':'मौजूदा PIN गलत है।','New PINs do not match':'दोनों नए PIN एक जैसे नहीं हैं।',
+  'PIN Changed Successfully':'PIN सफलतापूर्वक बदल दिया गया।',
+  'Google Drive sync completed.':'Google Drive सिंक पूरा हो गया।',
+  'Google Drive sync failed. Your local data is safe.':'Google Drive सिंक नहीं हुआ। आपका लोकल डेटा सुरक्षित है।',
+  'No Google Drive data found for this Google account.':'इस Google अकाउंट के लिए Google Drive में कोई डेटा नहीं मिला।',
+  'Invalid Google Drive data.':'Google Drive का डेटा मान्य नहीं है।',
+  'Google Drive data restored successfully.':'Google Drive का डेटा सफलतापूर्वक वापस आ गया।',
+  'Google Drive restore failed. Your local data is safe.':'Google Drive से डेटा वापस नहीं आया। आपका लोकल डेटा सुरक्षित है।',
+  'Backup Created Successfully':'बैकअप सफलतापूर्वक बन गया।',
+  'Invalid Backup File':'बैकअप फाइल मान्य नहीं है।',
+  'Backup Restored Successfully':'बैकअप सफलतापूर्वक वापस आ गया।',
+  'Home Display par kaunsa text dikhana hai?':'होम स्क्रीन पर कौन-सा टेक्स्ट दिखाना है?',
+  'Enter your name':'अपना नाम लिखें','Enter PIN to Disable Lock':'लॉक बंद करने के लिए PIN डालें',
+  'Create 4 Digit PIN':'4 अंकों का PIN बनाएँ','Edit Student Name':'विद्यार्थी का नाम बदलें',
+  'Enter Current PIN':'मौजूदा PIN डालें','Create New 4 Digit PIN':'नया 4 अंकों का PIN बनाएँ',
+  'Re-enter New PIN':'नया PIN दोबारा डालें','Enter Extra Holiday':'अतिरिक्त छुट्टी लिखें',
+  "Remove this student's photo?":"क्या आप इस विद्यार्थी की फोटो हटाना चाहते हैं?",
+  "Would you like to unlock App Lock with your phone's fingerprint too?":"क्या आप फोन के फिंगरप्रिंट से भी ऐप अनलॉक करना चाहेंगे?",
+  "Change Google Account?\\n\\nYour current account's data will remain saved separately. You will be taken to Google Sign in.":"क्या आप Google अकाउंट बदलना चाहते हैं?\\n\\nआपके मौजूदा अकाउंट का डेटा अलग से सुरक्षित रहेगा। इसके बाद Google साइन-इन खुलेगा।",
+  'आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे।':'आपने नोट में बदलाव किए हैं। OK दबाने पर बदलाव सेव होंगे और Cancel दबाने पर रद्द होंगे।'
+ });
+ Object.assign(APP_TRANSLATIONS.hinglish, {
+  'Please select an image.':'Kripya ek photo select karein.',
+  'Image open nahi ho payi.':'Photo open nahi ho payi.',
+  'Name cannot be empty':'Naam khaali nahi ho sakta.',
+  'Google Login failed. Please try again.':'Google login nahi hua. Kripya dobara try karein.',
+  'Please sign in with your Google account first.':'Pehle apne Google account se sign in karein.',
+  'App Lock Disabled':'App Lock band ho gaya.','App Lock Enabled':'App Lock chalu ho gaya.',
+  'Wrong PIN':'PIN galat hai.','PIN must be 4 digits':'PIN 4 digit ka hona chahiye.',
+  'Select Date':'Date select karein','Attendance Saved':'Attendance save ho gayi.',
+  'Please select a valid date.':'Sahi date select karein.',
+  'Fill all payment details':'Payment ki saari details bharein.',
+  'Received amount must be greater than 0':'Mili hui rakam 0 se zyada honi chahiye.',
+  'Remaining amount cannot be negative':'Baaki rakam negative nahi ho sakti.',
+  'Select Fee Month':'Fees ka mahina select karein.','Select Fee Period':'Fees ki avadhi select karein.',
+  'End date must be after start date':'End date, start date ke baad honi chahiye.',
+  'Please select a valid Effective Month for the new monthly fee.':'Nayi monthly fees lagu karne ke liye sahi mahina select karein.',
+  'Effective Month cannot be earlier than the current month. This protects previous fee history.':'Fees lagu hone ka mahina current month se pehle nahi ho sakta. Isse purani fees ka record safe rahega.',
+  'Please select a valid Date of Joining.':'Tuition shuru hone ki sahi date select karein.',
+  'Unable to load this image.':'Ye photo load nahi ho payi.',
+  'Fingerprint/biometric unlock is not available in this browser. Use your PIN.':'Is browser mein fingerprint unlock available nahi hai. Apna PIN use karein.',
+  'App Lock is not enabled. Please enable App Lock first.':'App Lock chalu nahi hai. Pehle App Lock chalu karein.',
+  'Wrong Current PIN':'Current PIN galat hai.','New PINs do not match':'Dono naye PIN ek jaise nahi hain.',
+  'PIN Changed Successfully':'PIN successfully change ho gaya.',
+  'Google Drive sync completed.':'Google Drive sync complete ho gaya.',
+  'Google Drive sync failed. Your local data is safe.':'Google Drive sync nahi hua. Aapka local data safe hai.',
+  'No Google Drive data found for this Google account.':'Is Google account ke liye Google Drive mein data nahi mila.',
+  'Invalid Google Drive data.':'Google Drive ka data valid nahi hai.',
+  'Google Drive data restored successfully.':'Google Drive ka data successfully wapas aa gaya.',
+  'Google Drive restore failed. Your local data is safe.':'Google Drive se data restore nahi hua. Aapka local data safe hai.',
+  'Backup Created Successfully':'Backup successfully ban gaya.',
+  'Invalid Backup File':'Backup file valid nahi hai.',
+  'Backup Restored Successfully':'Backup successfully restore ho gaya.',
+  'Home Display par kaunsa text dikhana hai?':'Home screen par kaunsa text dikhana hai?',
+  'Enter your name':'Apna naam likhein','Enter PIN to Disable Lock':'Lock band karne ke liye PIN daalein',
+  'Create 4 Digit PIN':'4 digit PIN banayein','Edit Student Name':'Vidyarthi ka naam badlein',
+  'Enter Current PIN':'Current PIN daalein','Create New 4 Digit PIN':'Naya 4 digit PIN banayein',
+  'Re-enter New PIN':'Naya PIN dobara daalein','Enter Extra Holiday':'Extra chhutti likhein',
+  "Remove this student's photo?":"Kya is vidyarthi ki photo hatani hai?",
+  "Would you like to unlock App Lock with your phone's fingerprint too?":"Kya aap phone ke fingerprint se bhi App Lock unlock karna chahenge?",
+  'आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे।':'Note mein badlav hain. OK dabane par save honge aur Cancel dabane par cancel honge.'
+ });
+ Object.assign(APP_TRANSLATIONS.english, {
+  'होम स्क्रीन पर कौन-सा टेक्स्ट दिखाना है?':'What text should appear on the Home screen?',
+  'अपना नाम लिखें':'Enter your name','लॉक बंद करने के लिए PIN डालें':'Enter PIN to Disable Lock',
+  '4 अंकों का PIN बनाएँ':'Create 4 Digit PIN','विद्यार्थी का नाम बदलें':'Edit Student Name',
+  'मौजूदा PIN डालें':'Enter Current PIN','नया 4 अंकों का PIN बनाएँ':'Create New 4 Digit PIN',
+  "Remove this student's photo?":"क्या आप इस विद्यार्थी की फोटो हटाना चाहते हैं?",
+  "Would you like to unlock App Lock with your phone's fingerprint too?":"क्या आप फोन के फिंगरप्रिंट से भी ऐप अनलॉक करना चाहेंगे?",
+  "Change Google Account?\\n\\nYour current account's data will remain saved separately. You will be taken to Google Sign in.":"क्या आप Google अकाउंट बदलना चाहते हैं?\\n\\nआपके मौजूदा अकाउंट का डेटा अलग से सुरक्षित रहेगा। इसके बाद Google साइन-इन खुलेगा।",
+  'आपने नोट में बदलाव किए हैं। OK दबाने पर बदलाव सेव होंगे और Cancel दबाने पर रद्द होंगे।':'You have unsaved note changes. Press OK to save or Cancel to discard them.'
+ });
+
 (function(){
   const originalTextNodes=new WeakMap();
   const originalAttributes=new WeakMap();
   let currentLanguage='hinglish';
-  const NEVER_TRANSLATE = '#teachingMottoHome,#teachingMottoPreview,#homeMyNotesContent,.myNoteContent,.thoughtItemText,.pfQuestion,.pfAnswer,[data-no-translate],input,textarea,[contenteditable="true"]';
+  const NEVER_TRANSLATE = '#teachingMottoHome,#teachingMottoPreview,#homeMyNotesContent,.myNoteContent,.thoughtItemText,.thoughtText,.pfQuestion,.pfAnswer,.appTitle,.aboutAppName,.googleLoginBox h2,[data-no-translate],input,textarea,[contenteditable="true"]';
   const PATTERNS = {
     hindi: [
       [/^Mark (.+) as Inactive\?([\s\S]*)$/i,(_,name,tail)=>`${name} को निष्क्रिय करें?${tail.replace(/This student will stop appearing in Daily Attendance\. Previous attendance and fee data will remain safe\./,'\n\nयह विद्यार्थी दैनिक उपस्थिति में नहीं दिखेगा। पिछली उपस्थिति और फीस का रिकॉर्ड सुरक्षित रहेगा।')}`],
@@ -5203,13 +5442,64 @@ Object.assign(APP_TRANSLATIONS.english, {
       [/^कुल बाकी फीस\s*-\s*(.+)$/i,(_,amount)=>`Total Pending Fees - ${amount}`]
     ]
   };
+  PATTERNS.hindi.push(
+    [/^Advance\s*[·-]\s*₹([\d,]+)$/i,(_,amount)=>`अग्रिम भुगतान · ₹${amount}`],
+    [/^Remaining\s*-\s*₹([\d,]+)$/i,(_,amount)=>`बाकी राशि - ₹${amount}`],
+    [/^Discount\s*₹([\d,]+)$/i,(_,amount)=>`छूट ₹${amount}`]
+  );
+  PATTERNS.hinglish.push(
+    [/^Advance\s*[·-]\s*₹([\d,]+)$/i,(_,amount)=>`Advance payment · ₹${amount}`],
+    [/^Remaining\s*-\s*₹([\d,]+)$/i,(_,amount)=>`Baaki rakam - ₹${amount}`],
+    [/^Discount\s*₹([\d,]+)$/i,(_,amount)=>`Chhoot ₹${amount}`]
+  );
+  PATTERNS.english.push(
+    [/^अग्रिम भुगतान\s*[·-]\s*₹([\d,]+)$/i,(_,amount)=>`Advance · ₹${amount}`],
+    [/^बाकी राशि\s*-\s*₹([\d,]+)$/i,(_,amount)=>`Remaining - ₹${amount}`],
+    [/^छूट\s*₹([\d,]+)$/i,(_,amount)=>`Discount ₹${amount}`]
+  );
+  PATTERNS.hindi.push(
+    [/^(\d{4})\s*•\s*Total Collections\s*-\s*₹([\d,]+)$/i,(_,year,amount)=>`${year} • कुल फीस प्राप्ति - ₹${amount}`]
+  );
+  PATTERNS.hinglish.push(
+    [/^(\d{4})\s*•\s*Total Collections\s*-\s*₹([\d,]+)$/i,(_,year,amount)=>`${year} • Kul tuition fees mili - ₹${amount}`]
+  );
+  PATTERNS.english.push(
+    [/^(\d{4})\s*•\s*कुल फीस प्राप्ति\s*-\s*₹([\d,]+)$/i,(_,year,amount)=>`${year} • Total Collections - ₹${amount}`]
+  );
+  PATTERNS.hindi.push(
+    [/^Google Drive data mil gaya\.\s*Kya aap is data ko restore karna chahte hain\?\s*Current local data will be replaced\.$/i,()=>'Google Drive का डेटा मिल गया है।\n\nक्या आप इसे वापस लाना चाहते हैं?\n\nमौजूदा डिवाइस का डेटा बदल जाएगा।'],
+    [/^Change Google Account\?\s*Your current account's data will remain saved separately\.\s*You will be taken to Google Sign in\.$/i,()=>'क्या आप Google अकाउंट बदलना चाहते हैं?\n\nआपके मौजूदा अकाउंट का डेटा अलग से सुरक्षित रहेगा। इसके बाद Google साइन-इन खुलेगा।'],
+    [/^(.+) section abhi is version mein available nahi hai\.\s*Iska feature alag se add kiya jayega\.$/i,(_,feature)=>`${APP_TRANSLATIONS.hindi[feature]||feature} सेक्शन अभी इस संस्करण में उपलब्ध नहीं है। इसका फीचर अलग से जोड़ा जाएगा।`],
+    [/^आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।$/i,()=>'आपने नोट में बदलाव किए हैं। OK दबाने पर बदलाव रद्द होंगे और Cancel दबाने पर नोट खुला रहेगा।']
+  );
+  PATTERNS.hinglish.push(
+    [/^Google Drive data mil gaya\.\s*Kya aap is data ko restore karna chahte hain\?\s*Current local data will be replaced\.$/i,()=>'Google Drive ka data mil gaya hai.\n\nKya aap ise restore karna chahte hain?\n\nMaujooda device ka data replace ho jayega.'],
+    [/^Change Google Account\?\s*Your current account's data will remain saved separately\.\s*You will be taken to Google Sign in\.$/i,()=>'Kya aap Google account badalna chahte hain?\n\nAapke current account ka data alag se safe rahega. Iske baad Google sign-in khulega.'],
+    [/^(.+) section abhi is version mein available nahi hai\.\s*Iska feature alag se add kiya jayega\.$/i,(_,feature)=>`${APP_TRANSLATIONS.hinglish[feature]||feature} section abhi is version mein available nahi hai. Iska feature alag se add kiya jayega.`],
+    [/^आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।$/i,()=>'Aapne note mein badlav kiye hain. OK dabane par badlav cancel honge aur Cancel dabane par note khula rahega.']
+  );
+  PATTERNS.english.push(
+    [/^Google Drive data mil gaya\.\s*Kya aap is data ko restore karna chahte hain\?\s*Current local data will be replaced\.$/i,()=>'Google Drive data was found.\\n\\nDo you want to restore it?\\n\\nYour current device data will be replaced.'],
+    [/^(.+) section abhi is version mein available nahi hai\.\s*Iska feature alag se add kiya jayega\.$/i,(_,feature)=>`${feature} section is not available in this version yet. It will be added separately.`],
+    [/^आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।$/i,()=>'You have made changes to the note. Press OK to discard them; Cancel to keep the note open.']
+  );
+
   function translatePhrase(value){
+    const monthYearNames = {
+      hindi:{January:'जनवरी',February:'फ़रवरी',March:'मार्च',April:'अप्रैल',May:'मई',June:'जून',July:'जुलाई',August:'अगस्त',September:'सितंबर',October:'अक्टूबर',November:'नवंबर',December:'दिसंबर'},
+      hinglish:{January:'Janvari',February:'Farvari',March:'March',April:'April',May:'May',June:'June',July:'July',August:'Agast',September:'Sitambar',October:'Aktubar',November:'Navambar',December:'Disambar'}
+    };
+    const monthYearMatch=value.match(/^(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})$/);
+    if(monthYearMatch && monthYearNames[currentLanguage]) return monthYearNames[currentLanguage][monthYearMatch[1]]+' '+monthYearMatch[2];
     const dict=APP_TRANSLATIONS[currentLanguage]||{};
     if(Object.prototype.hasOwnProperty.call(dict,value)) return dict[value];
     for(const [pattern,replace] of (PATTERNS[currentLanguage]||[])){const match=value.match(pattern);if(match)return value.replace(pattern,replace);}
     return value;
   }
   function shouldSkip(el){return !!(el&&el.closest&&el.closest(NEVER_TRANSLATE));}
+  function shouldSkipAttributes(el){
+    return !!(el&&el.closest&&el.closest('#teachingMottoHome,#teachingMottoPreview,#homeMyNotesContent,.myNoteContent,.thoughtItemText,.thoughtText,.pfQuestion,.pfAnswer,.appTitle,.aboutAppName,.googleLoginBox h2,[data-no-translate],[contenteditable="true"]'));
+  }
   function translateNode(node){
     if(node.nodeType!==Node.TEXT_NODE || !node.parentElement || shouldSkip(node.parentElement)) return;
     if(node.parentElement.closest('script,style')) return;
@@ -5226,7 +5516,7 @@ Object.assign(APP_TRANSLATIONS.english, {
     if(root.nodeType===Node.ELEMENT_NODE) nodes.push(root);
     if(root.querySelectorAll) nodes.push(...root.querySelectorAll('[placeholder],[title],[aria-label],[value]'));
     for(const el of nodes){
-      if(shouldSkip(el)) continue;
+      if(shouldSkipAttributes(el)) continue;
       for(const attr of ['placeholder','title','aria-label','value']){
         if(!el.hasAttribute(attr)) continue;
         if(attr==='value' && !['button','submit','reset'].includes((el.type||'').toLowerCase())) continue;
