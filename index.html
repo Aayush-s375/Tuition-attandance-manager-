@@ -804,6 +804,16 @@ body.darkMode #reportArea .student{
 }
 
 
+/* Hindi report typography: visually match the English report text. */
+html[lang="hi"] #reportArea .reportSlide > p{font-size:14px!important;}
+html[lang="hi"] #reportArea .reportSlide .summary{font-size:14px!important;}
+
+/* Hindi + dark mode fee card: keep the first date-range and Update control on one row. */
+body.darkMode .modernStudent.feeHindiDarkRow,html[lang="hi"] body.darkMode .modernStudent:has(.feeStatusBlock){align-items:flex-start;gap:8px;}
+body.darkMode .modernStudent.feeHindiDarkRow .studentMain,html[lang="hi"] body.darkMode .modernStudent:has(.feeStatusBlock) .studentMain{min-width:0;}
+body.darkMode .modernStudent.feeHindiDarkRow .feeStatusBlock:first-child .feeStatusLine:first-child,html[lang="hi"] body.darkMode .modernStudent:has(.feeStatusBlock) .feeStatusBlock:first-child .feeStatusLine:first-child{display:block;white-space:nowrap!important;overflow:hidden;text-overflow:clip;font-size:8.5px!important;letter-spacing:-.2px;line-height:1.25;}
+body.darkMode .modernStudent.feeHindiDarkRow > .miniBtn,html[lang="hi"] body.darkMode .modernStudent:has(.feeStatusBlock) > .miniBtn{flex:none;white-space:nowrap;margin-top:22px;padding:6px 7px;font-size:10px;}
+
 /* Requested visual refinements. */
 body.darkMode #reportArea .reportStatusPresent{color:#86efac!important;}
 body.darkMode #reportArea .reportStatusSunday{color:#fbbf24!important;}
@@ -3448,7 +3458,7 @@ function feeItemStatusText(item, student){
     const monthEnd=item.record.type==='month' && item.record.monthKey ? feeDateObj(`${item.record.monthKey}-${String(new Date(Number(item.record.monthKey.slice(0,4)),Number(item.record.monthKey.slice(5,7)),0).getDate()).padStart(2,'0')}`) : null;
     const isAdvance=!!(monthEnd && monthEnd>feeDateObj(getLocalFeeToday()));
     const status=isAdvance?'Advance':'Fee Credited';
-    const second=`₹${amount}${item.record.date ? ` · ${formatFeeShortDate(item.record.date)}` : ''}${item.record.mode ? ` · ${typeof window.t==='function'?window.t(item.record.mode):item.record.mode}` : ''}`;
+    const second=`₹${amount}${item.record.date ? ` · ${formatFeeShortDate(item.record.date)}` : ''}${item.record.mode ? ` · ${item.record.mode}` : ''}`;
     const remaining=item.record.type==='month' ? getMonthlyFeeRemaining(student,item.record.monthKey,item.record) : Number(item.record.remainingAmount||0);
     const discount=Number(item.record.discount||0);
     return `<span class="feeStatusLine feeCredited">${item.label}</span><span class="feeStatusLine feeCredited">${status} · ₹${amount}</span><span class="feeStatusMeta">${second}</span>${item.record.type==='month' && discount>0?`<span class="feeStatusMeta">Discount - ₹${discount}</span>`:''}${remaining>0?`<span class="feeStatusLine feePending">Remaining - ₹${remaining}</span>`:''}`;
@@ -3483,7 +3493,8 @@ function renderFeesPage(){
       const totalPending=getStudentTotalPending(s);
       feeLines+=`<div class="feeStatusMeta" style="color:#b02a37;font-weight:800;margin-top:4px;">Total Pending - ₹${totalPending}</div>`;
     }
-    return `<div class="modernStudent" onclick="openFeeStatus(${index})" style="cursor:pointer;">
+    const hindiDarkFeeRow=document.body.classList.contains('darkMode') && window.getAppLanguage?.()==='hindi';
+    return `<div class="modernStudent${hindiDarkFeeRow?' feeHindiDarkRow':''}" onclick="openFeeStatus(${index})" style="cursor:pointer;">
       <div class="avatar" style="background:#fff4df;color:#e58b00;">${s.photo?`<img src="${s.photo}" alt="">`:'₹'}</div>
       <div class="studentMain"><b>${s.name}</b>${feeLines}</div>
       <button class="miniBtn" onclick="event.stopPropagation();openFee(${index})">Update</button>
@@ -3764,8 +3775,7 @@ function renderReports(){
         else if(a.status=="Sunday Manage ✅") color="green";
         else color="#ff8800";
 
-        const rawStatus = a.status.startsWith("EH|") ? a.status.split("|").slice(1).join("|") : a.status;
-        const displayStatus = a.status.startsWith("EH|") ? rawStatus : (typeof window.t === "function" ? window.t(rawStatus) : rawStatus);
+        const displayStatus = a.status.startsWith("EH|") ? a.status.split("|").slice(1).join("|") : a.status;
         const safeDate = a.date.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
 
         const statusClass = a.status==="Present" ? "reportStatusPresent" : (a.status==="Sunday" ? "reportStatusSunday" : (a.status==="Sunday Manage ✅" ? "reportStatusSundayManage" : ""));
@@ -3789,7 +3799,7 @@ function renderReports(){
     slidesHtml += `
     <div class="student reportSlide ${slideIndex===reportSlideIndex?'active':''}" data-report-slide="${slideIndex}">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
-        <h3 class="reportStudentName" style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;">${s.name}</h3>
+        <h3 class="reportStudentName" style="color:#0d6efd;font-weight:700;font-size:20px;margin:0;cursor:pointer;text-decoration:underline;" onclick="openStudentDetails(${index})">${s.name}</h3>
         <button class="feeBtn" onclick="downloadPDF(${index})" style="padding:7px 10px;min-width:0;white-space:nowrap;">Print Report</button>
       </div>
 
@@ -4053,8 +4063,7 @@ function renderFeeDetails(st){
     if(rec?.status==='credited'){
       hasCredited=true;
       const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
-      const rawMode=rec.mode || 'Mode not set';
-      const mode=typeof window.t==='function'?window.t(rawMode):rawMode;
+      const mode=rec.mode || 'Mode not set';
       const monthEnd=rec.type==='month'&&rec.monthKey?feeDateObj(`${rec.monthKey}-${String(new Date(Number(rec.monthKey.slice(0,4)),Number(rec.monthKey.slice(5,7)),0).getDate()).padStart(2,'0')}`):null;
       const advance=!!(monthEnd&&monthEnd>feeDateObj(today));
       const dueRemaining=rec.type==='month'?getMonthlyFeeRemaining(st,rec.monthKey,rec):Number(rec.remainingAmount||0);
@@ -4557,9 +4566,18 @@ function downloadPDF(index){
   const reportText=(value)=>typeof window.t==="function"?window.t(value):value;
   const reportMonth=reportText(monthNames[parseInt(selectedMonth)-1]);
 
+  const reportValue=(value)=>value!==undefined && value!==null && String(value).trim()!=='' ? escapeHtml(String(value)) : reportText("Not added");
+  const profileMonthlyFee=getKnownFeeAmount(s);
   let reportHtml = `
   <h1 style="color:#0d6efd;">${reportText("Tuition Report")}</h1>
-  <h2>${s.name}</h2>
+  <h2>${escapeHtml(s.name||'')}</h2>
+  <div style="line-height:1.65;margin:8px 0 12px;">
+    <div><b>${reportText("Present Class")}:</b> ${reportValue(s.presentClass)}</div>
+    <div><b>${reportText("Monthly Fee")}:</b> ${profileMonthlyFee ? `₹${profileMonthlyFee}` : reportText("Not added")}</div>
+    <div><b>${reportText("Parent/Guardian Name")}:</b> ${reportValue(s.parentName)}</div>
+    <div><b>${reportText("Parent/Guardian Mobile Number")}:</b> ${reportValue(s.parentMobile)}</div>
+    <div><b>${reportText("Address")}:</b> ${reportValue(s.address)}</div>
+  </div>
   <p><b>${reportText("Month")} :</b> ${reportMonth}, ${selectedYear}</p>
   <hr>`;
 
@@ -4581,7 +4599,7 @@ function downloadPDF(index){
       const amount=Number(rec?.amount || getKnownFeeAmount(s) || 0);
       if(rec?.status==='credited'){
         const paymentDate=rec.date ? formatFeeDate(rec.date) : '';
-        reportHtml += `<p><b>${item.label}</b><br><span style="color:green;font-weight:bold;">${reportText("Credited")}</span> ₹${amount} ${reportText("via")} ${rec.mode?(typeof window.t==='function'?window.t(rec.mode):rec.mode):reportText("Mode not set")} ${reportText("on")} ${paymentDate}</p>`;
+        reportHtml += `<p><b>${item.label}</b><br><span style="color:green;font-weight:bold;">${reportText("Credited")}</span> ₹${amount} ${reportText("via")} ${rec.mode||reportText("Mode not set")} ${reportText("on")} ${paymentDate}</p>`;
       }else{
         reportHtml += `<p><b>${item.label}</b><br><span style="color:#d97706;font-weight:bold;">${reportText("Pending")}</span>${amount ? ` · ₹${amount}` : ''}</p>`;
       }
@@ -4652,7 +4670,7 @@ function downloadPDF(index){
     ${reportHtml}
 
     <div class="card" style="text-align:center;">
-      <div style="font-weight:700;font-size:18px;">Tuition Manager</div>
+      <div style="font-weight:700;font-size:18px;">Tuition Attendance Manager</div>
     </div>
 
 </body></html>`);
@@ -5408,42 +5426,6 @@ Object.assign(APP_TRANSLATIONS.english, {
   'आपने नोट में बदलाव किए हैं। OK दबाने पर बदलाव सेव होंगे और Cancel दबाने पर रद्द होंगे।':'You have unsaved note changes. Press OK to save or Cancel to discard them.'
  });
 
-
-// Final language fixes: canonical stored values are translated only for display.
-Object.assign(APP_TRANSLATIONS.hindi, {
-  'Leave':'विद्यार्थी छुट्टी लिया', '= Leave':'= विद्यार्थी छुट्टी लिया',
-  'Student Leave':'विद्यार्थी छुट्टी लिया',
-  'Sunday Manage':'रविवार (पिछला अनुपस्थिति मैनेज)',
-  'Sunday Manage ✅':'रविवार (पिछला अनुपस्थिति मैनेज) ✅',
-  '= Sunday Manage':'= रविवार (पिछला अनुपस्थिति मैनेज)',
-  'Cash':'नकद','Total Fee Pending -':'कुल बकाया ट्यूशन फीस -',
-  'Total Fee Pending':'कुल बकाया ट्यूशन फीस',
-  'Fee Credited':'ट्यूशन फीस प्राप्त हो गई',
-  'Active':'सक्रिय','Inactive':'निष्क्रिय',
-  'View Profile':'प्रोफाइल देखें'
-});
-Object.assign(APP_TRANSLATIONS.hinglish, {
-  'Leave':'Student Chhutti Liya', '= Leave':'= Student Chhutti Liya',
-  'Student Leave':'Student Chhutti Liya',
-  'Sunday Manage':'Ravivar (pichhli anupasthiti manage)',
-  'Sunday Manage ✅':'Ravivar (pichhli anupasthiti manage) ✅',
-  '= Sunday Manage':'= Ravivar (pichhli anupasthiti manage)',
-  'Cash':'Nagad','Total Fee Pending -':'Kul bakaya tuition fees -',
-  'Total Fee Pending':'Kul bakaya tuition fees',
-  'Fee Credited':'Tuition fees mil gayi',
-  'Active':'Active','Inactive':'Inactive',
-  'View Profile':'Profile dekhein'
-});
-Object.assign(APP_TRANSLATIONS.english, {
-  'Leave':'Student Leave', '= Leave':'= Student Leave',
-  'Sunday Manage':'Sunday (Previous absent manage)',
-  'Sunday Manage ✅':'Sunday (Previous absent manage) ✅',
-  '= Sunday Manage':'= Sunday (Previous absent manage)',
-  'Cash':'Cash','Total Fee Pending -':'Total Fee Pending -',
-  'Total Fee Pending':'Total Fee Pending',
-  'Fee Credited':'Fee Credited'
-});
-
 (function(){
   const originalTextNodes=new WeakMap();
   const originalAttributes=new WeakMap();
@@ -5521,10 +5503,6 @@ Object.assign(APP_TRANSLATIONS.english, {
     [/^(.+) section abhi is version mein available nahi hai\.\s*Iska feature alag se add kiya jayega\.$/i,(_,feature)=>`${feature} section is not available in this version yet. It will be added separately.`],
     [/^आपने Note में बदलाव किया है। OK दबाने पर बदलाव रद्द होंगे, Cancel दबाने पर Note खुला रहेगा।$/i,()=>'You have made changes to the note. Press OK to discard them; Cancel to keep the note open.']
   );
-
-  PATTERNS.hindi.push([/^Total Fee Pending\s*-\s*(.+)$/i,(_,amount)=>`कुल बकाया ट्यूशन फीस - ${amount}`]);
-  PATTERNS.hinglish.push([/^Total Fee Pending\s*-\s*(.+)$/i,(_,amount)=>`Kul bakaya tuition fees - ${amount}`]);
-  PATTERNS.english.push([/^कुल बकाया ट्यूशन फीस\s*-\s*(.+)$/i,(_,amount)=>`Total Fee Pending - ${amount}`]);
 
   function translatePhrase(value){
     const monthYearNames = {
