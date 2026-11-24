@@ -1,7 +1,7 @@
 <!DOCTYPE html>  <html lang="en">  
 <head>  
 <meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">  
 <title>Tuition Attendance Manager</title> <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0d6efd">
   <script src="https://accounts.google.com/gsi/client" async defer></script><style>  
@@ -10,6 +10,16 @@
 
 
 
+
+/* Keep the app at the device's native scale; allow normal page scrolling but block pinch/double-tap zoom. */
+html, body{
+  width:100%;
+  min-width:0;
+  touch-action:pan-x pan-y;
+}
+body{
+  overflow-x:hidden;
+}
 
 *{  
 margin:0;  
