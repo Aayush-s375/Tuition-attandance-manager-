@@ -948,6 +948,48 @@ body.darkMode .studentViewProfileText{color:#8fc4ff}
 .studentViewProfileText:active{text-decoration:underline}
 </style>
 
+
+<style id="householdManagementStyles">
+.householdFeatureCard{background:linear-gradient(135deg,#e9efff,#f5edff);color:#283b83;border:1px solid #d9defb}
+.householdFeatureCard .featureIcon{font-size:27px}
+.householdToolbar{display:flex;gap:10px;flex-wrap:wrap;padding:13px;margin-bottom:12px}
+.householdToolbar input{flex:1 1 220px;min-width:0;padding:12px;border:1px solid #d6dbea;border-radius:10px;font-size:14px;background:#fff;color:#202638}
+.householdListArea{padding:10px}
+.householdCard{padding:13px;border:1px solid #e1e5ef;border-radius:13px;margin:7px 0;background:#fff;color:#202638}
+.householdCardHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.householdCardName{font-weight:850;font-size:16px;overflow-wrap:anywhere}
+.householdMeta{font-size:12px;color:#697386;line-height:1.55;margin-top:5px;overflow-wrap:anywhere}
+.householdCardActions,.householdActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.householdBtn{border:0;border-radius:9px;padding:9px 11px;font-weight:750;background:#3947a7;color:white;cursor:pointer}
+.householdBtn.secondary{background:#edf0fa;color:#344054}
+.householdBtn.danger{background:#fff0f0;color:#b42318}
+.householdPanel{padding:14px;margin:0 0 12px}
+.householdGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.householdField{min-width:0;display:flex;flex-direction:column;gap:5px}
+.householdField.full{grid-column:1/-1}
+.householdField label{font-size:12px;font-weight:750;color:#596579}
+.householdField input,.householdField textarea,.householdField select{width:100%;box-sizing:border-box;padding:10px;border:1px solid #d5dbea;border-radius:9px;background:#fff;color:#202638;font:inherit}
+.householdField textarea{min-height:76px;resize:vertical}
+.householdStudentRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #e8ebf2}
+.householdStudentRow:last-child{border-bottom:0}
+.householdEmpty{text-align:center;padding:24px 10px;color:#788195}
+.householdSummary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0}
+.householdStat{padding:11px;border-radius:11px;background:#f0f3ff;color:#283b83}
+.householdStat b{display:block;font-size:18px;margin-top:3px}
+.householdCheckList{max-height:300px;overflow:auto;border:1px solid #e1e5ef;border-radius:10px;padding:8px}
+.householdCheckRow{display:flex;align-items:center;gap:9px;padding:8px 4px;border-bottom:1px solid #edf0f5;font-size:14px}
+.householdCheckRow:last-child{border-bottom:0}
+body.darkMode .householdFeatureCard{background:linear-gradient(135deg,#252f50,#342b50);color:#eef1ff;border-color:#465477}
+body.darkMode .householdCard,body.darkMode .householdToolbar,body.darkMode .householdPanel{background:#1c2330;color:#f0f3ff;border-color:#37445b}
+body.darkMode .householdToolbar input,body.darkMode .householdField input,body.darkMode .householdField textarea,body.darkMode .householdField select{background:#252d3b;color:#f4f6ff;border-color:#4a5872}
+body.darkMode .householdMeta,body.darkMode .householdField label{color:#b8c3d9}
+body.darkMode .householdStudentRow,body.darkMode .householdCheckRow{border-color:#37445b}
+body.darkMode .householdStat{background:#293653;color:#e4eaff}
+body.darkMode .householdBtn.secondary{background:#303b55;color:#f0f3ff}
+body.darkMode .householdCheckList{border-color:#46536a}
+@media(max-width:480px){.householdGrid{grid-template-columns:1fr}.householdSummary{grid-template-columns:repeat(2,minmax(0,1fr))}.householdToolbar .thoughtBtn{width:100%}}
+</style>
+
 </head>  
   <body>
 
@@ -1145,6 +1187,10 @@ Reset PIN
               </div>
             </div>
             <div id="menuMainList">
+              <div class="modernMenuItem" onclick="openHouseholdManagementFromMenu(event)">
+                <span class="modernMenuIcon">🏠</span>
+                <span class="modernMenuLabel">Household Management</span>
+              </div>
               <div class="modernMenuItem" onclick="showMenuNotice('Homework')">
                 <span class="modernMenuIcon">📚</span>
                 <span class="modernMenuLabel">Homework</span>
@@ -1207,6 +1253,9 @@ Reset PIN
         </button>
         <button class="featureCard cardReports" onclick="showSection('reportsSection','reportsNav')">
           <span class="featureIcon">📊</span><h3>Reports</h3><p>View monthly reports</p>
+        </button>
+        <button class="featureCard householdFeatureCard" onclick="openHouseholdManagement()">
+          <span class="featureIcon">🏠</span><h3>Household Management</h3><p>Manage families and linked students</p>
         </button>
       </div>
       <div id="attendanceReminder" class="attendanceReminder" role="status"></div>
@@ -1336,6 +1385,19 @@ Reset PIN
           <button type="button" class="aboutMottoEditBtn" onclick="editTeachingMottoText()" aria-label="Edit display text" title="Edit text"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button>
         </div>
       </div>
+    </section>
+
+    <section id="householdSection" class="section">
+      <div class="pageHead"><div><h2>🏠 Household Management</h2><p>Manage families, guardians and linked students</p></div><button class="backHomeBtn" onclick="navigateBackSection()">← Back</button></div>
+      <div id="householdListView">
+        <div class="modernPanel householdToolbar">
+          <input id="householdSearchInput" type="search" placeholder="Search household, student, guardian, mobile, class or address…" oninput="renderHouseholds()" autocomplete="off">
+          <button type="button" class="thoughtBtn" onclick="startAddHousehold()">＋ Add Household</button>
+        </div>
+        <div id="householdListArea" class="modernPanel householdListArea"></div>
+      </div>
+      <div id="householdDetailView" style="display:none;"></div>
+      <div id="householdFormView" style="display:none;"></div>
     </section>
 
     <section id="studentsSection" class="section">
@@ -3213,6 +3275,164 @@ function toggleLock(){
   }
 }
 
+// ===== Household Management UI and relationships =====
+let activeHouseholdId = null;
+let householdFormMode = "add";
+
+function openHouseholdManagement(){
+  activeHouseholdId=null;
+  const menu=document.getElementById("menuPopup");
+  if(menu)menu.style.display="none";
+  showSection("householdSection","homeNav");
+  renderHouseholds();
+}
+function openHouseholdManagementFromMenu(event){
+  if(event)event.stopPropagation();
+  menuNavigationInProgress=true;
+  const menu=document.getElementById("menuPopup");
+  if(menu)closeMenuDrawer();
+  overlayHistoryStack=overlayHistoryStack.filter(id=>id!=="menuPopup");
+  openHouseholdManagement();
+  setTimeout(()=>{menuNavigationInProgress=false;},300);
+}
+function householdStudents(h){
+  const ids=new Set((Array.isArray(h?.studentIds)?h.studentIds:[]).map(String));
+  return students.filter(st=>ids.has(String(st.studentId)) || String(st.householdId||"")===String(h?.householdId||""));
+}
+function householdMonthlyTotal(h){
+  if(h?.feeMode==="household")return Math.max(0,Number(h.householdFee)||0);
+  return householdStudents(h).reduce((sum,st)=>sum+(typeof getKnownFeeAmount==="function"?Number(getKnownFeeAmount(st))||0:Number(st.monthlyFee)||0),0);
+}
+function rebuildHouseholdStudentIds(){
+  const byId=new Map(households.filter(h=>h&&h.householdId).map(h=>[String(h.householdId),h]));
+  households.forEach(h=>h.studentIds=[]);
+  students.forEach(st=>{
+    const h=byId.get(String(st.householdId||""));
+    if(h)h.studentIds.push(String(st.studentId));
+  });
+}
+function householdEsc(value){return escapeHtml(String(value??""));}
+function renderHouseholds(){
+  const area=document.getElementById("householdListArea");
+  if(!area)return;
+  const query=(document.getElementById("householdSearchInput")?.value||"").trim().toLowerCase();
+  const list=households.filter(h=>{
+    const linked=householdStudents(h);
+    const hay=[h.householdName,h.guardianName,h.primaryMobile,h.alternateMobile,h.address,...linked.flatMap(st=>[st.name,st.className,st.class,st.section,st.presentClass,st.schoolClass])].join(" ").toLowerCase();
+    return !query||hay.includes(query);
+  });
+  if(!list.length){area.innerHTML='<div class="householdEmpty">'+(query?'No matching household found.':'No households found.')+'<br><br><button class="householdBtn" onclick="startAddHousehold()">＋ Add Household</button></div>';return;}
+  area.innerHTML=list.map(h=>{
+    const linked=householdStudents(h),fee=householdMonthlyTotal(h);
+    return `<div class="householdCard"><div class="householdCardHead"><div><div class="householdCardName">${householdEsc(h.householdName||'Unnamed Household')}</div><div class="householdMeta">Guardian: ${householdEsc(h.guardianName||'Not added')}<br>Mobile: ${householdEsc(h.primaryMobile||'Not added')}<br>${linked.length} student(s) · Monthly fee: ₹${fee.toLocaleString('en-IN')}</div></div><span title="${h.provisional?'Provisional household':'Household'}">${h.provisional?'📄':'🏠'}</span></div><div class="householdCardActions"><button class="householdBtn" onclick="openHouseholdDetails('${householdEsc(h.householdId)}')">View Household</button><button class="householdBtn secondary" onclick="editHousehold('${householdEsc(h.householdId)}')">Edit</button></div></div>`;
+  }).join("");
+}
+function startAddHousehold(){
+  activeHouseholdId=null;
+  householdFormMode="add";
+  renderHouseholdForm({householdName:"",guardianName:"",primaryMobile:"",alternateMobile:"",address:"",feeMode:"student",householdFee:""});
+}
+function editHousehold(id){
+  const h=households.find(x=>String(x.householdId)===String(id));
+  if(!h)return;
+  activeHouseholdId=String(id);
+  householdFormMode="edit";
+  renderHouseholdForm(h);
+}
+function renderHouseholdForm(h){
+  document.getElementById("householdListView").style.display="none";
+  document.getElementById("householdDetailView").style.display="none";
+  const box=document.getElementById("householdFormView");box.style.display="block";
+  box.innerHTML=`<div class="pageHead"><div><h2>${householdFormMode==='add'?'Add Household':'Edit Household'}</h2><p>Family and guardian information</p></div><button class="backHomeBtn" onclick="backToHouseholdList()">← Back</button></div>
+  <div class="modernPanel householdPanel"><form onsubmit="saveHouseholdForm(event)"><div class="householdGrid">
+  <div class="householdField full"><label for="hhName">Family / Household Name *</label><input id="hhName" required maxlength="100" value="${householdEsc(h.householdName)}" placeholder="e.g. Sharma Family"></div>
+  <div class="householdField"><label for="hhGuardian">Parent / Guardian Name</label><input id="hhGuardian" maxlength="100" value="${householdEsc(h.guardianName)}"></div>
+  <div class="householdField"><label for="hhMobile">Primary Mobile</label><input id="hhMobile" type="tel" maxlength="20" value="${householdEsc(h.primaryMobile)}"></div>
+  <div class="householdField"><label for="hhAltMobile">Alternate Mobile</label><input id="hhAltMobile" type="tel" maxlength="20" value="${householdEsc(h.alternateMobile)}"></div>
+  <div class="householdField full"><label for="hhAddress">Complete Address (Area / City / PIN)</label><textarea id="hhAddress" maxlength="500">${householdEsc(h.address)}</textarea></div>
+  <div class="householdField"><label for="hhFeeMode">Fee Method</label><select id="hhFeeMode" onchange="toggleHouseholdFeeField()"><option value="student" ${h.feeMode!=='household'?'selected':''}>Student-wise fee</option><option value="household" ${h.feeMode==='household'?'selected':''}>Direct Household Fee</option></select></div>
+  <div class="householdField" id="hhFeeField" style="display:${h.feeMode==='household'?'flex':'none'}"><label for="hhFee">Combined Monthly Household Fee (₹)</label><input id="hhFee" type="number" min="0" step="1" value="${householdEsc(h.householdFee??'')}" placeholder="Enter combined fee"></div>
+  </div><div class="householdActions"><button class="householdBtn" type="submit">Save Household</button><button class="householdBtn secondary" type="button" onclick="backToHouseholdList()">Cancel</button></div></form></div>`;
+}
+function toggleHouseholdFeeField(){const mode=document.getElementById("hhFeeMode")?.value;const field=document.getElementById("hhFeeField");if(field)field.style.display=mode==="household"?"flex":"none";}
+function saveHouseholdForm(event){
+  event.preventDefault();
+  const name=document.getElementById("hhName").value.trim();
+  if(!name){alert("Please enter a household name.");return;}
+  const now=Date.now(),mode=document.getElementById("hhFeeMode").value;
+  const data={householdName:name,guardianName:document.getElementById("hhGuardian").value.trim(),primaryMobile:document.getElementById("hhMobile").value.trim(),alternateMobile:document.getElementById("hhAltMobile").value.trim(),address:document.getElementById("hhAddress").value.trim(),feeMode:mode,householdFee:mode==="household"?Math.max(0,Number(document.getElementById("hhFee").value)||0):null,updatedAt:now};
+  if(householdFormMode==="add")households.unshift({...data,householdId:createStableRecordId("HH"),studentIds:[],status:"active",provisional:false,createdAt:now});
+  else{const h=households.find(x=>String(x.householdId)===String(activeHouseholdId));if(!h)return;Object.assign(h,data,{provisional:false});}
+  saveLocalData(true);backToHouseholdList();
+}
+function backToHouseholdList(){
+  document.getElementById("householdListView").style.display="block";
+  document.getElementById("householdDetailView").style.display="none";
+  document.getElementById("householdFormView").style.display="none";
+  activeHouseholdId=null;renderHouseholds();
+}
+function openHouseholdDetails(id){
+  const h=households.find(x=>String(x.householdId)===String(id));if(!h)return;
+  activeHouseholdId=String(id);
+  document.getElementById("householdListView").style.display="none";
+  document.getElementById("householdFormView").style.display="none";
+  const box=document.getElementById("householdDetailView");box.style.display="block";
+  const linked=householdStudents(h),fee=householdMonthlyTotal(h);
+  const feeLabel=h.feeMode==="household"?'Direct household fee':'Student-wise total';
+  box.innerHTML=`<div class="pageHead"><div><h2>${householdEsc(h.householdName)}</h2><p>Household details</p></div><button class="backHomeBtn" onclick="backToHouseholdList()">← Back</button></div>
+  <div class="modernPanel householdPanel"><div class="householdSummary"><div class="householdStat">Linked Students<b>${linked.length}</b></div><div class="householdStat">Monthly Fee<b>₹${fee.toLocaleString('en-IN')}</b></div></div>
+  <div class="householdMeta" style="font-size:14px;color:inherit;line-height:1.8"><b>Guardian:</b> ${householdEsc(h.guardianName||'Not added')}<br><b>Primary Mobile:</b> ${householdEsc(h.primaryMobile||'Not added')}<br><b>Alternate Mobile:</b> ${householdEsc(h.alternateMobile||'Not added')}<br><b>Address:</b> ${householdEsc(h.address||'Not added')}<br><b>Fee Method:</b> ${feeLabel}</div>
+  ${h.feeMode==='household'?`<div class="householdActions"><button class="householdBtn" onclick="recordHouseholdFee('${householdEsc(h.householdId)}')">＋ Record Household Payment</button></div><div class="householdMeta" style="margin-top:10px"><b>Household payment records</b><br>${(Array.isArray(h.feeRecords)?h.feeRecords:[]).length?(h.feeRecords.slice().sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0)).map(r=>`₹${(Number(r.amount)||0).toLocaleString('en-IN')} · ${householdEsc(r.date||'Date not set')} · ${householdEsc(r.paymentMode||'')}`).join('<br>')):'No household payments recorded yet.'}</div>`:''}
+  <div class="householdActions"><button class="householdBtn" onclick="editHousehold('${householdEsc(h.householdId)}')">Edit Household</button><button class="householdBtn secondary" onclick="addStudentToHousehold('${householdEsc(h.householdId)}')">＋ Add Student</button><button class="householdBtn secondary" onclick="manageHouseholdStudents('${householdEsc(h.householdId)}')">Link / Manage Students</button></div></div>
+  <div class="modernPanel householdPanel"><h3 style="margin:0 0 8px">Linked Students</h3>${linked.length?linked.map(st=>`<div class="householdStudentRow"><div><b>${householdEsc(st.name||'Unnamed Student')}</b><div class="householdMeta">${householdEsc(st.presentClass||st.className||st.class||'Class not added')} · Monthly fee ₹${(Number(typeof getKnownFeeAmount==='function'?getKnownFeeAmount(st):st.monthlyFee)||0).toLocaleString('en-IN')}</div></div><button class="householdBtn danger" onclick="unlinkStudentFromHousehold('${householdEsc(h.householdId)}','${householdEsc(st.studentId)}')">Unlink</button></div>`).join(''):'<div class="householdEmpty">No students linked yet.</div>'}</div>`;
+}
+function recordHouseholdFee(id){
+  const h=households.find(x=>String(x.householdId)===String(id));if(!h||h.feeMode!=="household")return;
+  const amountText=prompt("Household payment amount (₹)");if(amountText===null)return;
+  const amount=Number(amountText);if(!Number.isFinite(amount)||amount<=0){alert("Enter a valid payment amount.");return;}
+  const date=prompt("Payment date (YYYY-MM-DD)",new Date().toISOString().slice(0,10));if(date===null)return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){alert("Enter the date in YYYY-MM-DD format.");return;}
+  const paymentMode=prompt("Payment method (Cash / UPI / Other)","Cash")||"Cash";
+  if(!Array.isArray(h.feeRecords))h.feeRecords=[];
+  h.feeRecords.unshift({recordId:createStableRecordId("HFP"),amount,date,paymentMode:paymentMode.trim(),createdAt:Date.now()});
+  h.updatedAt=Date.now();saveLocalData(true);openHouseholdDetails(id);
+}
+function addStudentToHousehold(id){
+  const h=households.find(x=>String(x.householdId)===String(id));if(!h)return;
+  const name=prompt("Student Name");if(!name||!name.trim())return;
+  const className=prompt("Class / Section (optional)")||"";
+  const st={studentId:createStableRecordId("ST"),name:name.trim(),className:className.trim(),fees:[],attendance:[],active:true,monthlyFee:0,feeCycle:"month",joiningDate:new Date().toISOString().slice(0,10),savedFeeInterval:null,householdId:String(h.householdId)};
+  students.push(st);rebuildHouseholdStudentIds();saveLocalData(true);openHouseholdDetails(id);
+}
+function manageHouseholdStudents(id){
+  const h=households.find(x=>String(x.householdId)===String(id));if(!h)return;
+  const linked=new Set(householdStudents(h).map(st=>String(st.studentId)));
+  const available=students.filter(st=>st.active!==false);
+  const box=document.getElementById("householdDetailView");
+  const existing=box.querySelector("#householdManageStudents");if(existing){existing.remove();return;}
+  const panel=document.createElement("div");panel.id="householdManageStudents";panel.className="modernPanel householdPanel";
+  panel.innerHTML=`<h3 style="margin-top:0">Link / Manage Students</h3><p class="householdMeta">Select the students who should belong to this household. Unselected students will be moved to their own provisional household; their records remain unchanged.</p><div class="householdCheckList">${available.length?available.map(st=>`<label class="householdCheckRow"><input type="checkbox" value="${householdEsc(st.studentId)}" ${linked.has(String(st.studentId))?'checked':''}><span>${householdEsc(st.name||'Unnamed Student')} · ${householdEsc(st.presentClass||st.className||st.class||'Class not added')}</span></label>`).join(''):'No active students available.'}</div><div class="householdActions"><button class="householdBtn" onclick="saveHouseholdStudentLinks('${householdEsc(h.householdId)}')">Save Student Links</button><button class="householdBtn secondary" onclick="document.getElementById('householdManageStudents').remove()">Cancel</button></div>`;
+  box.appendChild(panel);
+}
+function saveHouseholdStudentLinks(id){
+  const h=households.find(x=>String(x.householdId)===String(id));if(!h)return;
+  const panel=document.getElementById("householdManageStudents");if(!panel)return;
+  const chosen=new Set(Array.from(panel.querySelectorAll('input[type="checkbox"]:checked')).map(x=>String(x.value)));
+  students.forEach(st=>{
+    if(chosen.has(String(st.studentId)))st.householdId=String(h.householdId);
+    else if(String(st.householdId||"")===String(h.householdId)){
+      const own=buildProvisionalHousehold(st);own.provisional=true;households.push(own);st.householdId=own.householdId;
+    }
+  });
+  rebuildHouseholdStudentIds();saveLocalData(true);openHouseholdDetails(id);
+}
+function unlinkStudentFromHousehold(householdId,studentId){
+  const st=students.find(x=>String(x.studentId)===String(studentId));if(!st)return;
+  if(!confirm("Unlink this student? Student profile, fee history and attendance will remain unchanged."))return;
+  const own=buildProvisionalHousehold(st);own.provisional=true;households.push(own);st.householdId=own.householdId;
+  rebuildHouseholdStudentIds();saveLocalData(true);openHouseholdDetails(householdId);
+}
+
 function addStudent(){
   const name = prompt("Student Name");
   if(!name) return;
@@ -3263,6 +3483,7 @@ function sectionNavId(sectionId){
   const map={
     homeSection:'homeNav',
     studentsSection:'studentsNav',
+    householdSection:'homeNav',
     studentProfileSection:'studentsNav',
     attendanceSection:'attendanceNav',
     feesSection:'feesNav',
@@ -3321,6 +3542,7 @@ function showSection(sectionId, navId, fromHistory){
   if(nav) nav.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(sectionId==='studentsSection') renderStudentsPage();
+  if(sectionId==='householdSection') renderHouseholds();
   if(sectionId==='feesSection') renderFeesPage();
   if(sectionId==='feeDetailsSection' && students[currentStudent]) renderFeeDetails(students[currentStudent]);
   if(sectionId==='aboutAppSection') renderTeachingMottoSetting();
